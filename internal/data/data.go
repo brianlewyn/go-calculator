@@ -13,6 +13,14 @@ const (
 	Float64
 )
 
+// Tnn is the limit of digits of a data type
+const (
+	T64 int8 = 18
+	T32 int8 = 10
+	T16 int8 = 5
+	T08 int8 = 3
+)
+
 // Numbers
 const Numbers string = "0123456789"
 
