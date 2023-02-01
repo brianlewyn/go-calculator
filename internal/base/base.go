@@ -12,7 +12,7 @@ type List struct {
 
 // Result
 type Result struct {
-	Kind    data.Type
+	Kind    data.Kind
 	Int08   int8
 	Int16   int16
 	Int32   int32
