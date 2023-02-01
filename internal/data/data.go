@@ -21,35 +21,35 @@ const (
 	T08 int8 = 3
 )
 
-// Numbers
-const Numbers string = "0123456789"
-
 // Opetator
 const (
-	Mul       string = "*"
-	Add       string = "+"
-	Sub       string = "-"
-	Div       string = "/"
-	Mod       string = "%"
-	Opetators string = Mul + Add + Sub + Div + Mod
+	Mul rune = '*'
+	Add rune = '+'
+	Sub rune = '-'
+	Div rune = '/'
+	Mod rune = '%'
 )
 
 // Parentheses
 const (
-	Left        string = "("
-	Right       string = ")"
-	Parentheses string = Left + Right
+	Left  rune = '('
+	Right rune = ')'
 )
 
 // Special character
 const (
-	Dot      string = "."
-	Pow      string = "^"
-	Gap      string = " "
-	Pi       string = "π"
-	Root     string = "√"
-	Specials string = Dot + Pow + Gap + Pi + Root
+	Dot  rune = '.'
+	Pow  rune = '^'
+	Gap  rune = ' '
+	Pi   rune = 'π'
+	Root rune = '√'
 )
 
 // Runes are all characters used
-const Runes string = Numbers + Opetators + Parentheses + Specials
+var Runes = [22]rune{
+	Gap, Mod, Left, Right, // 4
+	'0', '1', '2', '3', '4', // 5
+	'5', '6', '7', '8', '9', // 5
+	Mul, Add, Sub, Dot, Div, // 5
+	Pow, Pi, Root, //3
+}
