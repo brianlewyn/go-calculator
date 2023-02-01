@@ -1,6 +1,6 @@
 package data
 
-type Kind int8
+type Kind uint8
 
 // Kind is the data type of the result
 const (
@@ -13,12 +13,14 @@ const (
 	Float64
 )
 
-// Tnn is the limit of digits of a data type
+// It is the limit of digits of a data type
 const (
-	T64 int8 = 18
-	T32 int8 = 10
-	T16 int8 = 5
-	T08 int8 = 3
+	F64 uint16 = 309
+	F32 uint8  = 39
+	I64 uint8  = 18
+	I32 uint8  = 10
+	I16 uint8  = 5
+	I08 uint8  = 3
 )
 
 // Opetator
