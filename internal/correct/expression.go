@@ -1,22 +1,22 @@
 package correct
 
-func (b base) inconsistentNumbers() {}
+func (a analyse) inconsistentNumbers() {}
 
-func (b base) inconsistentOperators() {}
+func (a analyse) inconsistentOperators() {}
 
-func (b base) inconsistentParentheses() {}
+func (a analyse) inconsistentParentheses() {}
 
-func (b base) inconsistentBlankSpakces() {}
+func (a analyse) inconsistentBlankSpakces() {}
 
-func (b base) inconsistentDecimalPoints() {}
+func (a analyse) inconsistentDecimalPoints() {}
 
-func (b base) isCorrectMathExpr() error {
+func (a *analyse) IsCorrectMathExpr() bool {
 
-	b.inconsistentNumbers()
-	b.inconsistentOperators()
-	b.inconsistentParentheses()
-	b.inconsistentBlankSpakces()
-	b.inconsistentDecimalPoints()
+	a.inconsistentNumbers()
+	a.inconsistentOperators()
+	a.inconsistentParentheses()
+	a.inconsistentBlankSpakces()
+	a.inconsistentDecimalPoints()
 
-	return nil
+	return false
 }

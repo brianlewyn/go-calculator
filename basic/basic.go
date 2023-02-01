@@ -32,11 +32,14 @@ func (e *MathExpr) answer() float64 { return 0 }
 func (e *MathExpr) process() {}
 
 func (e *MathExpr) Calculate() (float64, error) {
+	analyse := correct.NewAnalyser(&e.Expr)
 
-	err := correct.IsCorrect(&e.Expr)
-	if err != nil {
-		return 0, err
+	if analyse.IsCorrectSyntax() {
+		return 0, analyse.Error()
 	}
 
+	if analyse.IsCorrectMathExpr() {
+		return 0, analyse.Error()
+	}
 	return e.answer(), nil
 }

@@ -13,6 +13,7 @@ const (
 	Float64
 )
 
+// Numbers
 const Numbers string = "0123456789"
 
 // Opetator

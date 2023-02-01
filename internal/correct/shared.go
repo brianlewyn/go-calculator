@@ -1,19 +1,14 @@
 package correct
 
-type base struct {
-	mathExpr *string
+type analyse struct {
+	expr *string
+	err  error
 }
 
-func IsCorrect(mathExpr *string) error {
-	expr := base{mathExpr: mathExpr}
+func NewAnalyser(expr *string) *analyse {
+	return &analyse{expr: expr, err: nil}
+}
 
-	if err := expr.isCorrectSyntax(); err != nil {
-		return err
-	}
-
-	if err := expr.isCorrectMathExpr(); err != nil {
-		return err
-	}
-
-	return nil
+func (a analyse) Error() error {
+	return a.err
 }
