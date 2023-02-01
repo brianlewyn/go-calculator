@@ -38,9 +38,9 @@ const (
 
 // Special character
 const (
+	Gap  rune = ' '
 	Dot  rune = '.'
 	Pow  rune = '^'
-	Gap  rune = ' '
 	Pi   rune = 'π'
 	Root rune = '√'
 )
