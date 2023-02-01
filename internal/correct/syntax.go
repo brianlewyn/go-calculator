@@ -6,11 +6,14 @@ import (
 )
 
 func symbols(r *rune) bool {
-	for _, s := range data.Runes {
-		if *r == s {
-			return true
-		}
+	if data.Numbers(r) {
+		return true
 	}
+
+	if data.Runes(r) {
+		return true
+	}
+
 	return false
 }
 

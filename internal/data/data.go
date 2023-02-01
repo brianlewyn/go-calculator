@@ -45,11 +45,20 @@ const (
 	Root rune = '√'
 )
 
-// Runes are all characters used
-var Runes = [22]rune{
-	Gap, Mod, Left, Right, // 4
-	'0', '1', '2', '3', '4', // 5
-	'5', '6', '7', '8', '9', // 5
-	Mul, Add, Sub, Dot, Div, // 5
-	Pow, Pi, Root, //3
+// Numbers are numbers from 0 to 9
+func Numbers(r *rune) bool {
+	return '0' <= *r && *r <= '9'
+}
+
+// Runes are all characters of a math expression
+func Runes(r *rune) bool {
+	for _, s := range [12]rune{
+		Gap, Mod, Left, Right, Mul, Add,
+		Sub, Dot, Div, Pow, Pi, Root,
+	} {
+		if *r == s {
+			return true
+		}
+	}
+	return false
 }
