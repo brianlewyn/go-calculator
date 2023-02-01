@@ -1,8 +1,7 @@
 package correct
 
 import (
-	"errors"
-
+	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
 )
 
@@ -18,7 +17,7 @@ func symbols(r *rune) bool {
 func (a *analyse) IsCorrectSyntax() bool {
 	for _, r := range *a.expr {
 		if !symbols(&r) {
-			a.err = errors.New("error")
+			a.err = ierr.Syntax{S: &r}.Wrap()
 			return true
 		}
 	}
