@@ -1,14 +1,14 @@
 package basic
 
 import (
+	"github.com/brianlewyn/go-calculator/internal/base"
 	"github.com/brianlewyn/go-calculator/internal/correct"
-	"github.com/brianlewyn/go-calculator/internal/data"
 )
 
 type MathExpr struct {
 	Expr   string
-	list   data.List
-	result data.Result
+	list   base.List
+	result base.Result
 }
 
 func NewMathExpr(expr string) *MathExpr {

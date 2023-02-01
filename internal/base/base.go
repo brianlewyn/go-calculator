@@ -1,4 +1,4 @@
-package data
+package base
 
 // Type is the data type of the result
 type Type string
