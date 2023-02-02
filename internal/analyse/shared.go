@@ -1,11 +1,11 @@
-package correct
+package analyse
 
 type analyse struct {
 	expr *string
 	err  error
 }
 
-func NewAnalyser(expr *string) *analyse {
+func New(expr *string) *analyse {
 	return &analyse{expr: expr, err: nil}
 }
 

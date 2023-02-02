@@ -1,4 +1,4 @@
-package correct
+package analyse
 
 func (a analyse) inconsistentNumbers() {}
 

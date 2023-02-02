@@ -1,4 +1,4 @@
-package correct
+package analyse
 
 import (
 	"github.com/brianlewyn/go-calculator/ierr"
