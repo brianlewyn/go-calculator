@@ -18,5 +18,5 @@ func (a *analyse) IsCorrectMathExpr() bool {
 	a.inconsistentBlankSpakces()
 	a.inconsistentDecimalPoints()
 
-	return false
+	return true
 }

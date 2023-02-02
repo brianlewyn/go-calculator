@@ -5,7 +5,7 @@ import (
 	"github.com/brianlewyn/go-calculator/internal/data"
 )
 
-func symbols(r *rune) bool {
+func isSymbol(r *rune) bool {
 	if data.Numbers(r) {
 		return true
 	}
@@ -19,10 +19,10 @@ func symbols(r *rune) bool {
 
 func (a *analyse) IsCorrectSyntax() bool {
 	for _, r := range *a.expr {
-		if !symbols(&r) {
+		if !isSymbol(&r) {
 			a.err = ierr.Syntax{S: &r}.Wrap()
-			return true
+			return false
 		}
 	}
-	return false
+	return true
 }

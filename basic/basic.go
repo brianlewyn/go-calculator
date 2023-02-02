@@ -37,11 +37,11 @@ func (e *MathExpr) Calculate() (float64, error) {
 
 	analyser := analyse.New(&e.Expr)
 
-	if analyser.IsCorrectSyntax() {
+	if !analyser.IsCorrectSyntax() {
 		return 0, analyser.Error()
 	}
 
-	if analyser.IsCorrectMathExpr() {
+	if !analyser.IsCorrectMathExpr() {
 		return 0, analyser.Error()
 	}
 
