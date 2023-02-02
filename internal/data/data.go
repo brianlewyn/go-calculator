@@ -28,11 +28,11 @@ const (
 
 // Opetator
 const (
+	Mod rune = '%'
 	Mul rune = '*'
 	Add rune = '+'
 	Sub rune = '-'
 	Div rune = '/'
-	Mod rune = '%'
 )
 
 // Parentheses
@@ -57,8 +57,8 @@ func Numbers(r *rune) bool {
 
 // Runes are all characters of a math expression
 func Runes(r *rune) bool {
-	for _, s := range [12]rune{
-		Gap, Mod, Left, Right, Mul, Add,
+	for _, s := range [11]rune{
+		Mod, Left, Right, Mul, Add,
 		Sub, Dot, Div, Pow, Pi, Root,
 	} {
 		if *r == s {
