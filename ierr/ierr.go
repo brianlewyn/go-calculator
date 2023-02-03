@@ -18,12 +18,13 @@ const (
 
 type Syntax struct {
 	S *rune // Symbol or character
+	I *int  // index
 }
 
 // ! The data error
 
 func (e Syntax) Error() string {
-	return string(*e.S)
+	return fmt.Sprintf("char=%q index=%d", *e.S, *e.I)
 }
 
 // ! Add context to the data error
@@ -31,7 +32,7 @@ func (e Syntax) Error() string {
 func (e Syntax) Wrap() error {
 	return wrap(syntax, wrap(
 		kind("incorrect syntax"),
-		&Syntax{S: e.S}),
+		&Syntax{S: e.S, I: e.I}),
 	)
 }
 

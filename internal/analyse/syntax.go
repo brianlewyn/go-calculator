@@ -18,9 +18,9 @@ func isSymbol(r *rune) bool {
 }
 
 func (a *analyse) IsCorrectSyntax() bool {
-	for _, r := range *a.expr {
+	for i, r := range *a.expr {
 		if !isSymbol(&r) {
-			a.err = ierr.Syntax{S: &r}.Wrap()
+			a.err = ierr.Syntax{S: &r, I: &i}.Wrap()
 			return false
 		}
 	}
