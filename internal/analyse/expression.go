@@ -32,24 +32,28 @@ func (a *analyse) areCorrectNumbers() bool {
 	return true
 }
 
-func (a analyse) inconsistentOperators() {}
+func (a analyse) areCorrectOperators() bool { return true }
 
-func (a analyse) inconsistentParentheses() {}
+func (a analyse) areCorrectParentheses() bool { return true }
 
-func (a analyse) inconsistentBlankSpakces() {}
-
-func (a analyse) inconsistentDecimalPoints() {}
+func (a analyse) areCorrectDots() bool { return true }
 
 func (a *analyse) IsCorrectExpression() bool {
-
 	if !a.areCorrectNumbers() {
 		return false
 	}
 
-	a.inconsistentOperators()
-	a.inconsistentParentheses()
-	a.inconsistentBlankSpakces()
-	a.inconsistentDecimalPoints()
+	if !a.areCorrectOperators() {
+		return false
+	}
+
+	if !a.areCorrectParentheses() {
+		return false
+	}
+
+	if !a.areCorrectDots() {
+		return false
+	}
 
 	return true
 }
