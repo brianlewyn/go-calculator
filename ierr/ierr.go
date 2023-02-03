@@ -26,37 +26,31 @@ type Rune struct {
 
 // !The data error
 
-func (e Rune) Error() string {
-	return fmt.Sprintf("char=%q index=%d", *e.R, *e.I)
+func (s Rune) Error() string {
+	return fmt.Sprintf("%d", *s.I)
 }
 
 // !Add context to the data error
 
 func (r Rune) Character() error {
-	return wrap(Syntax,
-		wrap(IncorrectCharacter,
-			&Rune{R: r.R, I: r.I},
-		),
-	)
+	return wrapRune(Syntax, IncorrectCharacter, r.R, &Rune{I: r.I})
 }
 
 func (r Rune) Dot() error {
-	return wrap(Expression,
-		wrap(DuplicateDot,
-			&Rune{R: r.R, I: r.I},
-		),
-	)
+	return wrapRune(Expression, DuplicateDot, r.R, &Rune{I: r.I})
 }
 
 func (r Rune) Digit() error {
-	return wrap(Expression,
-		wrap(DigitLimit,
-			&Rune{R: r.R, I: r.I},
-		),
-	)
+	return wrapRune(Expression, DigitLimit, r.R, &Rune{I: r.I})
 }
 
-// Add a wrapper of type error to the already created error
+// wrap add a wrapper of type error to the already created error
 func wrap(kind kind, err error) error {
 	return fmt.Errorf("%s: %w", kind, err)
+}
+
+// wrapRune works mainly for the Rune interface.
+// Add three wrappers of type error to the already created error
+func wrapRune(k1, k2 kind, r *rune, err error) error {
+	return wrap(k1, wrap(k2, fmt.Errorf("char=%q index=%w", *r, err)))
 }
