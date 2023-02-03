@@ -7,13 +7,14 @@ type kind string
 // !What kind of bug?
 const (
 	Syntax     = kind("syntax error")
-	Expression = kind("math expression error")
+	Expression = kind("expression error")
 )
 
 // !What error occurred?
 const (
 	IncorrectCharacter = kind("incorrect character")
-	DuplicateDots      = kind("duplicate dots")
+	DuplicateDot       = kind("this dot is duplicated")
+	DigitLimit         = kind("this digit exceeds the digit limit")
 )
 
 // !Interface errors
@@ -39,9 +40,17 @@ func (r Rune) Character() error {
 	)
 }
 
-func (r Rune) Dots() error {
+func (r Rune) Dot() error {
 	return wrap(Expression,
-		wrap(DuplicateDots,
+		wrap(DuplicateDot,
+			&Rune{R: r.R, I: r.I},
+		),
+	)
+}
+
+func (r Rune) Digit() error {
+	return wrap(Expression,
+		wrap(DigitLimit,
 			&Rune{R: r.R, I: r.I},
 		),
 	)
