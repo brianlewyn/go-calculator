@@ -9,6 +9,6 @@ func New(expr *string) *analyse {
 	return &analyse{expr: expr, err: nil}
 }
 
-func (a analyse) Error() error {
-	return *a.err
+func (a analyse) Error() *error {
+	return a.err
 }
