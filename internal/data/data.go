@@ -13,8 +13,8 @@ const (
 	Float64
 )
 
-// LimitDigit is the limit of digits of a float64 and dot
-const LimitDigit uint16 = 617
+// DigitLimit is the limit of digits of a float64 and dot
+const DigitLimit uint16 = 617
 
 // It is the limit of digits of a data type
 const (
