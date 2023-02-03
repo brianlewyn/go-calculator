@@ -20,7 +20,7 @@ func isSymbol(r *rune) bool {
 func (a *analyse) IsCorrectSyntax() bool {
 	for i, r := range *a.expr {
 		if !isSymbol(&r) {
-			a.err = ierr.Rune{R: &r, I: &i}.Character()
+			*a.err = ierr.Rune{R: &r, I: &i}.Character()
 			return false
 		}
 	}
