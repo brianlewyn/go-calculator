@@ -29,8 +29,6 @@ func (c *Calculator) countSubExpr() int { return 0 }
 
 func (c *Calculator) solve() {}
 
-func (c Calculator) Answer() float64 { return 0 }
-
 func (c *Calculator) process() {}
 
 func (c *Calculator) Calculate() bool {
@@ -51,6 +49,6 @@ func (c *Calculator) Calculate() bool {
 	return true
 }
 
-func (e Calculator) Error() error {
-	return *e.err
-}
+func (c Calculator) Answer() float64 { return 0 }
+
+func (e Calculator) Error() error { return *e.err }
