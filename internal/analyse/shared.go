@@ -2,7 +2,7 @@ package analyse
 
 type analyse struct {
 	expr *string
-	err  error
+	err  *error
 }
 
 func New(expr *string) *analyse {
@@ -10,5 +10,5 @@ func New(expr *string) *analyse {
 }
 
 func (a analyse) Error() error {
-	return a.err
+	return *a.err
 }
