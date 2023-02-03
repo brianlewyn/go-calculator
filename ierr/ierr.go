@@ -1,38 +1,49 @@
 package ierr
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type kind string
 
-// ! What kind of bug?
+// !What kind of bug?
 const (
-	syntax = kind("syntax error")
-	// math   = kind("math error")
+	Syntax     = kind("syntax error")
+	Expression = kind("math expression error")
 )
 
-// ! What error occurred?
+// !What error occurred?
+const (
+	IncorrectCharacter = kind("incorrect character")
+	DuplicateDots      = kind("duplicate dots")
+)
 
-// var IncorrectSyntax = wrap(syntax, errors.New("empty list"))
+// !Interface errors
 
-type Syntax struct {
-	S *rune // Symbol or character
+type Rune struct {
+	R *rune // character
 	I *int  // index
 }
 
-// ! The data error
+// !The data error
 
-func (e Syntax) Error() string {
-	return fmt.Sprintf("char=%q index=%d", *e.S, *e.I)
+func (e Rune) Error() string {
+	return fmt.Sprintf("char=%q index=%d", *e.R, *e.I)
 }
 
-// ! Add context to the data error
+// !Add context to the data error
 
-func (e Syntax) Wrap() error {
-	return wrap(syntax, wrap(
-		kind("incorrect syntax"),
-		&Syntax{S: e.S, I: e.I}),
+func (r Rune) Character() error {
+	return wrap(Syntax,
+		wrap(IncorrectCharacter,
+			&Rune{R: r.R, I: r.I},
+		),
+	)
+}
+
+func (r Rune) Dots() error {
+	return wrap(Expression,
+		wrap(DuplicateDots,
+			&Rune{R: r.R, I: r.I},
+		),
 	)
 }
 
