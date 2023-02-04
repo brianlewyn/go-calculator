@@ -26,7 +26,7 @@ func (a *analyse) areCorrectNumbers() bool {
 		}
 
 		if digit++; digit == data.DigitLimit {
-			*a.err = ierr.Rune{R: &r, I: &i}.Limit()
+			*a.err = ierr.OneRune{R: &r, I: &i}.Limit()
 			return false
 		}
 	}

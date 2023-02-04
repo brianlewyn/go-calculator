@@ -5,8 +5,16 @@ import (
 	"github.com/brianlewyn/go-calculator/internal/data"
 )
 
-// areCorrectCharacter
-func (a *analyse) areCorrectCharacter() bool {
+// isEmptyField
+func (a *analyse) isEmptyField() bool {
+	if len(*a.expr) == 0 {
+		*a.err = ierr.EmptyField
+	}
+	return true
+}
+
+// isProperSyntax is the proper syntax
+func (a *analyse) isProperSyntax() bool {
 	isCharacter := func(r *rune) bool {
 		if !data.IsNumber(r) {
 			return data.IsRune(r)
@@ -16,7 +24,7 @@ func (a *analyse) areCorrectCharacter() bool {
 
 	for i, r := range *a.expr {
 		if !isCharacter(&r) {
-			*a.err = ierr.Rune{R: &r, I: &i}.Character()
+			*a.err = ierr.OneRune{R: &r, I: &i}.Character()
 			return false
 		}
 	}
@@ -30,7 +38,7 @@ func (a *analyse) isGoodStart() bool {
 	char := rune((*a.expr)[start])
 
 	if !data.IsFirstChar(&char) {
-		*a.err = ierr.Rune{R: &char, I: &start}.Start()
+		*a.err = ierr.OneRune{R: &char, I: &start}.Start()
 		return false
 	}
 
@@ -43,7 +51,7 @@ func (a *analyse) isGoodFinal() bool {
 	char := rune((*a.expr)[end])
 
 	if !data.IsLastChar(&char) || end != 1 {
-		*a.err = ierr.Rune{R: &char, I: &end}.Final()
+		*a.err = ierr.OneRune{R: &char, I: &end}.Final()
 		return false
 	}
 
@@ -87,14 +95,12 @@ func (a *analyse) areThereDuplicates() bool {
 
 func (a *analyse) IsCorrectSyntax() bool {
 	switch {
-	// case !a.isEmpty():
-	case !a.areCorrectCharacter():
+	case !a.isEmptyField():
+	case !a.isProperSyntax():
 	case !a.isGoodStart():
 	case !a.isGoodFinal():
-	// case !a.isThereValidOperation():
-	case !a.areThereDuplicates():
 	default:
-		return true
+		return a.areThereDuplicates()
 	}
 	return false
 }
