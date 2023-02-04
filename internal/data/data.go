@@ -26,37 +26,40 @@ const (
 	I08 uint8  = 3
 )
 
-// Opetator
 const (
-	Mod rune = '%'
-	Mul rune = '*'
-	Add rune = '+'
-	Sub rune = '-'
-	Div rune = '/'
+	// Opetator
+
+	Mod rune = '%' // Mod = '%'
+	Mul rune = '*' // Mul = '*'
+	Add rune = '+' // Add = '+'
+	Sub rune = '-' // Sub = '-'
+	Div rune = '/' // Div = '/'
 )
 
-// Parentheses
 const (
-	Left  rune = '('
-	Right rune = ')'
+	// Parentheses
+
+	Left  rune = '(' // Left  = '('
+	Right rune = ')' // Right = ')'
 )
 
-// Special character
 const (
-	Gap  rune = ' '
-	Dot  rune = '.'
-	Pow  rune = '^'
-	Pi   rune = 'π'
-	Root rune = '√'
+	// Special character
+
+	Gap  rune = ' ' // Gap  = '\0'
+	Dot  rune = '.' // Dot  = '.'
+	Pow  rune = '^' // Pow  = '^'
+	Pi   rune = 'π' // Pi   = 'π'
+	Root rune = '√' // Root = '√'
 )
 
-// Numbers are numbers from 0 to 9
-func Numbers(r *rune) bool {
+// IsNumber is number from 0 to 9
+func IsNumber(r *rune) bool {
 	return '0' <= *r && *r <= '9'
 }
 
-// Runes are all characters of a math expression
-func Runes(r *rune) bool {
+// IsRune is symbol or operator of a math expression
+func IsRune(r *rune) bool {
 	for _, s := range [11]rune{
 		Mod, Left, Right, Mul, Add,
 		Sub, Dot, Div, Pow, Pi, Root,
@@ -66,4 +69,25 @@ func Runes(r *rune) bool {
 		}
 	}
 	return false
+}
+
+// IsFirstChar is the possible first character of a math expression
+func IsFirstChar(r *rune) bool {
+	switch {
+	case IsNumber(r):
+	case *r == Left:
+	case *r == Add:
+	case *r == Sub:
+	case *r == Dot:
+	case *r == Pi:
+	case *r == Root:
+	default:
+		return false
+	}
+	return true
+}
+
+// IsLastChar is the possible last character of a mathematical expression
+func IsLastChar(r *rune) bool {
+	return IsNumber(r) || *r == Right
 }
