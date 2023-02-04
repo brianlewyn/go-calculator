@@ -9,7 +9,7 @@ func (a *analyse) areCorrectNumbers() bool {
 	digit, isDot := uint16(0), false
 
 	for i, r := range *a.expr {
-		if !(data.Numbers(&r) || r == data.Dot) {
+		if !(data.IsNumber(&r) || r == data.Dot) {
 			isDot = false
 			digit = 0
 			continue
@@ -39,21 +39,13 @@ func (a analyse) areCorrectParentheses() bool { return true }
 func (a analyse) areCorrectDots() bool { return true }
 
 func (a *analyse) IsCorrectExpression() bool {
-	if !a.areCorrectNumbers() {
+	switch {
+	case a.areCorrectNumbers():
+	case a.areCorrectOperators():
+	case a.areCorrectParentheses():
+	case a.areCorrectDots():
+	default:
 		return false
 	}
-
-	if !a.areCorrectOperators() {
-		return false
-	}
-
-	if !a.areCorrectParentheses() {
-		return false
-	}
-
-	if !a.areCorrectDots() {
-		return false
-	}
-
 	return true
 }

@@ -6,11 +6,11 @@ import (
 )
 
 func isSymbol(r *rune) bool {
-	if data.Numbers(r) {
+	if data.IsNumber(r) {
 		return true
 	}
 
-	if data.Runes(r) {
+	if data.IsRune(r) {
 		return true
 	}
 
