@@ -4,18 +4,17 @@ import "github.com/brianlewyn/go-calculator/internal/data"
 
 type trim struct {
 	size int
-	char rune
 	expr *string
 }
 
-func newTrim(expr *string, char rune) *trim {
-	return &trim{size: len(*expr), char: char, expr: expr}
+func newTrim(expr *string) *trim {
+	return &trim{size: len(*expr), expr: expr}
 }
 
 // contains
 func (t *trim) contains() bool {
 	for _, char := range *t.expr {
-		if char == t.char {
+		if char == data.Gap {
 			return true
 		}
 	}
@@ -47,7 +46,7 @@ func (t *trim) remove() {
 	}
 
 	for i, j := 0, 0; i <= t.size-1; i++ {
-		if rune((*t.expr)[i]) == t.char {
+		if rune((*t.expr)[i]) == data.Gap {
 			t.finalCut(&i, &j)
 			continue
 		}
@@ -57,6 +56,6 @@ func (t *trim) remove() {
 }
 
 func Gaps(expr *string) {
-	t := newTrim(expr, data.Gap)
+	t := newTrim(expr)
 	t.remove()
 }
