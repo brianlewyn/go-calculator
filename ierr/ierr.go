@@ -24,7 +24,10 @@ const (
 )
 
 // What error occurred?
-var EmptyField = wrap(Syntax, errors.New("empty field"))
+var (
+	EmptyField            = wrap(Syntax, errors.New("empty field"))
+	IncompleteParentheses = wrap(Expression, errors.New("there are incomplete parentheses"))
+)
 
 // Interface errors
 
@@ -40,10 +43,10 @@ type TwoRune struct {
 }
 
 type ThreeRune struct {
-	B rune // Before
-	M rune // Middle
-	A rune // After
-	I int
+	B rune // before
+	M rune // middle
+	A rune // after
+	I int  // index
 }
 
 // The data error
