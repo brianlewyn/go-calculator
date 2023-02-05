@@ -15,35 +15,12 @@ func (a *analyse) isEmptyField() bool {
 
 // isProperSyntax is the proper syntax
 func (a *analyse) isProperSyntax() bool {
-
-	isGoodRune := func(r *rune) bool {
-		switch *r {
-		case data.Left:
-		case data.Right:
-		case data.Dot:
-		case data.Pow:
-		case data.Pi:
-		case data.Root:
-		default:
-			return data.IsOperator(r)
-		}
-		return true
-	}
-
-	isGoodChar := func(r *rune) bool {
-		if !data.IsNumber(r) {
-			return isGoodRune(r)
-		}
-		return true
-	}
-
 	for i, r := range *a.expr {
 		if !isGoodChar(&r) {
 			*a.err = ierr.OneRune{R: r, I: i}.Character()
 			return false
 		}
 	}
-
 	return true
 }
 
