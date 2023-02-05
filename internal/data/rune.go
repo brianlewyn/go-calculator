@@ -68,6 +68,14 @@ func IsNumber(r *rune) bool {
 
 // !For each rune group
 
+// IsMoreLess is addition or subtraction operator
+func IsMoreLess(r *rune) bool {
+	if !IsAdd(r) {
+		return IsSub(r)
+	}
+	return true
+}
+
 // IsOperator is operator: %, *, +, -, /
 func IsOperator(r *rune) bool {
 	switch *r {
@@ -77,44 +85,6 @@ func IsOperator(r *rune) bool {
 	case Sub:
 	default:
 		return IsDiv(r)
-	}
-	return true
-}
-
-// IsRune is symbol or operator of a math expression
-func IsRune(r *rune) bool {
-	switch *r {
-	case Left:
-	case Right:
-	case Dot:
-	case Pow:
-	case Pi:
-	case Root:
-	default:
-		return IsOperator(r)
-	}
-	return true
-}
-
-// IsFirstChar is the possible first character of a math expression
-func IsFirstChar(r *rune) bool {
-	switch *r {
-	case Left:
-	case Add:
-	case Sub:
-	case Dot:
-	case Pi:
-	case Root:
-	default:
-		return IsNumber(r)
-	}
-	return true
-}
-
-// IsLastChar is the possible last character of a mathematical expression
-func IsLastChar(r *rune) bool {
-	if !IsRight(r) {
-		return IsNumber(r)
 	}
 	return true
 }
