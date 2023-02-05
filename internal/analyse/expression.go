@@ -1,6 +1,8 @@
 package analyse
 
 import (
+	"strings"
+
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
 )
@@ -74,10 +76,27 @@ func (a *analyse) areCorrectOperators() bool {
 
 // areCorrectParentheses
 func (a *analyse) areCorrectParentheses() bool {
-	// if strings.Contains(*a.expr, string(data.Left)+string(data.Right)) {
-	// 	*a.err = ierr.TwoRune{S: data.Left}
-	// 	return false
-	// }
+	if strings.Contains(*a.expr, string(data.Left)+string(data.Right)) {
+		*a.err = ierr.TwoRune{S: data.Left}
+		return false
+	}
+
+	var nLeft, nRight int
+	for _, r := range *a.expr {
+		if data.IsLeft(&r) {
+			nLeft++
+			continue
+		}
+		if data.IsRight(&r) {
+			nRight++
+		}
+	}
+
+	if nLeft != nRight {
+		*a.err = ierr.IncompleteParentheses
+		return false
+	}
+
 	return true
 }
 
