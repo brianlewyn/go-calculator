@@ -3,7 +3,7 @@ package basic
 import (
 	"github.com/brianlewyn/go-calculator/internal/analyse"
 	"github.com/brianlewyn/go-calculator/internal/base"
-	"github.com/brianlewyn/go-calculator/internal/trim"
+	"github.com/brianlewyn/go-calculator/internal/rebuild"
 )
 
 type Calculator struct {
@@ -32,7 +32,10 @@ func (c *Calculator) solve() {}
 func (c *Calculator) process() {}
 
 func (c *Calculator) Calculate() bool {
-	trim.Gaps(&c.Expr)
+	rebuilder := rebuild.New(&c.Expr)
+
+	rebuilder.RemoveGaps()
+	rebuilder.AddAsterisk()
 
 	analyser := analyse.New(&c.Expr)
 
