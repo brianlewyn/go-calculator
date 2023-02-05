@@ -2,22 +2,33 @@ package basic
 
 import (
 	"github.com/brianlewyn/go-calculator/internal/analyse"
-	"github.com/brianlewyn/go-calculator/internal/base"
+	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/rebuild"
 )
 
+// token
+type token struct {
+	kind  data.TokenKind
+	value string
+}
+
+// Calculator
 type Calculator struct {
-	Expr   string
-	list   *base.List
-	result *base.Result
-	err    *error
+	Expr string
+	err  *error
+
+	// start and end of temporary list
+	// inside original list
+	start, end int
+
+	// linked list
+	original  *[]string // *doubly.Doubly[token]
+	temporary *[]string // *doubly.Doubly[token]
 }
 
 func New(expr string) *Calculator {
 	return &Calculator{Expr: expr}
 }
-
-func (c *Calculator) completeMathExpr() {}
 
 func (c *Calculator) newOriginalList() {}
 
@@ -48,6 +59,8 @@ func (c *Calculator) Calculate() bool {
 		c.err = analyser.Error()
 		return false
 	}
+
+	// list.Fill(&c.Expr, c.list.Original)
 
 	return true
 }
