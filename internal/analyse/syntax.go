@@ -5,7 +5,8 @@ import (
 	"github.com/brianlewyn/go-calculator/internal/data"
 )
 
-// isEmptyField
+// isEmptyField returns true if the field is empty, otherwise returns false.
+// But if there are any errors, an error is created and stored
 func (a *analyse) isEmptyField() bool {
 	if len(*a.expr) == 0 {
 		*a.err = ierr.EmptyField
@@ -13,7 +14,8 @@ func (a *analyse) isEmptyField() bool {
 	return true
 }
 
-// isProperSyntax is the proper syntax
+// isProperSyntax returns true if is the proper syntax, otherwise returns false
+// But if there are any errors, an error is created and stored
 func (a *analyse) isProperSyntax() bool {
 	for i, r := range *a.expr {
 		if !isGoodChar(&r) {
@@ -24,7 +26,8 @@ func (a *analyse) isProperSyntax() bool {
 	return true
 }
 
-// isGoodStart
+// isGoodStart returns true if is a good start for the expression, otherwise returns false
+// But if there are any errors, an error is created and stored
 func (a *analyse) isGoodStart() bool {
 	start := 0
 	char := rune((*a.expr)[start])
@@ -37,7 +40,8 @@ func (a *analyse) isGoodStart() bool {
 	return true
 }
 
-// isGoodFinal
+// isGoodFinal returns true if is a good final for the expression, otherwise returns false
+// But if there are any errors, an error is created and stored
 func (a *analyse) isGoodFinal() bool {
 	end := len(*a.expr) - 1
 	char := rune((*a.expr)[end])
@@ -50,7 +54,8 @@ func (a *analyse) isGoodFinal() bool {
 	return false
 }
 
-// areThereDuplicates
+// areThereDuplicates returns true if there are duplicate characters, otherwise returns false
+// But if there are any errors, an error is created and stored
 func (a *analyse) areThereDuplicates() bool {
 	d := &duplicate{expr: a.expr}
 
@@ -85,6 +90,8 @@ func (a *analyse) areThereDuplicates() bool {
 	return true
 }
 
+// IsCorrectSyntax returns true if the syntax is correct, otherwise returns false
+// But if there are any errors, an error is created and stored
 func (a *analyse) IsCorrectSyntax() bool {
 	switch {
 	case !a.isEmptyField():
