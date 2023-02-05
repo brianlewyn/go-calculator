@@ -40,18 +40,6 @@ func (a *analyse) areCorrectNumbers() bool {
 func (a *analyse) areCorrectOperators() bool {
 	n := len(*a.expr) - 1
 
-	isGoodAfter := func(after *rune) bool {
-		switch *after {
-		case data.Pi:
-		case data.Left:
-		case data.Root:
-		case data.Dot:
-		default:
-			return data.IsNumber(after)
-		}
-		return true
-	}
-
 	for i, r := range *a.expr {
 		if i != 0 && data.IsOperator(&r) && i != n {
 			before := rune((*a.expr)[i-1])
@@ -101,7 +89,9 @@ func (a *analyse) areCorrectParentheses() bool {
 }
 
 // areCorrectDots
-func (a analyse) areCorrectDots() bool { return true }
+func (a analyse) areCorrectDots() bool {
+	return true
+}
 
 // IsCorrectExpression
 func (a *analyse) IsCorrectExpression() bool {

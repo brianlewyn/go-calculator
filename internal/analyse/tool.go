@@ -76,3 +76,15 @@ func isGoodLastChar(r *rune) bool {
 	}
 	return true
 }
+
+func isGoodAfter(after *rune) bool {
+	switch *after {
+	case data.Pi:
+	case data.Left:
+	case data.Root:
+	case data.Dot:
+	default:
+		return data.IsNumber(after)
+	}
+	return true
+}
