@@ -90,6 +90,35 @@ func (a *analyse) areCorrectParentheses() bool {
 
 // areCorrectDots
 func (a analyse) areCorrectDots() bool {
+	n := len(*a.expr) - 1
+
+	for i, r := range *a.expr {
+		if data.IsDot(&r) && i != n {
+			before := rune((*a.expr)[i-1])
+			after := rune((*a.expr)[i+1])
+
+			if !data.IsNumber(&after) {
+				*a.err = ierr.ThreeRune{
+					B: before, M: r, A: after, I: i,
+				}.Together()
+				return false
+			}
+
+			switch {
+			case data.IsOperator(&before):
+			case data.IsLeft(&before):
+			case data.IsLeft(&before):
+			case data.IsRoot(&before):
+			case data.IsPow(&before):
+			default:
+				*a.err = ierr.ThreeRune{
+					B: before, M: r, A: after, I: i,
+				}.Together()
+				return false
+			}
+		}
+	}
+
 	return true
 }
 
