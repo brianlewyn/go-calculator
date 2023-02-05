@@ -89,7 +89,7 @@ func (a *analyse) areCorrectParentheses() bool {
 }
 
 // areCorrectDots
-func (a analyse) areCorrectDots() bool {
+func (a *analyse) areCorrectDots() bool {
 	n := len(*a.expr) - 1
 
 	for i, r := range *a.expr {
@@ -107,9 +107,33 @@ func (a analyse) areCorrectDots() bool {
 			switch {
 			case data.IsOperator(&before):
 			case data.IsLeft(&before):
-			case data.IsLeft(&before):
 			case data.IsRoot(&before):
 			case data.IsPow(&before):
+			default:
+				*a.err = ierr.ThreeRune{
+					B: before, M: r, A: after, I: i,
+				}.Together()
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+// areCorrectDots
+func (a *analyse) areCorrectPowers() bool {
+	n := len(*a.expr) - 1
+
+	for i, r := range *a.expr {
+		if data.IsPow(&r) && i != n {
+			before := rune((*a.expr)[i-1])
+			after := rune((*a.expr)[i+1])
+
+			switch {
+			case data.IsNumber(&before) && isGoodAfter(&after):
+			case data.IsRight(&before) && isGoodAfter(&after):
+			case data.IsPi(&before) && isGoodAfter(&after):
 			default:
 				*a.err = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
@@ -129,6 +153,7 @@ func (a *analyse) IsCorrectExpression() bool {
 	case !a.areCorrectOperators():
 	case !a.areCorrectParentheses():
 	case !a.areCorrectDots():
+	case !a.areCorrectPowers():
 	default:
 		return true
 	}
