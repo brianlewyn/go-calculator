@@ -29,20 +29,6 @@ func (a *analyse) isGoodStart() bool {
 	start := 0
 	char := rune((*a.expr)[start])
 
-	isGoodFirstChar := func(r *rune) bool {
-		switch *r {
-		case data.Left:
-		case data.Add:
-		case data.Sub:
-		case data.Dot:
-		case data.Pi:
-		case data.Root:
-		default:
-			return data.IsNumber(r)
-		}
-		return true
-	}
-
 	if !isGoodFirstChar(&char) {
 		*a.err = ierr.OneRune{R: char, I: start}.Start()
 		return false
@@ -55,13 +41,6 @@ func (a *analyse) isGoodStart() bool {
 func (a *analyse) isGoodFinal() bool {
 	end := len(*a.expr) - 1
 	char := rune((*a.expr)[end])
-
-	isGoodLastChar := func(r *rune) bool {
-		if !data.IsRight(r) {
-			return data.IsNumber(r)
-		}
-		return true
-	}
 
 	if !isGoodLastChar(&char) || end != 1 {
 		*a.err = ierr.OneRune{R: char, I: end}.Final()
