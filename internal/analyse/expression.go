@@ -35,7 +35,39 @@ func (a *analyse) areCorrectNumbers() bool {
 }
 
 // areCorrectOperators
-func (a analyse) areCorrectOperators() bool { return true }
+func (a *analyse) areCorrectOperators() bool {
+	n := len(*a.expr) - 1
+
+	isGoodAfter := func(after *rune) bool {
+		switch *after {
+		case data.Pi:
+		case data.Left:
+		case data.Root:
+		case data.Dot:
+		default:
+			return data.IsNumber(after)
+		}
+		return true
+	}
+
+	for i, r := range *a.expr {
+		if i != 0 && data.IsOperator(&r) && i != n {
+			before := rune((*a.expr)[i-1])
+			after := rune((*a.expr)[i+1])
+
+			switch {
+			case data.IsNumber(&before) && isGoodAfter(&after):
+			case data.IsPi(&before) && isGoodAfter(&after):
+			case data.IsRight(&before) && isGoodAfter(&after):
+			case data.IsLeft(&before) && data.IsMoreLess(&r) && isGoodAfter(&after):
+			default:
+				return false
+			}
+		}
+	}
+
+	return true
+}
 
 // areCorrectParentheses
 func (a analyse) areCorrectParentheses() bool { return true }
