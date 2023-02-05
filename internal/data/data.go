@@ -1,27 +1,26 @@
 package data
 
-type Kind uint8
+// TokenKind is the data type of the value
+type TokenKind uint8
 
-// Kind is the data type of the result
 const (
-	_ = Kind(iota)
-	Int08
-	Int16
-	Int32
-	Int64
-	Float32
-	Float64
+	_ = TokenKind(iota)
+
+	ModToken // Mod = '%'
+	MulToken // Mul = '*'
+	AddToken // Add = '+'
+	SubToken // Sub = '-'
+	DivToken // Div = '/'
+
+	NumToken // Number = n
+	PiToken  // Pi number = 'π'
+
+	LeftToken  // Left = '('
+	RightToken // Right = ')'
+
+	PowToken  // Pow = '^'
+	RootToken // Root = '√'
 )
 
 // DigitLimit is the limit of digits of a float64 and dot
 const DigitLimit uint16 = 617
-
-// It is the limit of digits of a data type
-const (
-	F64 uint16 = 308
-	F32 uint8  = 38
-	I64 uint8  = 18
-	I32 uint8  = 10
-	I16 uint8  = 5
-	I08 uint8  = 3
-)
