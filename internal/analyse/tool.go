@@ -59,8 +59,6 @@ func isGoodChar(r *rune) bool {
 func isGoodFirstChar(r *rune) bool {
 	switch *r {
 	case data.Left:
-	case data.Add:
-	case data.Sub:
 	case data.Dot:
 	case data.Pi:
 	case data.Root:
@@ -71,7 +69,10 @@ func isGoodFirstChar(r *rune) bool {
 }
 
 func isGoodLastChar(r *rune) bool {
-	if !data.IsRight(r) {
+	switch *r {
+	case data.Right:
+	case data.Pi:
+	default:
 		return data.IsNumber(r)
 	}
 	return true
