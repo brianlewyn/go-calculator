@@ -39,7 +39,7 @@ func (a *analyse) isProperSyntax() bool {
 
 	for i, r := range *a.expr {
 		if !isGoodChar(&r) {
-			*a.err = ierr.OneRune{R: &r, I: &i}.Character()
+			*a.err = ierr.OneRune{R: r, I: i}.Character()
 			return false
 		}
 	}
@@ -67,7 +67,7 @@ func (a *analyse) isGoodStart() bool {
 	}
 
 	if !isGoodFirstChar(&char) {
-		*a.err = ierr.OneRune{R: &char, I: &start}.Start()
+		*a.err = ierr.OneRune{R: char, I: start}.Start()
 		return false
 	}
 
@@ -87,7 +87,7 @@ func (a *analyse) isGoodFinal() bool {
 	}
 
 	if !isGoodLastChar(&char) || end != 1 {
-		*a.err = ierr.OneRune{R: &char, I: &end}.Final()
+		*a.err = ierr.OneRune{R: char, I: end}.Final()
 		return false
 	}
 
@@ -100,28 +100,28 @@ func (a *analyse) areThereDuplicates() bool {
 
 	if d.duplicates(data.IsOperator) {
 		*a.err = ierr.TwoRune{
-			S: d.start, E: d.end, I: d.index,
+			S: *d.start, E: *d.end, I: *d.index,
 		}.Together()
 		return false
 	}
 
 	if d.duplicates(data.IsPow) {
 		*a.err = ierr.TwoRune{
-			S: d.start, E: d.end, I: d.index,
+			S: *d.start, E: *d.end, I: *d.index,
 		}.Together()
 		return false
 	}
 
 	if d.duplicates(data.IsPi) {
 		*a.err = ierr.TwoRune{
-			S: d.start, E: d.end, I: d.index,
+			S: *d.start, E: *d.end, I: *d.index,
 		}.Together()
 		return false
 	}
 
 	if d.duplicates(data.IsDot) {
 		*a.err = ierr.TwoRune{
-			S: d.start, E: d.end, I: d.index,
+			S: *d.start, E: *d.end, I: *d.index,
 		}.Together()
 		return false
 	}

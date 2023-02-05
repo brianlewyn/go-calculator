@@ -29,41 +29,53 @@ var EmptyField = wrap(Syntax, errors.New("empty field"))
 // Interface errors
 
 type OneRune struct {
-	R *rune // character
-	I *int  // index
+	R rune // character
+	I int  // index
 }
 
 type TwoRune struct {
-	S *rune // start
-	E *rune // end
-	I *int  // index
+	S rune // start
+	E rune // end
+	I int  // index
+}
+
+type ThreeRune struct {
+	B rune // Before
+	M rune // Middle
+	A rune // After
+	I int
 }
 
 // The data error
 
-func (r OneRune) Error() string { return fmt.Sprintf("%d", *r.I) }
-func (r TwoRune) Error() string { return fmt.Sprintf("%d", *r.I) }
+func (r OneRune) Error() string   { return fmt.Sprintf("%d", r.I) }
+func (r TwoRune) Error() string   { return fmt.Sprintf("%d", r.I) }
+func (r ThreeRune) Error() string { return fmt.Sprintf("%d", r.I) }
 
 // Add context to the data error
 
 func (r OneRune) Character() error {
-	return wrapOneRune(Syntax, IncorrectCharacter, r.R, &OneRune{I: r.I})
+	return wOneRune(Syntax, IncorrectCharacter, r.R, &OneRune{I: r.I})
 }
 
 func (r OneRune) Limit() error {
-	return wrapOneRune(Expression, DigitLimit, r.R, &OneRune{I: r.I})
+	return wOneRune(Expression, DigitLimit, r.R, &OneRune{I: r.I})
 }
 
 func (r OneRune) Start() error {
-	return wrapOneRune(Expression, FirstChar, r.R, &OneRune{I: r.I})
+	return wOneRune(Expression, FirstChar, r.R, &OneRune{I: r.I})
 }
 
 func (r OneRune) Final() error {
-	return wrapOneRune(Expression, LastChar, r.R, &OneRune{I: r.I})
+	return wOneRune(Expression, LastChar, r.R, &OneRune{I: r.I})
 }
 
 func (r TwoRune) Together() error {
-	return wrapTwoOneRune(Expression, NotTogether, r.S, r.E, &OneRune{I: r.I})
+	return wTwoRune(Expression, NotTogether, r.S, r.E, &TwoRune{I: r.I})
+}
+
+func (r ThreeRune) Together() error {
+	return wThreeRune(Expression, NotTogether, r.B, r.M, r.A, &ThreeRune{I: r.I})
 }
 
 // wrap add a wrapper of type error to the already created error
@@ -71,16 +83,27 @@ func wrap(kind kind, err error) error {
 	return fmt.Errorf("%s: %w", kind, err)
 }
 
-// wrapOneRune works mainly for the OneRune interface.
 // Add three wrappers of type error to the already created error
-func wrapOneRune(k1, k2 kind, r *rune, err error) error {
-	return wrap(k1, wrap(k2, fmt.Errorf("char=%q index=%w", *r, err)))
+
+// wOneRune works mainly for the OneRune interface
+func wOneRune(k1, k2 kind, r rune, err error) error {
+	return wrap(k1, wrap(k2,
+		fmt.Errorf("char=%q index=%w", r, err),
+	))
 }
 
-// wrapTwoOneRune works mainly for the TwoOneRune interface.
-// Add three wrappers of type error to the already created error
-func wrapTwoOneRune(k1, k2 kind, s, e *rune, err error) error {
-	return wrap(k1, wrap(k2, fmt.Errorf("start=%q end=%q index=%w", *s, *e, err)))
+// wTwoRune works mainly for the TwoOneRune interface
+func wTwoRune(k1, k2 kind, s, e rune, err error) error {
+	return wrap(k1, wrap(k2,
+		fmt.Errorf("start=%q end=%q index=%w", s, e, err),
+	))
+}
+
+// wThreeRune works mainly for the TwoOneRune interface
+func wThreeRune(k1, k2 kind, b, m, a rune, err error) error {
+	return wrap(k1, wrap(k2,
+		fmt.Errorf("before=%q middle=%q after=%q index=%w", b, m, a, err),
+	))
 }
 
 // As is similar to errors.As func of standard library

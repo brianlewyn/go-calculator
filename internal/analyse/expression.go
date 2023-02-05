@@ -19,14 +19,14 @@ func (a *analyse) areCorrectNumbers() bool {
 		if r == data.Dot {
 			if isDot {
 				e := rune((*a.expr)[i-1])
-				*a.err = ierr.TwoRune{S: &r, E: &e, I: &i}.Together()
+				*a.err = ierr.TwoRune{S: r, E: e, I: i}.Together()
 				return false
 			}
 			isDot = true
 		}
 
 		if digit++; digit == data.DigitLimit {
-			*a.err = ierr.OneRune{R: &r, I: &i}.Limit()
+			*a.err = ierr.OneRune{R: r, I: i}.Limit()
 			return false
 		}
 	}
@@ -61,6 +61,9 @@ func (a *analyse) areCorrectOperators() bool {
 			case data.IsRight(&before) && isGoodAfter(&after):
 			case data.IsLeft(&before) && data.IsMoreLess(&r) && isGoodAfter(&after):
 			default:
+				*a.err = ierr.ThreeRune{
+					B: before, M: r, A: after, I: i,
+				}.Together()
 				return false
 			}
 		}
@@ -70,7 +73,13 @@ func (a *analyse) areCorrectOperators() bool {
 }
 
 // areCorrectParentheses
-func (a analyse) areCorrectParentheses() bool { return true }
+func (a *analyse) areCorrectParentheses() bool {
+	// if strings.Contains(*a.expr, string(data.Left)+string(data.Right)) {
+	// 	*a.err = ierr.TwoRune{S: data.Left}
+	// 	return false
+	// }
+	return true
+}
 
 // areCorrectDots
 func (a analyse) areCorrectDots() bool { return true }
