@@ -54,5 +54,13 @@ func (r *rebuild) AddAsterisk() {
 		return
 	}
 
-	//
+	for i, char := range *r.expr {
+		if i != 0 && i != r.size {
+			after := rune((*r.expr)[i+1])
+			if data.IsRight(&char) && data.IsLeft(&after) {
+				*r.expr = (*r.expr)[:i+1] + string(data.Mul) + (*r.expr)[i+1:]
+				r.size++
+			}
+		}
+	}
 }
