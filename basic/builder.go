@@ -47,6 +47,7 @@ func (c *Calculator) Calculate() bool {
 
 	rebuilder.RemoveGaps()
 	rebuilder.AddAsterisk()
+	rebuilder.AddZero()
 
 	analyser := analyse.New(&c.Expr)
 

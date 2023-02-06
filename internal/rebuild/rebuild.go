@@ -55,11 +55,33 @@ func (r *rebuild) AddAsterisk() {
 	}
 
 	for i, char := range *r.expr {
-		if i != 0 && i != r.size {
+		if i != 0 && i != r.size-1 {
 			after := rune((*r.expr)[i+1])
 			if data.IsRight(&char) && data.IsLeft(&after) {
 				*r.expr = (*r.expr)[:i+1] + string(data.Mul) + (*r.expr)[i+1:]
 				r.size++
+			}
+		}
+	}
+}
+
+func (r *rebuild) AddZero() {
+	zero := "0"
+
+	for i, char := range *r.expr {
+		if data.IsMoreLess(&char) {
+			if i == 0 {
+				*r.expr = zero + *r.expr
+				r.size++
+				continue
+			}
+
+			if i != r.size-1 {
+				before := rune((*r.expr)[i-1])
+				if data.IsLeft(&before) {
+					*r.expr = (*r.expr)[:i] + zero + (*r.expr)[i:]
+					r.size++
+				}
 			}
 		}
 	}
