@@ -61,14 +61,22 @@ func IsPi(r *rune) bool { return *r == Pi }
 // IsRoot returns true if r is a square root
 func IsRoot(r *rune) bool { return *r == Root }
 
+// !For each rune group
+
 // IsNumber returns true if r is a number from 0 to 9
 func IsNumber(r *rune) bool {
 	return '0' <= *r && *r <= '9'
 }
 
-// !For each rune group
+// IsFloat retunrs true if is number or dot
+func IsFloat(r *rune) bool {
+	if !IsNumber(r) {
+		return IsDot(r)
+	}
+	return true
+}
 
-// IsMoreLess is addition or subtraction operator
+// IsMoreLess returns true if is operator: +, -
 func IsMoreLess(r *rune) bool {
 	if !IsAdd(r) {
 		return IsSub(r)
@@ -76,7 +84,7 @@ func IsMoreLess(r *rune) bool {
 	return true
 }
 
-// IsOperator is operator: %, *, +, -, /
+// IsOperator returns true if is operator: %, *, +, -, /
 func IsOperator(r *rune) bool {
 	switch *r {
 	case Mod:

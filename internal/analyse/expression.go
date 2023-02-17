@@ -9,22 +9,22 @@ import (
 
 // areCorrectNumbers
 func (a *analyse) areCorrectNumbers() bool {
-	digit, isDot := uint16(0), false
+	digit, flagDot := uint16(0), false
 
 	for i, r := range *a.expr {
-		if !(data.IsNumber(&r) || r == data.Dot) {
-			isDot = false
+		if !(data.IsFloat(&r)) {
+			flagDot = false
 			digit = 0
 			continue
 		}
 
-		if r == data.Dot {
-			if isDot {
+		if data.IsDot(&r) {
+			if flagDot {
 				e := rune((*a.expr)[i-1])
 				*a.err = ierr.TwoRune{S: r, E: e, I: i}.Together()
 				return false
 			}
-			isDot = true
+			flagDot = true
 		}
 
 		if digit++; digit == data.DigitLimit {
