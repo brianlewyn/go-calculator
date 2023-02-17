@@ -18,7 +18,7 @@ const (
 	LeftToken  // Left = '('
 	RightToken // Right = ')'
 
-	PowToken  // Pow = '^' Remember: n^±., ^±n, ^±π, ^±(, ^±√,
+	PowToken  // Pow = '^'
 	RootToken // Root = '√'
 )
 

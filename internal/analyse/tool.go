@@ -89,3 +89,10 @@ func isGoodAfter(after *rune) bool {
 	}
 	return true
 }
+
+func isGoodAfterPow(after *rune) bool {
+	if !isGoodAfter(after) {
+		return data.IsMoreLess(after)
+	}
+	return true
+}

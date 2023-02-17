@@ -45,11 +45,14 @@ func (a *analyse) areCorrectOperators() bool {
 			before := rune((*a.expr)[i-1])
 			after := rune((*a.expr)[i+1])
 
+			isGood := isGoodAfter(&after)
+
 			switch {
-			case data.IsNumber(&before) && isGoodAfter(&after):
-			case data.IsPi(&before) && isGoodAfter(&after):
-			case data.IsRight(&before) && isGoodAfter(&after):
-			case data.IsLeft(&before) && data.IsMoreLess(&r) && isGoodAfter(&after):
+			case data.IsNumber(&before) && isGood:
+			case data.IsRight(&before) && isGood:
+			case data.IsLeft(&before) && isGood:
+			case data.IsPow(&before) && isGood:
+			case data.IsPi(&before) && isGood:
 			default:
 				*a.err = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
@@ -106,6 +109,7 @@ func (a *analyse) areCorrectDots() bool {
 
 			switch {
 			case data.IsOperator(&before):
+			case data.IsNumber(&before):
 			case data.IsLeft(&before):
 			case data.IsRoot(&before):
 			case data.IsPow(&before):
@@ -125,22 +129,17 @@ func (a *analyse) areCorrectDots() bool {
 func (a *analyse) areCorrectPowers() bool {
 	n := len(*a.expr) - 1
 
-	isGoodAfterPow := func(after *rune) bool {
-		if !isGoodAfter(after) {
-			return data.IsMoreLess(after)
-		}
-		return true
-	}
-
 	for i, r := range *a.expr {
 		if data.IsPow(&r) && i != n {
 			before := rune((*a.expr)[i-1])
 			after := rune((*a.expr)[i+1])
 
+			isGood := isGoodAfterPow(&after)
+
 			switch {
-			case data.IsNumber(&before) && isGoodAfterPow(&after):
-			case data.IsRight(&before) && isGoodAfterPow(&after):
-			case data.IsPi(&before) && isGoodAfterPow(&after):
+			case data.IsNumber(&before) && isGood:
+			case data.IsRight(&before) && isGood:
+			case data.IsPi(&before) && isGood:
 			default:
 				*a.err = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
