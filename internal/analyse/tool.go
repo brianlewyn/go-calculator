@@ -2,16 +2,22 @@ package analyse
 
 import "github.com/brianlewyn/go-calculator/internal/data"
 
-// duplicate
+// !duplicate
 
+// duplicate represents a parser that checks for duplicates
 type duplicate struct {
-	expr  *string
-	start *rune
-	end   *rune
-	index *int
+	expr *string
 }
 
-func (d *duplicate) duplicates(data func(r *rune) bool) bool {
+// variables for duplicate struct
+var (
+	index *int
+	start *rune
+	end   *rune
+)
+
+// areDuplicates finds duplicates, if it is, returns true
+func (d *duplicate) areDuplicates(data func(r *rune) bool) bool {
 	var isChar bool
 
 	for i, r := range *d.expr {
@@ -21,9 +27,9 @@ func (d *duplicate) duplicates(data func(r *rune) bool) bool {
 		}
 
 		if isChar {
-			*d.start = rune((*d.expr)[i-1])
-			*d.end = r
-			*d.index = i
+			*start = rune((*d.expr)[i-1])
+			*end = r
+			*index = i
 			return false
 		}
 
@@ -33,8 +39,9 @@ func (d *duplicate) duplicates(data func(r *rune) bool) bool {
 	return true
 }
 
-// is rune methods
+// !Rune
 
+// isGoodRune checks if r is: (, ), ., ^, π, √, %, *, +, -, /
 func isGoodRune(r *rune) bool {
 	switch *r {
 	case data.Left:
@@ -49,6 +56,7 @@ func isGoodRune(r *rune) bool {
 	return true
 }
 
+// isGoodChar checks if r is: 0-9, (, ), ., ^, π, √, %, *, +, -, /
 func isGoodChar(r *rune) bool {
 	if !data.IsNumber(r) {
 		return isGoodRune(r)
@@ -56,6 +64,7 @@ func isGoodChar(r *rune) bool {
 	return true
 }
 
+// isGoodFirstChar checks if first r is: (, ., √, π, √, 0-9
 func isGoodFirstChar(r *rune) bool {
 	switch *r {
 	case data.Left:
@@ -68,6 +77,7 @@ func isGoodFirstChar(r *rune) bool {
 	return true
 }
 
+// isGoodLastChar checks if last r is: ), π, 0-9
 func isGoodLastChar(r *rune) bool {
 	switch *r {
 	case data.Right:
@@ -78,6 +88,7 @@ func isGoodLastChar(r *rune) bool {
 	return true
 }
 
+// isGoodAfter checks if after is: π, (, √, ., 0-9
 func isGoodAfter(after *rune) bool {
 	switch *after {
 	case data.Pi:
@@ -90,6 +101,7 @@ func isGoodAfter(after *rune) bool {
 	return true
 }
 
+// isGoodAfterPow checks if after is: π, (, √, ., 0-9, +, -
 func isGoodAfterPow(after *rune) bool {
 	if !isGoodAfter(after) {
 		return data.IsMoreLess(after)

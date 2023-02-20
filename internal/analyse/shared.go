@@ -1,14 +1,11 @@
 package analyse
 
+// analyse represents the expression parser
 type analyse struct {
 	expr *string
-	err  *error
 }
 
+// New creates an analyse instance
 func New(expr *string) *analyse {
-	return &analyse{expr: expr, err: nil}
-}
-
-func (a analyse) Error() *error {
-	return a.err
+	return &analyse{expr: expr}
 }

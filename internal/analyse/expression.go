@@ -7,7 +7,23 @@ import (
 	"github.com/brianlewyn/go-calculator/internal/data"
 )
 
-// areCorrectNumbers
+// IsCorrectExpression check that the expression is correct
+func (a *analyse) IsCorrectExpression() bool {
+	switch {
+	case !a.areCorrectNumbers():
+	case !a.areCorrectOperators():
+	case !a.areCorrectParentheses():
+	case !a.areCorrectDots():
+	case !a.areCorrectPowers():
+	default:
+		return true
+	}
+	return false
+}
+
+// !Tool Functions
+
+// areCorrectNumbers check that the numbers are correct
 func (a *analyse) areCorrectNumbers() bool {
 	digit, flagDot := uint16(0), false
 
@@ -21,14 +37,14 @@ func (a *analyse) areCorrectNumbers() bool {
 		if data.IsDot(&r) {
 			if flagDot {
 				e := rune((*a.expr)[i-1])
-				*a.err = ierr.TwoRune{S: r, E: e, I: i}.Together()
+				data.Error = ierr.TwoRune{S: r, E: e, I: i}.Together()
 				return false
 			}
 			flagDot = true
 		}
 
 		if digit++; digit == data.DigitLimit {
-			*a.err = ierr.OneRune{R: r, I: i}.Limit()
+			data.Error = ierr.OneRune{R: r, I: i}.Limit()
 			return false
 		}
 	}
@@ -36,9 +52,9 @@ func (a *analyse) areCorrectNumbers() bool {
 	return true
 }
 
-// areCorrectOperators
+// areCorrectOperators check that the operators are correct
 func (a *analyse) areCorrectOperators() bool {
-	n := len(*a.expr) - 1
+	n := data.Lenght - 1
 
 	for i, r := range *a.expr {
 		if i != 0 && data.IsOperator(&r) && i != n {
@@ -54,7 +70,7 @@ func (a *analyse) areCorrectOperators() bool {
 			case data.IsPow(&before) && isGood:
 			case data.IsPi(&before) && isGood:
 			default:
-				*a.err = ierr.ThreeRune{
+				data.Error = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
 				}.Together()
 				return false
@@ -65,10 +81,10 @@ func (a *analyse) areCorrectOperators() bool {
 	return true
 }
 
-// areCorrectParentheses
+// areCorrectParentheses check that the parentheses are correct
 func (a *analyse) areCorrectParentheses() bool {
 	if strings.Contains(*a.expr, string(data.Left)+string(data.Right)) {
-		*a.err = ierr.TwoRune{S: data.Left}
+		data.Error = ierr.TwoRune{S: data.Left}
 		return false
 	}
 
@@ -84,16 +100,16 @@ func (a *analyse) areCorrectParentheses() bool {
 	}
 
 	if nLeft != nRight {
-		*a.err = ierr.IncompleteParentheses
+		data.Error = ierr.IncompleteParentheses
 		return false
 	}
 
 	return true
 }
 
-// areCorrectDots
+// areCorrectDots check that the dots are correct
 func (a *analyse) areCorrectDots() bool {
-	n := len(*a.expr) - 1
+	n := data.Lenght - 1
 
 	for i, r := range *a.expr {
 		if data.IsDot(&r) && i != n {
@@ -101,7 +117,7 @@ func (a *analyse) areCorrectDots() bool {
 			after := rune((*a.expr)[i+1])
 
 			if !data.IsNumber(&after) {
-				*a.err = ierr.ThreeRune{
+				data.Error = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
 				}.Together()
 				return false
@@ -114,7 +130,7 @@ func (a *analyse) areCorrectDots() bool {
 			case data.IsRoot(&before):
 			case data.IsPow(&before):
 			default:
-				*a.err = ierr.ThreeRune{
+				data.Error = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
 				}.Together()
 				return false
@@ -125,9 +141,9 @@ func (a *analyse) areCorrectDots() bool {
 	return true
 }
 
-// areCorrectDots
+// areCorrectPowers check that the powers are correct
 func (a *analyse) areCorrectPowers() bool {
-	n := len(*a.expr) - 1
+	n := data.Lenght - 1
 
 	for i, r := range *a.expr {
 		if data.IsPow(&r) && i != n {
@@ -141,7 +157,7 @@ func (a *analyse) areCorrectPowers() bool {
 			case data.IsRight(&before) && isGood:
 			case data.IsPi(&before) && isGood:
 			default:
-				*a.err = ierr.ThreeRune{
+				data.Error = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
 				}.Together()
 				return false
@@ -150,18 +166,4 @@ func (a *analyse) areCorrectPowers() bool {
 	}
 
 	return true
-}
-
-// IsCorrectExpression
-func (a *analyse) IsCorrectExpression() bool {
-	switch {
-	case !a.areCorrectNumbers():
-	case !a.areCorrectOperators():
-	case !a.areCorrectParentheses():
-	case !a.areCorrectDots():
-	case !a.areCorrectPowers():
-	default:
-		return true
-	}
-	return false
 }

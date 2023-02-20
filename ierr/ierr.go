@@ -81,6 +81,8 @@ func (r ThreeRune) Together() error {
 	return wThreeRune(Expression, NotTogether, r.B, r.M, r.A, &ThreeRune{I: r.I})
 }
 
+// !Tool Functions
+
 // wrap add a wrapper of type error to the already created error
 func wrap(kind kind, err error) error {
 	return fmt.Errorf("%s: %w", kind, err)
@@ -111,8 +113,5 @@ func wThreeRune(k1, k2 kind, b, m, a rune, err error) error {
 
 // As is similar to errors.As func of standard library
 func As(err error, target kind) bool {
-	if !strings.Contains(fmt.Sprint(err), string(target)) {
-		return false
-	}
-	return true
+	return strings.Contains(fmt.Sprint(err), string(target))
 }
