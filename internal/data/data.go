@@ -6,7 +6,6 @@ const DigitLimit uint16 = 617
 const ( // Assistant Characthers
 	Jocker rune   = '#'
 	Empty  string = ""
-	Zero   string = "0"
 )
 
 var (

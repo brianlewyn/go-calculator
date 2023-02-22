@@ -11,13 +11,8 @@ type rebuild struct {
 	expr *string
 }
 
-// New creates a rebuild instance
-func New(expr *string) *rebuild {
-	return &rebuild{expr: expr}
-}
-
-// RemoveSpaces removes all spaces inside the expression
-func (r *rebuild) RemoveSpaces() {
+// removeSpaces removes all spaces inside the expression
+func (r *rebuild) removeSpaces() {
 	if !strings.Contains(*r.expr, string(data.Gap)) {
 		return
 	}
@@ -42,8 +37,8 @@ func (r *rebuild) RemoveSpaces() {
 	}
 }
 
-// AddAsterisks adds asterisks between the right and left parentheses
-func (r *rebuild) AddAsterisks() {
+// addAsterisks adds asterisks between the right and left parentheses
+func (r *rebuild) addAsterisks() {
 	if !strings.Contains(*r.expr, string(data.Left)+string(data.Right)) {
 		return
 	}
@@ -60,12 +55,14 @@ func (r *rebuild) AddAsterisks() {
 	}
 }
 
-// AddZeros adds zeros between the left parentheses and the plus or minus operator
-func (r *rebuild) AddZeros() {
+// addZeros adds zeros between the left parentheses and the plus or minus operator
+func (r *rebuild) addZeros() {
+	zero := "0"
+
 	for i, char := range *r.expr {
 		if data.IsMoreLess(&char) {
 			if i == 0 {
-				*r.expr = data.Zero + *r.expr
+				*r.expr = zero + *r.expr
 				data.Lenght++
 				continue
 			}
@@ -74,10 +71,18 @@ func (r *rebuild) AddZeros() {
 				before := rune((*r.expr)[i-1])
 
 				if data.IsLeft(&before) {
-					*r.expr = (*r.expr)[:i] + data.Zero + (*r.expr)[i:]
+					*r.expr = (*r.expr)[:i] + zero + (*r.expr)[i:]
 					data.Lenght++
 				}
 			}
 		}
 	}
+}
+
+// Rebuilder rebuilds the basic math expression to a simpler form
+func Rebuilder(expr *string) {
+	rebuilder := &rebuild{expr: expr}
+	rebuilder.removeSpaces()
+	rebuilder.addAsterisks()
+	rebuilder.addZeros()
 }

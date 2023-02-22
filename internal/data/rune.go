@@ -63,12 +63,16 @@ func IsRoot(r *rune) bool { return *r == Root }
 
 // !For each rune group
 
-// IsNumber returns true if r is a number from 0 to 9
+// IsNumber returns true if r is:
+//
+// 0-9
 func IsNumber(r *rune) bool {
 	return '0' <= *r && *r <= '9'
 }
 
-// IsFloat retunrs true if is number or dot
+// IsFloat retunrs true if r is:
+//
+// 0-9, .
 func IsFloat(r *rune) bool {
 	if !IsNumber(r) {
 		return IsDot(r)
@@ -76,7 +80,9 @@ func IsFloat(r *rune) bool {
 	return true
 }
 
-// IsMoreLess returns true if is operator: +, -
+// IsMoreLess returns true if r is:
+//
+// +, -
 func IsMoreLess(r *rune) bool {
 	if !IsAdd(r) {
 		return IsSub(r)
@@ -84,15 +90,86 @@ func IsMoreLess(r *rune) bool {
 	return true
 }
 
-// IsOperator returns true if is operator: %, *, +, -, /
+// IsOperator returns true if r is:
+//
+// %, *, +, -, /
 func IsOperator(r *rune) bool {
 	switch *r {
 	case Mod:
 	case Mul:
-	case Add:
-	case Sub:
+	case Div:
 	default:
-		return IsDiv(r)
+		return IsMoreLess(r)
+	}
+	return true
+}
+
+// IsRuneSyntax returns true if r is:
+//
+// 0-9, (, ), ., ^, π, √, %, *, +, -, /
+func IsRuneSyntax(r *rune) bool {
+	switch *r {
+	case Left:
+	case Right:
+	case Pow:
+	case Pi:
+	case Root:
+	default:
+		if IsFloat(r) {
+			return true
+		}
+		return IsOperator(r)
+	}
+	return true
+}
+
+// IsFirst returs true if r is:
+//
+// 0-9, (, ., √, π, √
+func IsFirst(r *rune) bool {
+	switch *r {
+	case Left:
+	case Pi:
+	case Root:
+	default:
+		return IsFloat(r)
+	}
+	return true
+}
+
+// IsLast returns true if r is:
+//
+// 0-9, ), π
+func IsLast(r *rune) bool {
+	switch *r {
+	case Right:
+	case Pi:
+	default:
+		return IsNumber(r)
+	}
+	return true
+}
+
+// IsAfter returns true if after is:
+//
+// 0-9, (, ., π, √
+func IsAfter(after *rune) bool {
+	switch *after {
+	case Pi:
+	case Left:
+	case Root:
+	default:
+		return IsFloat(after)
+	}
+	return true
+}
+
+// IsAfterPow returns true if after is:
+//
+// π, (, √, ., 0-9, +, -
+func IsAfterPow(after *rune) bool {
+	if !IsAfter(after) {
+		return IsMoreLess(after)
 	}
 	return true
 }

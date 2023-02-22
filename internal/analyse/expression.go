@@ -7,8 +7,10 @@ import (
 	"github.com/brianlewyn/go-calculator/internal/data"
 )
 
-// IsCorrectExpression check that the expression is correct
-func (a *analyse) IsCorrectExpression() bool {
+// isCorrectExpression returns true if the expression is correct, otherwise returns false.
+//
+// But if there is any error then the error is stored in data.Error
+func (a *analyse) isCorrectExpression() bool {
 	switch {
 	case !a.areCorrectNumbers():
 	case !a.areCorrectOperators():
@@ -21,9 +23,11 @@ func (a *analyse) IsCorrectExpression() bool {
 	return false
 }
 
-// !Tool Functions
+// !Tool Methods
 
-// areCorrectNumbers check that the numbers are correct
+// areCorrectNumbers returns true is the numbers are correct, otherwise returns false.
+//
+// But if there is any error then the error is stored in data.Error
 func (a *analyse) areCorrectNumbers() bool {
 	digit, flagDot := uint16(0), false
 
@@ -52,7 +56,9 @@ func (a *analyse) areCorrectNumbers() bool {
 	return true
 }
 
-// areCorrectOperators check that the operators are correct
+// areCorrectOperators returns true if the operators are correct, otherwise returns false.
+//
+// But if there is any error then the error is stored in data.Error
 func (a *analyse) areCorrectOperators() bool {
 	n := data.Lenght - 1
 
@@ -61,14 +67,14 @@ func (a *analyse) areCorrectOperators() bool {
 			before := rune((*a.expr)[i-1])
 			after := rune((*a.expr)[i+1])
 
-			isGood := isGoodAfter(&after)
+			is := data.IsAfter(&after)
 
 			switch {
-			case data.IsNumber(&before) && isGood:
-			case data.IsRight(&before) && isGood:
-			case data.IsLeft(&before) && isGood:
-			case data.IsPow(&before) && isGood:
-			case data.IsPi(&before) && isGood:
+			case data.IsNumber(&before) && is:
+			case data.IsRight(&before) && is:
+			case data.IsLeft(&before) && is:
+			case data.IsPow(&before) && is:
+			case data.IsPi(&before) && is:
 			default:
 				data.Error = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
@@ -81,7 +87,9 @@ func (a *analyse) areCorrectOperators() bool {
 	return true
 }
 
-// areCorrectParentheses check that the parentheses are correct
+// areCorrectParentheses returns true if the parentheses are correct, otherwise returns false.
+//
+// But if there is any error then the error is stored in data.Error
 func (a *analyse) areCorrectParentheses() bool {
 	if strings.Contains(*a.expr, string(data.Left)+string(data.Right)) {
 		data.Error = ierr.TwoRune{S: data.Left}
@@ -107,7 +115,9 @@ func (a *analyse) areCorrectParentheses() bool {
 	return true
 }
 
-// areCorrectDots check that the dots are correct
+// areCorrectDots returns true if the dots are correct, otherwise returns false.
+//
+// But if there is any error then the error is stored in data.Error
 func (a *analyse) areCorrectDots() bool {
 	n := data.Lenght - 1
 
@@ -141,7 +151,9 @@ func (a *analyse) areCorrectDots() bool {
 	return true
 }
 
-// areCorrectPowers check that the powers are correct
+// areCorrectPowers returns true if the powers are correct, otherwise returns false.
+//
+// But if there is any error then the error is stored in data.Error
 func (a *analyse) areCorrectPowers() bool {
 	n := data.Lenght - 1
 
@@ -150,12 +162,12 @@ func (a *analyse) areCorrectPowers() bool {
 			before := rune((*a.expr)[i-1])
 			after := rune((*a.expr)[i+1])
 
-			isGood := isGoodAfterPow(&after)
+			is := data.IsAfterPow(&after)
 
 			switch {
-			case data.IsNumber(&before) && isGood:
-			case data.IsRight(&before) && isGood:
-			case data.IsPi(&before) && isGood:
+			case data.IsNumber(&before) && is:
+			case data.IsRight(&before) && is:
+			case data.IsPi(&before) && is:
 			default:
 				data.Error = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,

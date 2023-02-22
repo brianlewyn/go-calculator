@@ -14,7 +14,7 @@ const (
 	Expression = kind("expression error")
 )
 
-// What kind of secundary error occurred?
+// What kind of context error occurred?
 const (
 	IncorrectCharacter = kind("this character is incorrect")
 	DigitLimit         = kind("this digit exceeds the digit limit")
@@ -57,26 +57,32 @@ func (r ThreeRune) Error() string { return fmt.Sprintf("%d", r.I) }
 
 // Add context to the data error
 
+// Character returns an error with the kind of context: IncorrectCharacter
 func (r OneRune) Character() error {
 	return wOneRune(Syntax, IncorrectCharacter, r.R, &OneRune{I: r.I})
 }
 
+// Limit returns an error with the kind of context: DigitLimit
 func (r OneRune) Limit() error {
 	return wOneRune(Expression, DigitLimit, r.R, &OneRune{I: r.I})
 }
 
+// Start returns an error with the kind of context: FirstChar
 func (r OneRune) Start() error {
 	return wOneRune(Expression, FirstChar, r.R, &OneRune{I: r.I})
 }
 
+// Final returns an error with the kind of context: LastChar
 func (r OneRune) Final() error {
 	return wOneRune(Expression, LastChar, r.R, &OneRune{I: r.I})
 }
 
+// Together returns an error with the kind of context: NotTogether
 func (r TwoRune) Together() error {
 	return wTwoRune(Expression, NotTogether, r.S, r.E, &TwoRune{I: r.I})
 }
 
+// Together returns an error with the kind of context: NotTogether
 func (r ThreeRune) Together() error {
 	return wThreeRune(Expression, NotTogether, r.B, r.M, r.A, &ThreeRune{I: r.I})
 }

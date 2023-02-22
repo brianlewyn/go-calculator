@@ -1,11 +1,17 @@
 package analyse
 
-// analyse represents the expression parser
+// analyse represents a parser for expression
 type analyse struct {
 	expr *string
 }
 
-// New creates an analyse instance
-func New(expr *string) *analyse {
-	return &analyse{expr: expr}
+// Analyser returns true if the basic math expression is correct, otherwise returns false.
+//
+// But if there is any error then the error is stored in data.Error
+func Analyser(expr *string) bool {
+	analyser := &analyse{expr: expr}
+	if !analyser.isCorrectSyntax() {
+		return false
+	}
+	return analyser.isCorrectExpression()
 }
