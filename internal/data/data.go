@@ -9,7 +9,8 @@ const ( // Assistant Characthers
 )
 
 var (
-	Error  error   // Error is an error global
-	Answer float64 // Answer is the calculator answer
-	Lenght int     // Lenght is the lenght of the string expression
+	Lenght     int     // Lenght is the lenght of the string expression
+	Expression *string // Expression is basic math expression
+	Answer     float64 // Answer is the calculator answer
+	Error      error   // Error is a possible error
 )

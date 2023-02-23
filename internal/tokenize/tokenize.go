@@ -5,25 +5,14 @@ import "github.com/brianlewyn/go-calculator/internal/data"
 // Tokenizer tokenizes the expression in a linked list,
 //
 // but while creating the list, the expression is removed
-func Tokenizer(expr *string) *[]*data.Token {
+func Tokenizer() *[]*data.Token {
 	var value string
 	var list [](*data.Token)
 
-	for data.Lenght == 0 {
-		char := rune((*expr)[0])
+	for data.Lenght > 0 {
+		first := rune((*data.Expression)[0])
 
-		switch {
-		case data.Lenght >= 3:
-			*expr = (*expr)[1:]
-		case data.Lenght == 2:
-			*expr = string((*expr)[1])
-		default:
-			*expr = data.Empty
-		}
-
-		data.Lenght--
-
-		switch char {
+		switch first {
 
 		// opeartors
 		case data.Mod:
@@ -53,23 +42,27 @@ func Tokenizer(expr *string) *[]*data.Token {
 		case data.Pi:
 			list[0] = data.NewPiToken()
 		default:
-			var after rune
-			value += string(char)
+			if data.IsFloat(&first) {
+				var after rune
+				value += string(first)
 
-			if data.Lenght >= 2 {
-				after = rune((*expr)[1])
-			} else {
-				after = data.Jocker
-			}
+				if data.Lenght >= 2 {
+					after = rune((*data.Expression)[1])
+				} else {
+					after = data.Jocker
+				}
 
-			if !data.IsFloat(&after) {
-				list[0] = data.NewNumToken(value)
-				data.Lenght -= len(value)
-				value = data.Empty
+				if !data.IsFloat(&after) {
+					list[0] = data.NewNumToken(value)
+					value = data.Empty
+				}
 			}
 		}
+
+		*data.Expression = (*data.Expression)[1:]
+		data.Lenght--
 	}
 
-	*expr = data.Empty
+	*data.Expression = data.Empty
 	return &list
 }

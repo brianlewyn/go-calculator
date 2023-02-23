@@ -80,8 +80,8 @@ func (r *rebuild) addZeros() {
 }
 
 // Rebuilder rebuilds the basic math expression to a simpler form
-func Rebuilder(expr *string) {
-	rebuilder := &rebuild{expr: expr}
+func Rebuilder() {
+	rebuilder := &rebuild{expr: data.Expression}
 	rebuilder.removeSpaces()
 	rebuilder.addAsterisks()
 	rebuilder.addZeros()

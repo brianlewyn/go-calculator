@@ -11,15 +11,16 @@ import (
 //
 // otherwise, it returns a zero and an error.
 func Calculate(expr string) (float64, error) {
+	data.Expression = &expr
 	data.Lenght = len(expr)
 
-	rebuild.Rebuilder(&expr)
+	rebuild.Rebuilder()
 
-	if analyse.Analyser(&expr) {
+	if analyse.Analyser() {
 		return 0, data.Error
 	}
 
-	tokenize.Tokenizer(&expr)
+	tokenize.Tokenizer()
 
 	return data.Answer, data.Error
 }
