@@ -7,7 +7,7 @@ import (
 
 // isCorrectSyntax returns true if the syntax is correct, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) isCorrectSyntax() bool {
 	switch {
 	case !a.isEmptyField():
@@ -24,21 +24,21 @@ func (a *analyse) isCorrectSyntax() bool {
 
 // isEmptyField returns true if the field is empty, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) isEmptyField() bool {
-	if data.Lenght == 0 {
-		data.Error = ierr.EmptyField
+	if *a.lenght == 0 {
+		eError = ierr.EmptyField
 	}
 	return true
 }
 
 // isProperSyntax returns true if is the proper syntax, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) isProperSyntax() bool {
-	for i, r := range *a.expr {
+	for i, r := range *a.expression {
 		if !data.IsRuneSyntax(&r) {
-			data.Error = ierr.OneRune{R: r, I: i}.Character()
+			eError = ierr.OneRune{R: r, I: i}.Character()
 			return false
 		}
 	}
@@ -47,13 +47,13 @@ func (a *analyse) isProperSyntax() bool {
 
 // isGoodStart returns true if is a good start for the expression, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) isGoodStart() bool {
 	start := 0
-	char := rune((*a.expr)[start])
+	char := rune((*a.expression)[start])
 
 	if !data.IsFirst(&char) {
-		data.Error = ierr.OneRune{R: char, I: start}.Start()
+		eError = ierr.OneRune{R: char, I: start}.Start()
 		return false
 	}
 
@@ -62,13 +62,13 @@ func (a *analyse) isGoodStart() bool {
 
 // isGoodFinal returns true if is a good final for the expression, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) isGoodFinal() bool {
-	end := len(*a.expr) - 1
-	char := rune((*a.expr)[end])
+	end := len(*a.expression) - 1
+	char := rune((*a.expression)[end])
 
 	if !data.IsLast(&char) || end != 1 {
-		data.Error = ierr.OneRune{R: char, I: end}.Final()
+		eError = ierr.OneRune{R: char, I: end}.Final()
 		return false
 	}
 
@@ -77,9 +77,9 @@ func (a *analyse) isGoodFinal() bool {
 
 // areThereDuplicates returns true if there are duplicate characters, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) areThereDuplicates() bool {
-	d := &duplicate{expr: a.expr}
+	d := &duplicate{expr: a.expression}
 
 	switch {
 	case !d.findDuplicates(data.IsOperator):
@@ -90,7 +90,7 @@ func (a *analyse) areThereDuplicates() bool {
 		return true
 	}
 
-	data.Error = ierr.TwoRune{
+	eError = ierr.TwoRune{
 		S: *d.start, E: *d.end, I: *d.index,
 	}.Together()
 	return false

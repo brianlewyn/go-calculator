@@ -2,15 +2,19 @@ package tokenize
 
 import "github.com/brianlewyn/go-calculator/internal/data"
 
-// Tokenizer tokenizes the expression in a linked list,
-//
-// but while creating the list, the expression is removed
-func Tokenizer() *[]*data.Token {
+// tokenize represent the tokenized linked list
+type tokenize struct {
+	expression *string
+	lenght     *int
+}
+
+// LinkedList returns an tokenized linked list
+func (t tokenize) LinkedList() *[]*data.Token {
 	var value string
 	var list [](*data.Token)
 
-	for data.Lenght > 0 {
-		first := rune((*data.Expression)[0])
+	for *t.lenght > 0 {
+		first := rune((*t.expression)[0])
 
 		switch first {
 
@@ -41,13 +45,14 @@ func Tokenizer() *[]*data.Token {
 		// numbers
 		case data.Pi:
 			list[0] = data.NewPiToken()
+
 		default:
 			if data.IsFloat(&first) {
 				var after rune
 				value += string(first)
 
-				if data.Lenght >= 2 {
-					after = rune((*data.Expression)[1])
+				if *t.lenght >= 2 {
+					after = rune((*t.expression)[1])
 				} else {
 					after = data.Jocker
 				}
@@ -59,10 +64,22 @@ func Tokenizer() *[]*data.Token {
 			}
 		}
 
-		*data.Expression = (*data.Expression)[1:]
-		data.Lenght--
+		*t.expression = (*t.expression)[1:]
+		*t.lenght--
 	}
 
-	*data.Expression = data.Empty
+	*t.expression = data.Empty
 	return &list
+}
+
+// Tokenizer tokenizes the expression in a linked list,
+//
+// but while creating the list, the expression is removed
+func Tokenizer(data *data.Data) *[]*data.Token {
+	tokenizer := tokenize{
+		expression: data.Expression(),
+		lenght:     data.Lenght(),
+	}
+
+	return tokenizer.LinkedList()
 }

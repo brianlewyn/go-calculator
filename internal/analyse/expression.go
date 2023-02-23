@@ -9,7 +9,7 @@ import (
 
 // isCorrectExpression returns true if the expression is correct, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) isCorrectExpression() bool {
 	switch {
 	case !a.areCorrectNumbers():
@@ -27,11 +27,11 @@ func (a *analyse) isCorrectExpression() bool {
 
 // areCorrectNumbers returns true is the numbers are correct, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) areCorrectNumbers() bool {
 	digit, flagDot := uint16(0), false
 
-	for i, r := range *a.expr {
+	for i, r := range *a.expression {
 		if !(data.IsFloat(&r)) {
 			flagDot = false
 			digit = 0
@@ -40,15 +40,15 @@ func (a *analyse) areCorrectNumbers() bool {
 
 		if data.IsDot(&r) {
 			if flagDot {
-				e := rune((*a.expr)[i-1])
-				data.Error = ierr.TwoRune{S: r, E: e, I: i}.Together()
+				e := rune((*a.expression)[i-1])
+				eError = ierr.TwoRune{S: r, E: e, I: i}.Together()
 				return false
 			}
 			flagDot = true
 		}
 
 		if digit++; digit == data.DigitLimit {
-			data.Error = ierr.OneRune{R: r, I: i}.Limit()
+			eError = ierr.OneRune{R: r, I: i}.Limit()
 			return false
 		}
 	}
@@ -58,14 +58,14 @@ func (a *analyse) areCorrectNumbers() bool {
 
 // areCorrectOperators returns true if the operators are correct, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) areCorrectOperators() bool {
-	n := data.Lenght - 1
+	n := *a.lenght - 1
 
-	for i, r := range *a.expr {
+	for i, r := range *a.expression {
 		if i != 0 && data.IsOperator(&r) && i != n {
-			before := rune((*a.expr)[i-1])
-			after := rune((*a.expr)[i+1])
+			before := rune((*a.expression)[i-1])
+			after := rune((*a.expression)[i+1])
 
 			is := data.IsAfter(&after)
 
@@ -76,7 +76,7 @@ func (a *analyse) areCorrectOperators() bool {
 			case data.IsPow(&before) && is:
 			case data.IsPi(&before) && is:
 			default:
-				data.Error = ierr.ThreeRune{
+				eError = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
 				}.Together()
 				return false
@@ -89,15 +89,15 @@ func (a *analyse) areCorrectOperators() bool {
 
 // areCorrectParentheses returns true if the parentheses are correct, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) areCorrectParentheses() bool {
-	if strings.Contains(*a.expr, string(data.Left)+string(data.Right)) {
-		data.Error = ierr.TwoRune{S: data.Left}
+	if strings.Contains(*a.expression, string(data.Left)+string(data.Right)) {
+		eError = ierr.TwoRune{S: data.Left}
 		return false
 	}
 
 	var nLeft, nRight int
-	for _, r := range *a.expr {
+	for _, r := range *a.expression {
 		if data.IsLeft(&r) {
 			nLeft++
 			continue
@@ -108,7 +108,7 @@ func (a *analyse) areCorrectParentheses() bool {
 	}
 
 	if nLeft != nRight {
-		data.Error = ierr.IncompleteParentheses
+		eError = ierr.IncompleteParentheses
 		return false
 	}
 
@@ -117,17 +117,17 @@ func (a *analyse) areCorrectParentheses() bool {
 
 // areCorrectDots returns true if the dots are correct, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) areCorrectDots() bool {
-	n := data.Lenght - 1
+	n := *a.lenght - 1
 
-	for i, r := range *a.expr {
+	for i, r := range *a.expression {
 		if data.IsDot(&r) && i != n {
-			before := rune((*a.expr)[i-1])
-			after := rune((*a.expr)[i+1])
+			before := rune((*a.expression)[i-1])
+			after := rune((*a.expression)[i+1])
 
 			if !data.IsNumber(&after) {
-				data.Error = ierr.ThreeRune{
+				eError = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
 				}.Together()
 				return false
@@ -140,7 +140,7 @@ func (a *analyse) areCorrectDots() bool {
 			case data.IsRoot(&before):
 			case data.IsPow(&before):
 			default:
-				data.Error = ierr.ThreeRune{
+				eError = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
 				}.Together()
 				return false
@@ -153,14 +153,14 @@ func (a *analyse) areCorrectDots() bool {
 
 // areCorrectPowers returns true if the powers are correct, otherwise returns false.
 //
-// But if there is any error then the error is stored in data.Error
+// But if there is any error then the error is stored in data.Error()
 func (a *analyse) areCorrectPowers() bool {
-	n := data.Lenght - 1
+	n := *a.lenght - 1
 
-	for i, r := range *a.expr {
+	for i, r := range *a.expression {
 		if data.IsPow(&r) && i != n {
-			before := rune((*a.expr)[i-1])
-			after := rune((*a.expr)[i+1])
+			before := rune((*a.expression)[i-1])
+			after := rune((*a.expression)[i+1])
 
 			is := data.IsAfterPow(&after)
 
@@ -169,7 +169,7 @@ func (a *analyse) areCorrectPowers() bool {
 			case data.IsRight(&before) && is:
 			case data.IsPi(&before) && is:
 			default:
-				data.Error = ierr.ThreeRune{
+				eError = ierr.ThreeRune{
 					B: before, M: r, A: after, I: i,
 				}.Together()
 				return false

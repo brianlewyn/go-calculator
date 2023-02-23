@@ -1,16 +1,25 @@
 package data
 
-// DigitLimit is the limit of digits of a float64 and dot
-const DigitLimit uint16 = 617
+// Data represents the data to calculate an expression
+type Data struct {
+	expression *string
+	lenght     int
+}
 
-const ( // Assistant Characthers
-	Jocker rune   = '#'
-	Empty  string = ""
-)
+// New creates an Data instance
+func New(expr *string) *Data {
+	return &Data{
+		expression: expr,
+		lenght:     len(*expr),
+	}
+}
 
-var (
-	Lenght     int     // Lenght is the lenght of the string expression
-	Expression *string // Expression is basic math expression
-	Answer     float64 // Answer is the calculator answer
-	Error      error   // Error is a possible error
-)
+// Expression returns the basic math expression
+func (d Data) Expression() *string {
+	return d.expression
+}
+
+// Lenght return the lenght of the basic string expression
+func (d Data) Lenght() *int {
+	return &d.lenght
+}

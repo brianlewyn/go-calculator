@@ -1,88 +1,82 @@
 package rebuild
 
 import (
-	"strings"
-
 	"github.com/brianlewyn/go-calculator/internal/data"
 )
 
-// rebuild represents a rebuilder for expression
+// rebuild represents a rebuilder for expressionession
 type rebuild struct {
-	expr *string
+	expression *string
+	lenght     *int
 }
 
-// removeSpaces removes all spaces inside the expression
-func (r *rebuild) removeSpaces() {
-	if !strings.Contains(*r.expr, string(data.Gap)) {
-		return
-	}
+// trim removes all spaces inside the expression
+func (r *rebuild) trim() {
+	var expression string
+	var lenght int = *r.lenght
 
-	for i, j := 0, 0; i <= data.Lenght-1; i++ {
-		if rune((*r.expr)[i]) == data.Gap {
+	for *r.lenght > 0 {
+		first := rune((*r.expression)[0])
 
-			// final cutout
-			if j++; i == data.Lenght-1 {
-				*r.expr = (*r.expr)[:i-j]
-			}
-			continue
+		if !data.IsGap(&first) {
+			expression += string(first)
+			lenght++
 		}
 
-		// internal cutout
-		if j != 0 {
-			*r.expr = (*r.expr)[:i-j] + (*r.expr)[i:]
-			data.Lenght -= j
-			i -= j
-			j = 0
-		}
+		*r.expression = (*r.expression)[1:]
+		*r.lenght--
 	}
+
+	r.expression = &expression
+	r.lenght = &lenght
 }
 
 // addAsterisks adds asterisks between the right and left parentheses
-func (r *rebuild) addAsterisks() {
-	if !strings.Contains(*r.expr, string(data.Left)+string(data.Right)) {
-		return
-	}
+func (r *rebuild) addAsterisks(i int, current rune) {
+	if i < *r.lenght-1 {
+		if data.IsRight(&current) {
+			after := rune((*r.expression)[i+1])
 
-	for i, char := range *r.expr {
-		if i != 0 && i != data.Lenght-1 {
-			after := rune((*r.expr)[i+1])
-
-			if data.IsRight(&char) && data.IsLeft(&after) {
-				*r.expr = (*r.expr)[:i+1] + string(data.Mul) + (*r.expr)[i+1:]
-				data.Lenght++
+			if data.IsLeft(&after) {
+				*r.expression = (*r.expression)[:i+1] + string(data.Mul) + (*r.expression)[i+1:]
+				*r.lenght++
 			}
 		}
 	}
 }
 
 // addZeros adds zeros between the left parentheses and the plus or minus operator
-func (r *rebuild) addZeros() {
-	zero := "0"
+func (r *rebuild) addZeros(i int, current rune) {
+	if data.IsMoreLess(&current) {
+		if i == 0 {
+			*r.expression = "0" + *r.expression
+			*r.lenght++
+			return
+		}
 
-	for i, char := range *r.expr {
-		if data.IsMoreLess(&char) {
-			if i == 0 {
-				*r.expr = zero + *r.expr
-				data.Lenght++
-				continue
-			}
+		if i < *r.lenght-1 {
+			before := rune((*r.expression)[i-1])
 
-			if i != data.Lenght-1 {
-				before := rune((*r.expr)[i-1])
-
-				if data.IsLeft(&before) {
-					*r.expr = (*r.expr)[:i] + zero + (*r.expr)[i:]
-					data.Lenght++
-				}
+			if data.IsLeft(&before) {
+				*r.expression = (*r.expression)[:i] + "0" + (*r.expression)[i:]
+				*r.lenght++
 			}
 		}
 	}
 }
 
-// Rebuilder rebuilds the basic math expression to a simpler form
-func Rebuilder() {
-	rebuilder := &rebuild{expr: data.Expression}
-	rebuilder.removeSpaces()
-	rebuilder.addAsterisks()
-	rebuilder.addZeros()
+// Rebuilder rebuilds the basic math expressionession to a simpler form
+func Rebuilder(data *data.Data) {
+	rebuilder := &rebuild{
+		expression: data.Expression(),
+		lenght:     data.Lenght(),
+	}
+
+	rebuilder.trim()
+
+	for i := 0; i < *rebuilder.lenght; i++ {
+		current := rune((*rebuilder.expression)[i])
+		rebuilder.addAsterisks(i, current)
+		rebuilder.addZeros(i, current)
+	}
 }
