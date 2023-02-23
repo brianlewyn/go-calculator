@@ -10,10 +10,8 @@ import (
 // But if there is any error then the error is stored in data.Error()
 func (a *analyse) isCorrectSyntax() bool {
 	switch {
-	case !a.isEmptyField():
+	case a.isEmptyField():
 	case !a.isProperSyntax():
-	case !a.isGoodStart():
-	case !a.isGoodFinal():
 	default:
 		return a.areThereDuplicates()
 	}
@@ -37,9 +35,16 @@ func (a *analyse) isEmptyField() bool {
 // But if there is any error then the error is stored in data.Error()
 func (a *analyse) isProperSyntax() bool {
 	for i, r := range *a.expression {
-		if !data.IsRuneSyntax(&r) {
-			eError = ierr.OneRune{R: r, I: i}.Character()
-			return false
+		switch i {
+		case 0:
+			a.isGoodStart(r)
+		case *a.lenght:
+			a.isGoodFinal(r)
+		default:
+			if !data.IsRuneSyntax(&r) {
+				eError = ierr.OneRune{R: r, I: i}.Character()
+				return false
+			}
 		}
 	}
 	return true
@@ -48,30 +53,22 @@ func (a *analyse) isProperSyntax() bool {
 // isGoodStart returns true if is a good start for the expression, otherwise returns false.
 //
 // But if there is any error then the error is stored in data.Error()
-func (a *analyse) isGoodStart() bool {
-	start := 0
-	char := rune((*a.expression)[start])
-
-	if !data.IsFirst(&char) {
-		eError = ierr.OneRune{R: char, I: start}.Start()
+func (a *analyse) isGoodStart(r rune) bool {
+	if start := 0; !data.IsFirst(&r) {
+		eError = ierr.OneRune{R: r, I: start}.Start()
 		return false
 	}
-
 	return true
 }
 
 // isGoodFinal returns true if is a good final for the expression, otherwise returns false.
 //
 // But if there is any error then the error is stored in data.Error()
-func (a *analyse) isGoodFinal() bool {
-	end := len(*a.expression) - 1
-	char := rune((*a.expression)[end])
-
-	if !data.IsLast(&char) || end != 1 {
-		eError = ierr.OneRune{R: char, I: end}.Final()
+func (a *analyse) isGoodFinal(r rune) bool {
+	if !data.IsLast(&r) {
+		eError = ierr.OneRune{R: r, I: *a.lenght}.Final()
 		return false
 	}
-
 	return false
 }
 
@@ -79,19 +76,20 @@ func (a *analyse) isGoodFinal() bool {
 //
 // But if there is any error then the error is stored in data.Error()
 func (a *analyse) areThereDuplicates() bool {
-	d := &duplicate{expr: a.expression}
+	var isOperator, isDot, isPow, isPi bool
+	d := &duplicate{expression: a.expression}
 
-	switch {
-	case !d.findDuplicates(data.IsOperator):
-	case !d.findDuplicates(data.IsPow):
-	case !d.findDuplicates(data.IsPi):
-	case !d.findDuplicates(data.IsDot):
-	default:
+	for i, r := range *a.expression {
+		switch {
+		case d.findDuplicates(i, r, &isOperator, data.IsOperator):
+		case d.findDuplicates(i, r, &isDot, data.IsDot):
+		case d.findDuplicates(i, r, &isPow, data.IsPow):
+		case d.findDuplicates(i, r, &isPi, data.IsPi):
+		default:
+			continue
+		}
 		return true
 	}
 
-	eError = ierr.TwoRune{
-		S: *d.start, E: *d.end, I: *d.index,
-	}.Together()
 	return false
 }
