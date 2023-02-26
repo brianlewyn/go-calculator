@@ -7,3 +7,6 @@ const ( // Assistant Characthers
 	Jocker rune   = '#'
 	Empty  string = ""
 )
+
+// Global Error
+var Error error

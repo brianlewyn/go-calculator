@@ -3,7 +3,6 @@ package basic
 import (
 	"github.com/brianlewyn/go-calculator/internal/analyse"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-calculator/internal/rebuild"
 	"github.com/brianlewyn/go-calculator/internal/tokenize"
 )
 
@@ -11,15 +10,11 @@ import (
 //
 // otherwise, it returns a zero and an error.
 func Calculate(expr string) (float64, error) {
-	data := data.New(&expr)
+	list := tokenize.Tokenizer(data.New(&expr))
 
-	rebuild.Rebuilder(data)
-
-	if analyse.Analyser(data) {
-		return 0, analyse.Error()
+	if analyse.Analyser(list) {
+		return 0, data.Error
 	}
-
-	tokenize.Tokenizer(data)
 
 	return 0 /*Answer*/, nil
 }
@@ -28,5 +23,4 @@ func Calculate(expr string) (float64, error) {
 !linked list
 list *doubly.Doubly[data.Token]
 listTemp *doubly.Doubly[data.Token]
-Remember: n^±., ^±n, ^±π, ^±(, ^±√,
 */

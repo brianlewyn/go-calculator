@@ -15,12 +15,23 @@ const ( // Parenthese
 	Right rune = ')' // Right Parentheses = ')'
 )
 
-const ( // Special Characthers
-	Gap  rune = ' ' // Gap = '\0'
-	Dot  rune = '.' // Dot = '.'
-	Pow  rune = '^' // Power = '^'
-	Pi   rune = 'π' // Pi Number = 'π'
-	Root rune = '√' // Square Root = '√'
+const ( // Others
+	Gap rune = ' ' // Gap = '\0'
+	Dot rune = '.' // Dot = '.'
+	Pow rune = '^' // Power = '^'
+)
+
+const ( // Special Pi
+	Pi      rune = 'π' // Pi Number = 'π'
+	PiFirst rune = 207 // Firt sub rune: Pi Number
+	PiLast  rune = 128 // Last sub rune: Pi Number
+)
+
+const ( // Special Root
+	Root       rune = '√' // Square Root = '√'
+	RootFirst  rune = 226 // Firt sub rune: Square Root
+	RootSecond rune = 136 // Second sub rune: Square Root
+	RootLast   rune = 154 // Last sub rune: Square Root
 )
 
 // !For each rune
@@ -55,11 +66,20 @@ func IsDot(r *rune) bool { return *r == Dot }
 // IsPow returns true if r is a power
 func IsPow(r *rune) bool { return *r == Pow }
 
-// IsPi returns true if r is a Pi number
-func IsPi(r *rune) bool { return *r == Pi }
+// IsSpecial returns true if r is a initial of π or √
+func IsSpecial(r *rune) bool {
+	return *r == PiFirst || *r == RootFirst
+}
 
-// IsRoot returns true if r is a square root
-func IsRoot(r *rune) bool { return *r == Root }
+// IsPi returns true if r1 & r2 is a initial of π
+func IsPi(r1, r2 *rune) bool {
+	return *r1 == PiFirst && *r2 == PiLast
+}
+
+// IsRoot returns true if r1, r2 & r3 is a initial of √
+func IsRoot(r1, r2, r3 *rune) bool {
+	return *r1 == RootFirst && *r2 == RootSecond && *r3 == RootLast
+}
 
 // !For each rune group
 
@@ -86,90 +106,6 @@ func IsFloat(r *rune) bool {
 func IsMoreLess(r *rune) bool {
 	if !IsAdd(r) {
 		return IsSub(r)
-	}
-	return true
-}
-
-// IsOperator returns true if r is:
-//
-// %, *, +, -, /
-func IsOperator(r *rune) bool {
-	switch *r {
-	case Mod:
-	case Mul:
-	case Div:
-	default:
-		return IsMoreLess(r)
-	}
-	return true
-}
-
-// IsRuneSyntax returns true if r is:
-//
-// 0-9, (, ), ., ^, π, √, %, *, +, -, /
-func IsRuneSyntax(r *rune) bool {
-	switch *r {
-	case Left:
-	case Right:
-	case Pow:
-	case Pi:
-	case Root:
-	default:
-		if IsFloat(r) {
-			return true
-		}
-		return IsOperator(r)
-	}
-	return true
-}
-
-// IsFirst returs true if r is:
-//
-// 0-9, (, ., √, π, √
-func IsFirst(r *rune) bool {
-	switch *r {
-	case Left:
-	case Pi:
-	case Root:
-	default:
-		return IsFloat(r)
-	}
-	return true
-}
-
-// IsLast returns true if r is:
-//
-// 0-9, ), π
-func IsLast(r *rune) bool {
-	switch *r {
-	case Right:
-	case Pi:
-	default:
-		return IsNumber(r)
-	}
-	return true
-}
-
-// IsAfter returns true if after is:
-//
-// 0-9, (, ., π, √
-func IsAfter(after *rune) bool {
-	switch *after {
-	case Pi:
-	case Left:
-	case Root:
-	default:
-		return IsFloat(after)
-	}
-	return true
-}
-
-// IsAfterPow returns true if after is:
-//
-// π, (, √, ., 0-9, +, -
-func IsAfterPow(after *rune) bool {
-	if !IsAfter(after) {
-		return IsMoreLess(after)
 	}
 	return true
 }
