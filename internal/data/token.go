@@ -171,10 +171,12 @@ CanBeTogether returns true if k1 & k2 are:
 	k1= / k2= (, n, π, √
 	k1= ( k2= (, n, π, √
 	k1= √ k2= (, n, π, √
-	k1= ^ k2= (, n, π, √, +, -
-	k1= n k2= %, *, +, -, /, ^, )
+
 	k1= π k2= %, *, +, -, /, ^, )
-	k1= ) k2= %, *, +, -, /, ^, ), (
+	k1= n k2= %, *, +, -, /, ^, )
+	k1= ) k2= %, *, +, -, /, ^, )
+
+	k1= ^ k2= (, n, π, √, +, -
 */
 func CanBeTogether(k1, k2 TokenKind) bool {
 	switch k1 {
@@ -185,15 +187,15 @@ func CanBeTogether(k1, k2 TokenKind) bool {
 	case DivToken:
 	case LeftToken:
 	case RootToken:
-	case PowToken:
-		return isLeftNumPiRootAddSub(&k2)
-	case PiToken:
-		return isOperatorPowRight(&k2)
-	case NumToken:
-		return isOperatorPowRight(&k2)
 	default:
-		// RightToken
-		return isOperatorPowParentheses(&k2)
+		switch k1 {
+		case PiToken:
+		case NumToken:
+		case RightToken:
+		default: // PowToken:
+			return isLeftNumPiRootAddSub(&k2)
+		}
+		return isOperatorPowRight(&k2)
 	}
 	return isLeftNumPiRoot(&k2)
 }
@@ -235,16 +237,6 @@ func isOperatorPowRight(kind *TokenKind) bool {
 	case RightToken:
 	default:
 		return IsOperator(*kind)
-	}
-	return true
-}
-
-// isOperatorPowParentheses returns true if kind is:
-//
-// %, *, +, -, /, ^, ), (
-func isOperatorPowParentheses(kind *TokenKind) bool {
-	if !isOperatorPowRight(kind) {
-		return *kind == LeftToken
 	}
 	return true
 }
