@@ -10,90 +10,81 @@ type analyse struct {
 	list *[]*data.Token
 }
 
-// isCorrect returns true if the syntax is correct, otherwise returns false.
-//
-// But if there is any error then the error is stored in data.Error
-func (a analyse) isCorrect() bool {
-	if thereIsAnyError() {
-		return false
-	}
-
+// isCorrect returns nil if the syntax is correct, otherwise returns an error
+func (a analyse) isCorrect() error {
+	var bug error
 	var nL, nR int
+
 	for temp := (*a.list)[0].Head(); temp.Next() != nil; temp = temp.Next() {
-		if !a.isCorrectFirst(temp) {
-			return false
+		bug = a.isCorrectFirst(temp)
+		if bug != nil {
+			return bug
 		}
-		if !a.isCorrectLast(temp) {
-			return false
+
+		bug = a.isCorrectLast(temp)
+		if bug != nil {
+			return bug
 		}
-		if !isCorrectNumber(temp) {
-			return false
+
+		bug = isCorrectNumber(temp)
+		if bug != nil {
+			return bug
 		}
-		if !canBeTogether(temp, temp.Next()) {
-			return false
+
+		bug = canBeTogether(temp, temp.Next())
+		if bug != nil {
+			return bug
 		}
-		if !areCorrectParentheses(&nL, &nR, temp, (*a.list)[0].Tail()) {
-			return false
+
+		bug = areCorrectParentheses(&nL, &nR, temp, (*a.list)[0].Tail())
+		if bug != nil {
+			return bug
 		}
 	}
 
-	return true
+	return nil
 }
 
 // !Tool Methods
 
-// isCorrectFirst returns true is the number is correct, otherwise returns false
-//
-// But if there is any error then the error is stored in data.Error
-func (a analyse) isCorrectFirst(token *data.Token) bool {
+// isCorrectFirst returns nil is the number is correct, otherwise returns an error
+func (a analyse) isCorrectFirst(token *data.Token) error {
 	if token != (*a.list)[0].Head() {
-		return true // go out
+		return nil
 	}
 
 	if !data.IsFirst(token.Kind()) {
-		data.Error = ierr.StartKind
-		return false
+		return ierr.StartKind
 	}
 
-	return true
+	return nil
 }
 
-// isCorrectLast returns true is the number is correct, otherwise returns false
-//
-// But if there is any error then the error is stored in data.Error
-func (a analyse) isCorrectLast(token *data.Token) bool {
+// isCorrectLast returns nil is the number is correct, otherwise returns an error
+func (a analyse) isCorrectLast(token *data.Token) error {
 	if token == (*a.list)[0].Tail() {
-		return true // go out
+		return nil
 	}
 
 	if !data.IsLast(token.Kind()) {
-		data.Error = ierr.EndKind
-		return false
+		return ierr.EndKind
 	}
 
-	return true
+	return nil
 }
 
 // !Tool Functions
 
-// thereIsAnyError returns true if data.Error isn't nil, otherwise returns false
-func thereIsAnyError() bool {
-	return data.Error != nil
-}
-
-// isCorrectNumber returns true is the number is correct, otherwise returns false
-//
-// But if there is any error then the error is stored in data.Error
-func isCorrectNumber(token *data.Token) bool {
+// isCorrectNumber returns nil is the number is correct, otherwise returns an error
+func isCorrectNumber(token *data.Token) error {
 	if token.Kind() != data.NumToken {
-		return true // go out
+		return nil
 	}
 
 	var number = token.Value()
 
 	if !isAbsurdDot(number) {
-		data.Error = ierr.NewNumber(*number).Misspelled()
-		return false
+		return ierr.NewNumber(*number).Misspelled()
 	}
 
 	var flagDot bool
@@ -108,19 +99,17 @@ func isCorrectNumber(token *data.Token) bool {
 
 		if data.IsDot(&r) {
 			if flagDot {
-				data.Error = ierr.NewNumber(*number).Misspelled()
-				return false
+				return ierr.NewNumber(*number).Misspelled()
 			}
 			flagDot = true
 		}
 
 		if nDigit++; nDigit == data.DigitLimit {
-			data.Error = ierr.NewNumber(*number).Limit()
-			return false
+			return ierr.NewNumber(*number).Limit()
 		}
 	}
 
-	return true
+	return nil
 }
 
 // isAbsurdDot returns true if there is a dot in absurd position, otherwise returns false
@@ -147,22 +136,20 @@ func isAbsurdDot(num *string) bool {
 	return true
 }
 
-// canBeTogether returns true if there are duplicate kinds
-//
-// But if there is any error then the error is stored in data.Error
-func canBeTogether(token1, token2 *data.Token) bool {
+// canBeTogether returns nil if there are not duplicate kinds, otherwise returns an error
+func canBeTogether(token1, token2 *data.Token) error {
 	if token2 == nil {
-		return true // go out
+		return nil
 	}
 
 	kind1, kind2 := token1.Kind(), token2.Kind()
 	beTogether := data.CanBeTogether(kind1, kind2)
 
 	if !beTogether {
-		data.Error = ierr.NewKind(format(token1, token2)).NotTogether()
+		return ierr.NewKind(format(token1, token2)).NotTogether()
 	}
 
-	return beTogether
+	return nil
 }
 
 // format returns the value of the kind
@@ -187,10 +174,8 @@ func format(token1, token2 *data.Token) (string, string) {
 	return fmt1, fmt2
 }
 
-// areCorrectParentheses returns true if the number of parentheses is correct, otherwise returns false.
-//
-// But if there is any error then the error is stored in data.Error
-func areCorrectParentheses(nLeft, nRight *int, current, last *data.Token) bool {
+// areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error
+func areCorrectParentheses(nLeft, nRight *int, current, last *data.Token) error {
 
 	if current.Kind() == data.LeftToken {
 		*nLeft++
@@ -199,18 +184,16 @@ func areCorrectParentheses(nLeft, nRight *int, current, last *data.Token) bool {
 	}
 
 	if *current != *last {
-		return true
+		return nil
 	}
 
 	if *nLeft == *nRight {
-		return true
+		return nil
 	}
 
 	if *nLeft > *nRight {
-		data.Error = ierr.IncompleteLeft
-		return false
+		return ierr.IncompleteLeft
 	}
 
-	data.Error = ierr.IncompleteRight
-	return false
+	return ierr.IncompleteRight
 }

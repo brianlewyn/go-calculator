@@ -10,10 +10,16 @@ import (
 //
 // otherwise, it returns a zero and an error.
 func Calculate(expr string) (float64, error) {
-	list := tokenize.Tokenizer(data.New(&expr))
+	dataExpr := data.New(&expr)
 
-	if analyse.Analyser(list) {
-		return 0, data.Error
+	list, err := tokenize.Tokenizer(dataExpr)
+	if err != nil {
+		return 0, err
+	}
+
+	err = analyse.Analyser(list)
+	if err != nil {
+		return 0, err
 	}
 
 	return 0 /*Answer*/, nil

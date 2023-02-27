@@ -11,10 +11,8 @@ type tokenize struct {
 	lenght     *int
 }
 
-// linkedList returns an tokenized linked list
-//
-// But if there is any error then the error is stored in data.Error
-func (t *tokenize) linkedList() *[]*data.Token {
+// linkedList returns an tokenized linked list and a possible error
+func (t *tokenize) linkedList() (*[]*data.Token, error) {
 	var list [](*data.Token)
 	var value string
 
@@ -68,8 +66,7 @@ func (t *tokenize) linkedList() *[]*data.Token {
 
 		default:
 			if !data.IsGap(&r) {
-				data.Error = ierr.NewRune(r).Unknown()
-				return &list
+				return nil, ierr.NewRune(r).Unknown()
 			}
 		}
 
@@ -78,18 +75,13 @@ func (t *tokenize) linkedList() *[]*data.Token {
 	}
 
 	*t.expression = data.Empty
-	return &list
+	return &list, nil
 }
 
-// rebuild returns a rebuilt tokenized linked list
-func (t tokenize) rebuild(list *[]*data.Token) *[]*data.Token {
-	if data.Error == nil {
-		return list
-	}
-
+// rebuild returns a rebuilt tokenized linked list and a possible error
+func (t tokenize) rebuild(list *[]*data.Token) (*[]*data.Token, error) {
 	if (*list)[0].IsEmpty() {
-		data.Error = ierr.EmptyField
-		return list
+		return nil, ierr.EmptyField
 	}
 
 	for i, temp := -1, (*list)[0].Head(); temp.Next() != nil; temp = temp.Next() {
@@ -100,7 +92,7 @@ func (t tokenize) rebuild(list *[]*data.Token) *[]*data.Token {
 		}
 	}
 
-	return list
+	return list, nil
 }
 
 // !Tool Methods
