@@ -19,16 +19,6 @@ func (t Token) Value() *string {
 	return &t.value
 }
 
-// By delete
-func (t Token) Head() *Token  { return &Token{} }
-func (t Token) Next() *Token  { return &Token{} }
-func (t Token) Prev() *Token  { return &Token{} }
-func (t Token) Tail() *Token  { return &Token{} }
-func (t Token) Size() int     { return 0 }
-func (t Token) IsEmpty() bool { return false }
-
-func (t Token) Insert(i int, token *Token) {}
-
 const (
 	_ = TokenKind(iota)
 

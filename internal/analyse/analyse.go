@@ -3,11 +3,12 @@ package analyse
 import (
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
+	d "github.com/brianlewyn/go-linked-list/doubly"
 )
 
 // analyse represents a parser for expression
 type analyse struct {
-	list *[]*data.Token
+	list *d.Doubly[*data.Token]
 }
 
 // isCorrect returns nil if the syntax is correct, otherwise returns an error
@@ -15,28 +16,28 @@ func (a analyse) isCorrect() error {
 	var bug error
 	var nL, nR int
 
-	for temp := (*a.list)[0].Head(); temp.Next() != nil; temp = temp.Next() {
-		bug = a.isCorrectFirst(temp)
+	for temp := a.list.Head(); temp.Next() != nil; temp = temp.Next() {
+		bug = a.isCorrectFirst(temp.Data())
 		if bug != nil {
 			return bug
 		}
 
-		bug = a.isCorrectLast(temp)
+		bug = a.isCorrectLast(temp.Data())
 		if bug != nil {
 			return bug
 		}
 
-		bug = isCorrectNumber(temp)
+		bug = isCorrectNumber(temp.Data())
 		if bug != nil {
 			return bug
 		}
 
-		bug = canBeTogether(temp, temp.Next())
+		bug = canBeTogether(temp.Data(), temp.Next().Data())
 		if bug != nil {
 			return bug
 		}
 
-		bug = areCorrectParentheses(&nL, &nR, temp, (*a.list)[0].Tail())
+		bug = areCorrectParentheses(&nL, &nR, temp.Data(), a.list.Tail().Data())
 		if bug != nil {
 			return bug
 		}
@@ -49,7 +50,7 @@ func (a analyse) isCorrect() error {
 
 // isCorrectFirst returns nil is the number is correct, otherwise returns an error
 func (a analyse) isCorrectFirst(token *data.Token) error {
-	if token != (*a.list)[0].Head() {
+	if token != a.list.Head().Data() {
 		return nil
 	}
 
@@ -62,7 +63,7 @@ func (a analyse) isCorrectFirst(token *data.Token) error {
 
 // isCorrectLast returns nil is the number is correct, otherwise returns an error
 func (a analyse) isCorrectLast(token *data.Token) error {
-	if token == (*a.list)[0].Tail() {
+	if token == a.list.Tail().Data() {
 		return nil
 	}
 

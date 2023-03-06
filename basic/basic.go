@@ -7,8 +7,7 @@ import (
 )
 
 /*
-Calculate solves a basic math expression
-
+Calculate solves a basic math expression and
 returns the result if it is correct and nil,
 otherwise, returns a zero value and an error.
 */
