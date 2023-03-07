@@ -106,6 +106,7 @@ func (t tokenize) rebuild(list *d.Doubly[*data.Token]) (*d.Doubly[*data.Token], 
 func (t *tokenize) isPi(r *rune) bool {
 	if *t.lenght < 2 {
 		return false
+		// ^ I didn't find a value to test it, but I leave this line just in case
 	}
 
 	last := rune((*t.expression)[1])
@@ -123,6 +124,7 @@ func (t *tokenize) isPi(r *rune) bool {
 func (t *tokenize) isRoot(r *rune) bool {
 	if *t.lenght < 3 {
 		return false
+		// ^ I didn't find a value to test it, but I leave this line just in case
 	}
 
 	second := rune((*t.expression)[1])
@@ -135,6 +137,7 @@ func (t *tokenize) isRoot(r *rune) bool {
 	}
 
 	return false
+	// ^ I didn't find a value to test it, but I leave this line just in case
 }
 
 // isFloat return true if the first rune of the expression is float, otherwise returns false

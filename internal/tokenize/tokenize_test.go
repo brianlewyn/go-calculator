@@ -30,7 +30,7 @@ func Test_tokenize_linkedList(t *testing.T) {
 		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList()")
 	})
 
-	t.Run("From an expression filled with an inappropriate symbol to a list", func(t *testing.T) {
+	t.Run("From an expression with some inappropriate symbols to a list", func(t *testing.T) {
 		expression := "12345 + hola + 12345"
 		lenght := len(expression)
 
@@ -47,7 +47,7 @@ func Test_tokenize_linkedList(t *testing.T) {
 	})
 
 	t.Run("From a filled expression to a list", func(t *testing.T) {
-		expression := "(0 - 1 + 2 * 3 / 4 ^ 5 % 6 + √π)"
+		expression := "(0 - 1 + 2 * 3 / 4 ^ 5 % 6 + √π) - 1.234"
 		lenght := len(expression)
 
 		tokenizer := tokenize{
@@ -77,6 +77,8 @@ func Test_tokenize_linkedList(t *testing.T) {
 		wantList.Append(d.NewNode(data.NewRootToken()))
 		wantList.Append(d.NewNode(data.NewPiToken()))
 		wantList.Append(d.NewNode(data.NewRightToken()))
+		wantList.Append(d.NewNode(data.NewSubToken()))
+		wantList.Append(d.NewNode(data.NewNumToken("1.234")))
 
 		node1 := gotList.Head()
 		node2 := wantList.Head()
@@ -130,89 +132,6 @@ func Test_tokenize_rebuild(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("tokenize.rebuild() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_tokenize_isPi(t *testing.T) {
-	type fields struct {
-		expression *string
-		lenght     *int
-	}
-	type args struct {
-		r *rune
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tr := &tokenize{
-				expression: tt.fields.expression,
-				lenght:     tt.fields.lenght,
-			}
-			if got := tr.isPi(tt.args.r); got != tt.want {
-				t.Errorf("tokenize.isPi() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_tokenize_isRoot(t *testing.T) {
-	type fields struct {
-		expression *string
-		lenght     *int
-	}
-	type args struct {
-		r *rune
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tr := &tokenize{
-				expression: tt.fields.expression,
-				lenght:     tt.fields.lenght,
-			}
-			if got := tr.isRoot(tt.args.r); got != tt.want {
-				t.Errorf("tokenize.isRoot() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_tokenize_isFloat(t *testing.T) {
-	type fields struct {
-		expression *string
-		lenght     *int
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tr := tokenize{
-				expression: tt.fields.expression,
-				lenght:     tt.fields.lenght,
-			}
-			if got := tr.isFloat(); got != tt.want {
-				t.Errorf("tokenize.isFloat() = %v, want %v", got, tt.want)
 			}
 		})
 	}
