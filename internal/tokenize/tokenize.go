@@ -88,7 +88,7 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 		return nil, ierr.EmptyField
 	}
 
-	for i, temp := 1, list.Head().Node; temp.Next() != nil; i, temp = i+1, temp.Next() {
+	for i, temp := 1, list.Head(); temp.Next() != nil; i, temp = i+1, temp.Next() {
 		if canBeAddedAsterisk(&plugin.TokenNode{Node: temp}) {
 			list.Insert(i, data.NewMulToken())
 

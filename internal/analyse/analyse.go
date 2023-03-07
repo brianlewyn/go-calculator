@@ -16,7 +16,7 @@ func (a analyse) isCorrect() error {
 	var bug error
 	var nL, nR int
 
-	for temp := a.list.Head().Node; temp.Next() != nil; temp = temp.Next() {
+	for temp := a.list.Head(); temp.Next() != nil; temp = temp.Next() {
 		bug = a.isCorrectFirst(temp.Data())
 		if bug != nil {
 			return bug

@@ -140,12 +140,12 @@ func Test_tokenize_rebuild(t *testing.T) {
 		wantList.Append(data.NewRightToken())
 
 		areEqualList(t, gotList, wantList)
-		// assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList()")
+		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList()")
 	})
 }
 
 func areEqualList(t *testing.T, got, want *plugin.TokenList) {
-	node1, node2 := got.Head().Node, want.Head().Node
+	node1, node2 := got.Head(), want.Head()
 
 	for node1 != nil && node2 != nil {
 		token1, token2 := node1.Data(), node2.Data()

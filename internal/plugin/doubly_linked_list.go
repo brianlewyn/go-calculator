@@ -19,16 +19,6 @@ func NewTokenList() *TokenList {
 	return &TokenList{&doubly.Doubly[*data.Token]{}}
 }
 
-// Head returns the first node in the list, but if the list is empty returns nil
-func (l TokenList) Head() *TokenNode {
-	return &TokenNode{l.Doubly.Head()}
-}
-
-// Tail returns the last node in the list, but if the list is empty returns nil
-func (l TokenList) Tail() *TokenNode {
-	return &TokenNode{l.Doubly.Tail()}
-}
-
 // Prepend adds a new token to the end of the list and returns nil,
 // and otherwise returns an error
 func (l *TokenList) Append(token *data.Token) error {
