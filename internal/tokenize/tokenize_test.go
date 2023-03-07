@@ -1,7 +1,6 @@
 package tokenize
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/brianlewyn/go-calculator/ierr"
@@ -103,76 +102,80 @@ func Test_tokenize_linkedList(t *testing.T) {
 }
 
 func Test_tokenize_rebuild(t *testing.T) {
-	type fields struct {
-		expression *string
-		lenght     *int
-	}
-	type args struct {
-		list *d.Doubly[*data.Token]
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *d.Doubly[*data.Token]
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tr := tokenize{
-				expression: tt.fields.expression,
-				lenght:     tt.fields.lenght,
-			}
-			got, err := tr.rebuild(tt.args.list)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("tokenize.rebuild() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("tokenize.rebuild() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+	assert := assert.New(t)
 
-func Test_canBeAddedAsterisk(t *testing.T) {
-	type args struct {
-		node *d.Node[*data.Token]
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := canBeAddedAsterisk(tt.args.node); got != tt.want {
-				t.Errorf("canBeAddedAsterisk() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+	t.Run("From an empty list to a list rebuilded", func(t *testing.T) {
+		expression := "   "
+		lenght := len(expression)
 
-func Test_canBeAddedZero(t *testing.T) {
-	type args struct {
-		node *d.Node[*data.Token]
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := canBeAddedZero(tt.args.node); got != tt.want {
-				t.Errorf("canBeAddedZero() = %v, want %v", got, tt.want)
+		tokenizer := tokenize{
+			expression: &expression,
+			lenght:     &lenght,
+		}
+
+		gotList, err := tokenizer.linkedList()
+		assert.NoError(err, "tokenizer.linkedList() error != nil")
+
+		gotList, err = tokenizer.rebuild(gotList)
+		assert.ErrorIsf(err, ierr.EmptyField, "ierr.EmptyField != %v", err)
+		assert.Nil(gotList, "gotList != nil")
+	})
+
+	t.Run("From a list to a list rebuilded", func(t *testing.T) {
+		expression := "(+10)(-12)(*12)"
+		lenght := len(expression)
+
+		tokenizer := tokenize{
+			expression: &expression,
+			lenght:     &lenght,
+		}
+
+		gotList, err := tokenizer.linkedList()
+		assert.NoError(err, "tokenizer.linkedList() error != nil")
+
+		gotList, err = tokenizer.rebuild(gotList)
+		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
+
+		wantList := d.NewDoubly[*data.Token]()
+		// (0+10)
+		wantList.Append(d.NewNode(data.NewLeftToken()))
+		wantList.Append(d.NewNode(data.NewNumToken("0")))
+		wantList.Append(d.NewNode(data.NewAddToken()))
+		wantList.Append(d.NewNode(data.NewNumToken("10")))
+		wantList.Append(d.NewNode(data.NewRightToken()))
+		// *
+		wantList.Append(d.NewNode(data.NewMulToken()))
+		// (0-12)
+		wantList.Append(d.NewNode(data.NewLeftToken()))
+		wantList.Append(d.NewNode(data.NewNumToken("0")))
+		wantList.Append(d.NewNode(data.NewSubToken()))
+		wantList.Append(d.NewNode(data.NewNumToken("12")))
+		wantList.Append(d.NewNode(data.NewRightToken()))
+		// *
+		wantList.Append(d.NewNode(data.NewMulToken()))
+		// (*12)
+		wantList.Append(d.NewNode(data.NewLeftToken()))
+		wantList.Append(d.NewNode(data.NewMulToken()))
+		wantList.Append(d.NewNode(data.NewNumToken("12")))
+		wantList.Append(d.NewNode(data.NewRightToken()))
+
+		node1 := gotList.Head()
+		node2 := wantList.Head()
+
+		for i := 0; node1 != nil && node2 != nil; i++ {
+			token1 := node1.Data()
+			token2 := node2.Data()
+
+			if assert.EqualValues(token1.Kind(), token2.Kind(), "kind1 != kind2") {
+				if token1.Kind() == data.NumToken {
+					assert.EqualValues(*token1.Value(), *token2.Value(), "value1 != value2")
+				}
 			}
-		})
-	}
+
+			node1 = node1.Next()
+			node2 = node2.Next()
+		}
+
+		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList()")
+	})
 }

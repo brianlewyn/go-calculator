@@ -88,12 +88,12 @@ func (t tokenize) rebuild(list *d.Doubly[*data.Token]) (*d.Doubly[*data.Token], 
 		return nil, ierr.EmptyField
 	}
 
-	for i, temp := -1, list.Head(); temp.Next() != nil; temp = temp.Next() {
-		if i++; canBeAddedAsterisk(temp) {
-			list.Insert(i+1, d.NewNode(data.NewMulToken()))
+	for i, temp := 1, list.Head(); temp.Next() != nil; i, temp = i+1, temp.Next() {
+		if canBeAddedAsterisk(temp) {
+			list.Insert(i, d.NewNode(data.NewMulToken()))
 
 		} else if canBeAddedZero(temp) {
-			list.Insert(i+1, d.NewNode(data.NewNumToken("0")))
+			list.Insert(i, d.NewNode(data.NewNumToken("0")))
 		}
 	}
 
