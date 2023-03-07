@@ -3,12 +3,12 @@ package analyse
 import (
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	d "github.com/brianlewyn/go-linked-list/doubly"
+	"github.com/brianlewyn/go-calculator/internal/plugin"
 )
 
 // analyse represents a parser for expression
 type analyse struct {
-	list *d.Doubly[*data.Token]
+	list *plugin.TokenList
 }
 
 // isCorrect returns nil if the syntax is correct, otherwise returns an error
@@ -16,7 +16,7 @@ func (a analyse) isCorrect() error {
 	var bug error
 	var nL, nR int
 
-	for temp := a.list.Head(); temp.Next() != nil; temp = temp.Next() {
+	for temp := a.list.Head().Node; temp.Next() != nil; temp = temp.Next() {
 		bug = a.isCorrectFirst(temp.Data())
 		if bug != nil {
 			return bug

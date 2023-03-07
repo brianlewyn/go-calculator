@@ -3,7 +3,7 @@ package tokenize
 import (
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	d "github.com/brianlewyn/go-linked-list/doubly"
+	"github.com/brianlewyn/go-calculator/internal/plugin"
 )
 
 // tokenize represent the tokenized linked list
@@ -13,8 +13,8 @@ type tokenize struct {
 }
 
 // linkedList returns an tokenized linked list and a possible error
-func (t *tokenize) linkedList() (*d.Doubly[*data.Token], error) {
-	list := d.NewDoubly[*data.Token]()
+func (t *tokenize) linkedList() (*plugin.TokenList, error) {
+	list := plugin.NewTokenList()
 	var value string
 
 	if *t.lenght == 0 {
@@ -28,35 +28,35 @@ func (t *tokenize) linkedList() (*d.Doubly[*data.Token], error) {
 
 		// opeartors
 		case data.IsMod(&r):
-			list.Append(d.NewNode(data.NewModToken()))
+			list.Append(data.NewModToken())
 		case data.IsMul(&r):
-			list.Append(d.NewNode(data.NewMulToken()))
+			list.Append(data.NewMulToken())
 		case data.IsAdd(&r):
-			list.Append(d.NewNode(data.NewAddToken()))
+			list.Append(data.NewAddToken())
 		case data.IsSub(&r):
-			list.Append(d.NewNode(data.NewSubToken()))
+			list.Append(data.NewSubToken())
 		case data.IsDiv(&r):
-			list.Append(d.NewNode(data.NewDivToken()))
+			list.Append(data.NewDivToken())
 
 		// parentheses
 		case data.IsLeft(&r):
-			list.Append(d.NewNode(data.NewLeftToken()))
+			list.Append(data.NewLeftToken())
 		case data.IsRight(&r):
-			list.Append(d.NewNode(data.NewRightToken()))
+			list.Append(data.NewRightToken())
 
 		// power
 		case data.IsPow(&r):
-			list.Append(d.NewNode(data.NewPowToken()))
+			list.Append(data.NewPowToken())
 
 		// special: pi or root
 		case data.IsSpecial(&r):
 
 			if t.isPi(&r) {
-				list.Append(d.NewNode(data.NewPiToken()))
+				list.Append(data.NewPiToken())
 				continue
 
 			} else if t.isRoot(&r) {
-				list.Append(d.NewNode(data.NewRootToken()))
+				list.Append(data.NewRootToken())
 				continue
 			}
 
@@ -65,7 +65,7 @@ func (t *tokenize) linkedList() (*d.Doubly[*data.Token], error) {
 			value += string(r)
 
 			if !t.isFloat() {
-				list.Append(d.NewNode(data.NewNumToken(value)))
+				list.Append(data.NewNumToken(value))
 				value = data.Empty
 			}
 
@@ -83,17 +83,17 @@ func (t *tokenize) linkedList() (*d.Doubly[*data.Token], error) {
 }
 
 // rebuild returns a rebuilt tokenized linked list and a possible error
-func (t tokenize) rebuild(list *d.Doubly[*data.Token]) (*d.Doubly[*data.Token], error) {
+func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 	if list.IsEmpty() {
 		return nil, ierr.EmptyField
 	}
 
-	for i, temp := 1, list.Head(); temp.Next() != nil; i, temp = i+1, temp.Next() {
-		if canBeAddedAsterisk(temp) {
-			list.Insert(i, d.NewNode(data.NewMulToken()))
+	for i, temp := 1, list.Head().Node; temp.Next() != nil; i, temp = i+1, temp.Next() {
+		if canBeAddedAsterisk(&plugin.TokenNode{Node: temp}) {
+			list.Insert(i, data.NewMulToken())
 
-		} else if canBeAddedZero(temp) {
-			list.Insert(i, d.NewNode(data.NewNumToken("0")))
+		} else if canBeAddedZero(&plugin.TokenNode{Node: temp}) {
+			list.Insert(i, data.NewNumToken("0"))
 		}
 	}
 
@@ -156,7 +156,7 @@ func (t tokenize) isFloat() bool {
 // !Tool Functions
 
 // canBeAddedAsterisk returns true if an asterisk can be added
-func canBeAddedAsterisk(node *d.Node[*data.Token]) bool {
+func canBeAddedAsterisk(node *plugin.TokenNode) bool {
 	if node.Data().Kind() == data.RightToken {
 		return node.Next().Data().Kind() == data.LeftToken
 	}
@@ -164,7 +164,7 @@ func canBeAddedAsterisk(node *d.Node[*data.Token]) bool {
 }
 
 // canBeAddedZero returns true if an zero can be added
-func canBeAddedZero(node *d.Node[*data.Token]) bool {
+func canBeAddedZero(node *plugin.TokenNode) bool {
 	if node.Data().Kind() == data.LeftToken {
 		switch node.Next().Data().Kind() {
 		case data.AddToken:
