@@ -14,8 +14,12 @@ type tokenize struct {
 
 // linkedList returns an tokenized linked list and a possible error
 func (t *tokenize) linkedList() (*d.Doubly[*data.Token], error) {
-	var list *d.Doubly[*data.Token]
+	list := d.NewDoubly[*data.Token]()
 	var value string
+
+	if *t.lenght == 0 {
+		return list, ierr.EmptyField
+	}
 
 	for *t.lenght > 0 {
 		r := rune((*t.expression)[0])
@@ -75,7 +79,6 @@ func (t *tokenize) linkedList() (*d.Doubly[*data.Token], error) {
 		*t.lenght--
 	}
 
-	*t.expression = data.Empty
 	return list, nil
 }
 
