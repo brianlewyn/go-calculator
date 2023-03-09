@@ -22,15 +22,15 @@ const ( // Others
 )
 
 const ( // Pi
-	Pi       rune = 'π' // Pi Number = 'π'
-	PrefixPi rune = 207 // The prefix of Pi
-	PiLenght int  = 2   // Pi lenght
+	Pi       rune  = 'π' // Pi Number = 'π'
+	PrefixPi rune  = 207 // The prefix of Pi
+	PiLenght uint8 = 2   // Pi lenght
 )
 
 const ( // Root
-	Root       rune = '√' // Square Root = '√'
-	PrefixRoot rune = 226 // The prefix of Root
-	RootLenght int  = 3   // Root lenght
+	Root       rune  = '√' // Square Root = '√'
+	PrefixRoot rune  = 226 // The prefix of Root
+	RootLenght uint8 = 3   // Root lenght
 )
 
 // !For each rune

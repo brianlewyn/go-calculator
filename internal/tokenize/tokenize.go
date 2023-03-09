@@ -33,6 +33,7 @@ func Tokenizer(data *data.Data) (*plugin.TokenList, error) {
 func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 	list := plugin.NewTokenList()
 	var value string
+	var num int
 
 	if *t.lenght == 0 {
 		return list, ierr.EmptyField
@@ -40,6 +41,7 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 
 	for *t.lenght > 0 {
 		r := rune((*t.expression)[0])
+		num = 1
 
 		switch {
 
@@ -68,13 +70,13 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 		// prefix of pi or root
 		case data.IsPrefix(&r):
 
-			if t.isPi(&r) {
+			if data.IsPrefixPi(&r) {
 				list.Append(data.NewPiToken())
-				continue
+				num = int(data.PiLenght)
 
-			} else if t.isRoot(&r) {
+			} else if data.IsPrefixRoot(&r) {
 				list.Append(data.NewRootToken())
-				continue
+				num = int(data.RootLenght)
 			}
 
 		// numbers
@@ -92,8 +94,8 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 			}
 		}
 
-		*t.expression = (*t.expression)[1:]
-		*t.lenght--
+		*t.expression = (*t.expression)[num:]
+		*t.lenght -= num
 	}
 
 	return list, nil
@@ -118,46 +120,6 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 }
 
 // !Tool Methods
-
-// isPi return true if r is pi number, otherwise returns false
-func (t *tokenize) isPi(r *rune) bool {
-	if !data.IsPrefixPi(r) {
-		return false
-	}
-
-	if *t.lenght < data.RootLenght {
-		return false
-	}
-
-	rs := []rune((*t.expression)[:data.PiLenght])
-	if !data.IsPi(&rs[0]) {
-		return false
-	}
-
-	*t.expression = (*t.expression)[data.PiLenght:]
-	*t.lenght -= data.PiLenght
-	return true
-}
-
-// isRoot return true if r is square root, otherwise returns false
-func (t *tokenize) isRoot(r *rune) bool {
-	if !data.IsPrefixRoot(r) {
-		return false
-	}
-
-	if *t.lenght < data.RootLenght {
-		return false
-	}
-
-	rs := []rune((*t.expression)[:data.RootLenght])
-	if !data.IsRoot(&rs[0]) {
-		return false
-	}
-
-	*t.expression = (*t.expression)[data.RootLenght:]
-	*t.lenght -= data.RootLenght
-	return true
-}
 
 // isFloat return true if the first rune of the expression is float, otherwise returns false
 func (t tokenize) isFloat() bool {
