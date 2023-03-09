@@ -121,7 +121,7 @@ func IsOperator(kind TokenKind) bool {
 	return true
 }
 
-// isOperatorPowParentheses returns true if kind is:
+// Kind returns a TokenKind:
 //
 // %, *, +, -, /, (, ), ^, √, π, n=#
 func Kind(kind TokenKind) rune {

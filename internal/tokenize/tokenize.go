@@ -12,6 +12,23 @@ type tokenize struct {
 	lenght     *int
 }
 
+// Tokenizer tokenizes the expression in a linked list,
+//
+// but while creating the list, the expression is removed
+func Tokenizer(data *data.Data) (*plugin.TokenList, error) {
+	tokenizer := tokenize{
+		expression: data.Expression(),
+		lenght:     data.Lenght(),
+	}
+
+	list, err := tokenizer.linkedList()
+	if err != nil {
+		return nil, err
+	}
+
+	return tokenizer.rebuild(list)
+}
+
 // linkedList returns an tokenized linked list and a possible error
 func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 	list := plugin.NewTokenList()
@@ -89,10 +106,10 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 	}
 
 	for i, temp := 1, list.Head(); temp.Next() != nil; i, temp = i+1, temp.Next() {
-		if canBeAddedAsterisk(&plugin.TokenNode{Node: temp}) {
+		if canBeAddedAsterisk(plugin.NewTokenNode(temp)) {
 			list.Insert(i, data.NewMulToken())
 
-		} else if canBeAddedZero(&plugin.TokenNode{Node: temp}) {
+		} else if canBeAddedZero(plugin.NewTokenNode(temp)) {
 			list.Insert(i, data.NewNumToken("0"))
 		}
 	}

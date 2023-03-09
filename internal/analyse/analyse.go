@@ -11,12 +11,17 @@ type analyse struct {
 	list *plugin.TokenList
 }
 
+// Analyser returns nil if the basic math expression is correct, otherwise returns an error
+func Analyser(list *plugin.TokenList) error {
+	return analyse{list: list}.isCorrect()
+}
+
 // isCorrect returns nil if the syntax is correct, otherwise returns an error
 func (a analyse) isCorrect() error {
 	var bug error
 	var nL, nR int
 
-	for temp := a.list.Head(); temp.Next() != nil; temp = temp.Next() {
+	for temp := a.list.Head(); temp != nil; temp = temp.Next() {
 		bug = a.isCorrectFirst(temp.Data())
 		if bug != nil {
 			return bug
@@ -32,12 +37,12 @@ func (a analyse) isCorrect() error {
 			return bug
 		}
 
-		bug = canBeTogether(temp.Data(), temp.Next().Data())
+		bug = canBeTogether(plugin.NewTokenNode(temp), plugin.NewTokenNode(temp.Next()))
 		if bug != nil {
 			return bug
 		}
 
-		bug = areCorrectParentheses(&nL, &nR, temp.Data(), a.list.Tail().Data())
+		bug = areCorrectParentheses(&nL, &nR, plugin.NewTokenNode(temp), plugin.NewTokenNode(a.list.Tail()))
 		if bug != nil {
 			return bug
 		}
@@ -50,7 +55,7 @@ func (a analyse) isCorrect() error {
 
 // isCorrectFirst returns nil is the number is correct, otherwise returns an error
 func (a analyse) isCorrectFirst(token *data.Token) error {
-	if token != a.list.Head().Data() {
+	if *token != *a.list.Head().Data() {
 		return nil
 	}
 
@@ -63,7 +68,7 @@ func (a analyse) isCorrectFirst(token *data.Token) error {
 
 // isCorrectLast returns nil is the number is correct, otherwise returns an error
 func (a analyse) isCorrectLast(token *data.Token) error {
-	if token == a.list.Tail().Data() {
+	if *token != *a.list.Tail().Data() {
 		return nil
 	}
 
@@ -84,7 +89,7 @@ func isCorrectNumber(token *data.Token) error {
 
 	var number = token.Value()
 
-	if !isAbsurdDot(number) {
+	if isAbsurdDot(number) {
 		return ierr.NewNumber(*number).Misspelled()
 	}
 
@@ -92,12 +97,6 @@ func isCorrectNumber(token *data.Token) error {
 	var nDigit uint16
 
 	for _, r := range *number {
-		if !data.IsFloat(&r) {
-			flagDot = false
-			nDigit = 0
-			continue
-		}
-
 		if data.IsDot(&r) {
 			if flagDot {
 				return ierr.NewNumber(*number).Misspelled()
@@ -105,7 +104,7 @@ func isCorrectNumber(token *data.Token) error {
 			flagDot = true
 		}
 
-		if nDigit++; nDigit == data.DigitLimit {
+		if nDigit++; nDigit >= data.DigitLimit {
 			return ierr.NewNumber(*number).Limit()
 		}
 	}
@@ -115,35 +114,18 @@ func isCorrectNumber(token *data.Token) error {
 
 // isAbsurdDot returns true if there is a dot in absurd position, otherwise returns false
 func isAbsurdDot(num *string) bool {
-	n := len(*num)
-
-	if data.Dot == rune((*num)[n-1]) {
-		return true
-	}
-
-	if n > 3 {
-		return false
-	}
-
-	switch *num {
-	case ".":
-	case "0.":
-	case ".0":
-	case "0.0":
-	default:
-		return false
-	}
-
-	return true
+	return data.Dot == rune((*num)[len(*num)-1])
 }
 
 // canBeTogether returns nil if there are not duplicate kinds, otherwise returns an error
-func canBeTogether(token1, token2 *data.Token) error {
-	if token2 == nil {
+func canBeTogether(curr, next *plugin.TokenNode) error {
+	if next.Node == nil {
 		return nil
 	}
 
+	token1, token2 := curr.Data(), next.Data()
 	kind1, kind2 := token1.Kind(), token2.Kind()
+
 	beTogether := data.CanBeTogether(kind1, kind2)
 
 	if !beTogether {
@@ -176,15 +158,15 @@ func format(token1, token2 *data.Token) (string, string) {
 }
 
 // areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error
-func areCorrectParentheses(nLeft, nRight *int, current, last *data.Token) error {
-
-	if current.Kind() == data.LeftToken {
+func areCorrectParentheses(nLeft, nRight *int, curr, last *plugin.TokenNode) error {
+	switch curr.Data().Kind() {
+	case data.LeftToken:
 		*nLeft++
-	} else if current.Kind() == data.RightToken {
+	case data.RightToken:
 		*nRight++
 	}
 
-	if *current != *last {
+	if *curr.Node != *last.Node {
 		return nil
 	}
 

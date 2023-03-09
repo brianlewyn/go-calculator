@@ -10,11 +10,17 @@ type TokenNode struct {
 	*doubly.Node[*data.Token]
 }
 
+// NewTokenNode creates a new instance of TokenNode
+func NewTokenNode(node *doubly.Node[*data.Token]) *TokenNode {
+	return &TokenNode{Node: node}
+}
+
 // TokenList represents the Token List
 type TokenList struct {
 	*doubly.Doubly[*data.Token]
 }
 
+// NewTokenList creates a new instance of TokenList
 func NewTokenList() *TokenList {
 	return &TokenList{&doubly.Doubly[*data.Token]{}}
 }
