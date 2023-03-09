@@ -65,8 +65,8 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 		case data.IsPow(&r):
 			list.Append(data.NewPowToken())
 
-		// special: pi or root
-		case data.IsSpecial(&r):
+		// prefix of pi or root
+		case data.IsPrefix(&r):
 
 			if t.isPi(&r) {
 				list.Append(data.NewPiToken())
@@ -121,40 +121,42 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 
 // isPi return true if r is pi number, otherwise returns false
 func (t *tokenize) isPi(r *rune) bool {
-	if *t.lenght < 2 {
+	if !data.IsPrefixPi(r) {
 		return false
-		// ^ I didn't find a value to test it, but I leave this line just in case
 	}
 
-	last := rune((*t.expression)[1])
-
-	if data.IsPi(r, &last) {
-		*t.expression = (*t.expression)[2:]
-		*t.lenght -= 2
-		return true
+	if *t.lenght < data.RootLenght {
+		return false
 	}
 
-	return false
+	rs := []rune((*t.expression)[:data.PiLenght])
+	if !data.IsPi(&rs[0]) {
+		return false
+	}
+
+	*t.expression = (*t.expression)[data.PiLenght:]
+	*t.lenght -= data.PiLenght
+	return true
 }
 
 // isRoot return true if r is square root, otherwise returns false
 func (t *tokenize) isRoot(r *rune) bool {
-	if *t.lenght < 3 {
+	if !data.IsPrefixRoot(r) {
 		return false
-		// ^ I didn't find a value to test it, but I leave this line just in case
 	}
 
-	second := rune((*t.expression)[1])
-	last := rune((*t.expression)[2])
-
-	if data.IsRoot(r, &second, &last) {
-		*t.expression = (*t.expression)[3:]
-		*t.lenght -= 3
-		return true
+	if *t.lenght < data.RootLenght {
+		return false
 	}
 
-	return false
-	// ^ I didn't find a value to test it, but I leave this line just in case
+	rs := []rune((*t.expression)[:data.RootLenght])
+	if !data.IsRoot(&rs[0]) {
+		return false
+	}
+
+	*t.expression = (*t.expression)[data.RootLenght:]
+	*t.lenght -= data.RootLenght
+	return true
 }
 
 // isFloat return true if the first rune of the expression is float, otherwise returns false

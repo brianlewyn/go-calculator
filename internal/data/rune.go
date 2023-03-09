@@ -21,17 +21,16 @@ const ( // Others
 	Pow rune = '^' // Power = '^'
 )
 
-const ( // Special Pi
-	Pi      rune = 'π' // Pi Number = 'π'
-	PiFirst rune = 207 // Firt sub rune: Pi Number
-	PiLast  rune = 128 // Last sub rune: Pi Number
+const ( // Pi
+	Pi       rune = 'π' // Pi Number = 'π'
+	PrefixPi rune = 207 // The prefix of Pi
+	PiLenght int  = 2   // Pi lenght
 )
 
-const ( // Special Root
+const ( // Root
 	Root       rune = '√' // Square Root = '√'
-	RootFirst  rune = 226 // Firt sub rune: Square Root
-	RootSecond rune = 136 // Second sub rune: Square Root
-	RootLast   rune = 154 // Last sub rune: Square Root
+	PrefixRoot rune = 226 // The prefix of Root
+	RootLenght int  = 3   // Root lenght
 )
 
 // !For each rune
@@ -66,22 +65,26 @@ func IsDot(r *rune) bool { return *r == Dot }
 // IsPow returns true if r is a power
 func IsPow(r *rune) bool { return *r == Pow }
 
-// IsSpecial returns true if r is a initial of π or √
-func IsSpecial(r *rune) bool {
-	return *r == PiFirst || *r == RootFirst
-}
+// IsPi returns true if r is a Pi number
+func IsPi(r *rune) bool { return *r == Pi }
 
-// IsPi returns true if r1 & r2 is a initial of π
-func IsPi(r1, r2 *rune) bool {
-	return *r1 == PiFirst && *r2 == PiLast
-}
+// IsPrefixPi returns true if r is a Pi number
+func IsPrefixPi(r *rune) bool { return *r == PrefixPi }
 
-// IsRoot returns true if r1, r2 & r3 is a initial of √
-func IsRoot(r1, r2, r3 *rune) bool {
-	return *r1 == RootFirst && *r2 == RootSecond && *r3 == RootLast
-}
+// IsRoot returns true if r is a square root
+func IsRoot(r *rune) bool { return *r == Root }
+
+// IsPrefixRoot returns true if r is a square root
+func IsPrefixRoot(r *rune) bool { return *r == PrefixRoot }
 
 // !For each rune group
+
+// IsPrefix returns true if r is a prefix:
+//
+// π, √
+func IsPrefix(r *rune) bool {
+	return *r == PrefixPi || *r == PrefixRoot
+}
 
 // IsNumber returns true if r is:
 //
