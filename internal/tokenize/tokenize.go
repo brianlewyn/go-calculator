@@ -108,10 +108,10 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 	}
 
 	for i, temp := 1, list.Head(); temp.Next() != nil; i, temp = i+1, temp.Next() {
-		if canBeAddedAsterisk(plugin.NewTokenNode(temp)) {
+		if canBeAddedAsterisk(temp) {
 			list.Insert(i, data.NewMulToken())
 
-		} else if canBeAddedZero(plugin.NewTokenNode(temp)) {
+		} else if canBeAddedZero(temp) {
 			list.Insert(i, data.NewNumToken("0"))
 		}
 	}
@@ -138,16 +138,16 @@ func (t tokenize) isFloat() bool {
 
 // canBeAddedAsterisk returns true if an asterisk can be added
 func canBeAddedAsterisk(node *plugin.TokenNode) bool {
-	if node.Data().Kind() == data.RightToken {
-		return node.Next().Data().Kind() == data.LeftToken
+	if node.Token().Kind() == data.RightToken {
+		return node.Next().Token().Kind() == data.LeftToken
 	}
 	return false
 }
 
 // canBeAddedZero returns true if an zero can be added
 func canBeAddedZero(node *plugin.TokenNode) bool {
-	if node.Data().Kind() == data.LeftToken {
-		switch node.Next().Data().Kind() {
+	if node.Token().Kind() == data.LeftToken {
+		switch node.Next().Token().Kind() {
 		case data.AddToken:
 		case data.SubToken:
 		default:

@@ -203,7 +203,7 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 	node1, node2 := got.Head(), want.Head()
 
 	for node1 != nil && node2 != nil {
-		token1, token2 := node1.Data(), node2.Data()
+		token1, token2 := node1.Token(), node2.Token()
 
 		if assert.EqualValues(t, token1.Kind(), token2.Kind(), "kind1 != kind2") {
 			if token1.Kind() == data.NumToken {

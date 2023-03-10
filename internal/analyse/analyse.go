@@ -22,27 +22,27 @@ func (a analyse) isCorrect() error {
 	var nL, nR int
 
 	for temp := a.list.Head(); temp != nil; temp = temp.Next() {
-		bug = a.isCorrectFirst(temp.Data())
+		bug = a.isCorrectFirst(temp.Token())
 		if bug != nil {
 			return bug
 		}
 
-		bug = a.isCorrectLast(temp.Data())
+		bug = a.isCorrectLast(temp.Token())
 		if bug != nil {
 			return bug
 		}
 
-		bug = isCorrectNumber(temp.Data())
+		bug = isCorrectNumber(temp.Token())
 		if bug != nil {
 			return bug
 		}
 
-		bug = canBeTogether(plugin.NewTokenNode(temp), plugin.NewTokenNode(temp.Next()))
+		bug = canBeTogether(temp, temp.Next())
 		if bug != nil {
 			return bug
 		}
 
-		bug = areCorrectParentheses(&nL, &nR, plugin.NewTokenNode(temp), plugin.NewTokenNode(a.list.Tail()))
+		bug = areCorrectParentheses(&nL, &nR, temp, a.list.Tail())
 		if bug != nil {
 			return bug
 		}
@@ -55,7 +55,7 @@ func (a analyse) isCorrect() error {
 
 // isCorrectFirst returns nil is the number is correct, otherwise returns an error
 func (a analyse) isCorrectFirst(token *data.Token) error {
-	if *token != *a.list.Head().Data() {
+	if *token != *a.list.Head().Token() {
 		return nil
 	}
 
@@ -68,7 +68,7 @@ func (a analyse) isCorrectFirst(token *data.Token) error {
 
 // isCorrectLast returns nil is the number is correct, otherwise returns an error
 func (a analyse) isCorrectLast(token *data.Token) error {
-	if *token != *a.list.Tail().Data() {
+	if *token != *a.list.Tail().Token() {
 		return nil
 	}
 
@@ -119,11 +119,11 @@ func isAbsurdDot(num *string) bool {
 
 // canBeTogether returns nil if there are not duplicate kinds, otherwise returns an error
 func canBeTogether(curr, next *plugin.TokenNode) error {
-	if next.Node == nil {
+	if next == nil {
 		return nil
 	}
 
-	token1, token2 := curr.Data(), next.Data()
+	token1, token2 := curr.Token(), next.Token()
 	kind1, kind2 := token1.Kind(), token2.Kind()
 
 	beTogether := data.CanBeTogether(kind1, kind2)
@@ -159,14 +159,14 @@ func format(token1, token2 *data.Token) (string, string) {
 
 // areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error
 func areCorrectParentheses(nLeft, nRight *int, curr, last *plugin.TokenNode) error {
-	switch curr.Data().Kind() {
+	switch curr.Token().Kind() {
 	case data.LeftToken:
 		*nLeft++
 	case data.RightToken:
 		*nRight++
 	}
 
-	if *curr.Node != *last.Node {
+	if *curr != *last {
 		return nil
 	}
 
