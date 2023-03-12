@@ -1,6 +1,9 @@
 package plugin
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-linked-list/doubly"
 )
@@ -54,6 +57,20 @@ func (l TokenList) Head() *TokenNode {
 // Tail returns the last node in the list, but if the list is empty returns nil
 func (l TokenList) Tail() *TokenNode {
 	return &TokenNode{node: l.list.Tail()}
+}
+
+func (l *TokenList) String() string {
+	if l.list.IsEmpty() {
+		return "list <nil>"
+	}
+
+	var b strings.Builder
+
+	for temp := l.list.Head(); temp != nil; temp = temp.Next() {
+		fmt.Fprintf(&b, "%c", data.FromTokenKindToRune(temp.Data().Kind()))
+	}
+
+	return b.String()
 }
 
 // IsEmpty returns true if list is empty and otherwise returns false

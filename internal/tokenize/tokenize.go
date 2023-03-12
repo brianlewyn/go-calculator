@@ -87,7 +87,7 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 
 			if !t.isFloat() {
 				list.Append(data.NewNumToken(value))
-				value = data.Empty
+				value = ""
 			}
 
 		default:
