@@ -59,7 +59,7 @@ func (a analyse) isCorrectFirst(token *data.Token) error {
 		return nil
 	}
 
-	if !data.IsFirst(token.Kind()) {
+	if !data.IsFirstToken(token.Kind()) {
 		return ierr.StartKind
 	}
 
@@ -72,7 +72,7 @@ func (a analyse) isCorrectLast(token *data.Token) error {
 		return nil
 	}
 
-	if !data.IsLast(token.Kind()) {
+	if !data.IsLastToken(token.Kind()) {
 		return ierr.EndKind
 	}
 
@@ -126,7 +126,7 @@ func canBeTogether(curr, next *plugin.TokenNode) error {
 	token1, token2 := curr.Token(), next.Token()
 	kind1, kind2 := token1.Kind(), token2.Kind()
 
-	beTogether := data.CanBeTogether(kind1, kind2)
+	beTogether := data.CanTokensBeTogether(kind1, kind2)
 
 	if !beTogether {
 		return ierr.NewKind(format(token1, token2)).NotTogether()
@@ -139,8 +139,8 @@ func canBeTogether(curr, next *plugin.TokenNode) error {
 func format(token1, token2 *data.Token) (string, string) {
 	var fmt1, fmt2 string
 
-	rune1 := data.Kind(token1.Kind())
-	rune2 := data.Kind(token2.Kind())
+	rune1 := data.FromTokenKindToRune(token1.Kind())
+	rune2 := data.FromTokenKindToRune(token2.Kind())
 
 	if rune1 == data.Jocker {
 		fmt1 = *token1.Value()
@@ -159,10 +159,11 @@ func format(token1, token2 *data.Token) (string, string) {
 
 // areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error
 func areCorrectParentheses(nLeft, nRight *int, curr, last *plugin.TokenNode) error {
-	switch curr.Token().Kind() {
-	case data.LeftToken:
+	kind := curr.Token().Kind()
+
+	if kind == data.LeftToken {
 		*nLeft++
-	case data.RightToken:
+	} else if kind == data.RightToken {
 		*nRight++
 	}
 

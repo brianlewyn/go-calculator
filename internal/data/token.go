@@ -76,10 +76,32 @@ func NewNumToken(value string) *Token {
 	return &Token{kind: NumToken, value: value}
 }
 
-// IsFirst returs true if kind is:
+// !For each token group
+
+// IsAddSubToken returns true if r is:
+//
+// +, -
+func IsAddSubToken(kind TokenKind) bool {
+	if kind != AddToken {
+		return kind == SubToken
+	}
+	return true
+}
+
+// IsAddSubToken returns true if r is:
+//
+// n, π
+func IsNumPiToken(kind TokenKind) bool {
+	if kind != NumToken {
+		return kind == PiToken
+	}
+	return true
+}
+
+// IsFirstToken returs true if kind is:
 //
 // 0-9, (, ., π, √
-func IsFirst(kind TokenKind) bool {
+func IsFirstToken(kind TokenKind) bool {
 	switch kind {
 	case PiToken:
 	case NumToken:
@@ -91,10 +113,10 @@ func IsFirst(kind TokenKind) bool {
 	return true
 }
 
-// IsLast returns true if kind is:
+// IsLastToken returns true if kind is:
 //
 // 0-9, ), π
-func IsLast(kind TokenKind) bool {
+func IsLastToken(kind TokenKind) bool {
 	switch kind {
 	case PiToken:
 	case NumToken:
@@ -105,10 +127,10 @@ func IsLast(kind TokenKind) bool {
 	return true
 }
 
-// IsOperator returns true if kind is:
+// IsOperatorToken returns true if kind is:
 //
 // %, *, +, -, /
-func IsOperator(kind TokenKind) bool {
+func IsOperatorToken(kind TokenKind) bool {
 	switch kind {
 	case ModToken:
 	case MulToken:
@@ -121,10 +143,10 @@ func IsOperator(kind TokenKind) bool {
 	return true
 }
 
-// Kind returns a TokenKind:
+// FromTokenKindToRune returns a TokenKind:
 //
 // %, *, +, -, /, (, ), ^, √, π, n=#
-func Kind(kind TokenKind) rune {
+func FromTokenKindToRune(kind TokenKind) rune {
 	switch kind {
 	case ModToken:
 		return Mod
@@ -152,7 +174,7 @@ func Kind(kind TokenKind) rune {
 }
 
 /*
-CanBeTogether returns true if k1 & k2 are:
+CanTokensBeTogether returns true if k1 & k2 are:
 
 	k1= % k2= (, n, π, √
 	k1= * k2= (, n, π, √
@@ -160,15 +182,14 @@ CanBeTogether returns true if k1 & k2 are:
 	k1= - k2= (, n, π, √
 	k1= / k2= (, n, π, √
 	k1= ( k2= (, n, π, √
+	k1= ^ k2= (, n, π, √
 	k1= √ k2= (, n, π, √
 
 	k1= π k2= %, *, +, -, /, ^, )
 	k1= n k2= %, *, +, -, /, ^, )
 	k1= ) k2= %, *, +, -, /, ^, )
-
-	k1= ^ k2= (, n, π, √, +, -
 */
-func CanBeTogether(k1, k2 TokenKind) bool {
+func CanTokensBeTogether(k1, k2 TokenKind) bool {
 	switch k1 {
 	case ModToken:
 	case MulToken:
@@ -176,15 +197,9 @@ func CanBeTogether(k1, k2 TokenKind) bool {
 	case SubToken:
 	case DivToken:
 	case LeftToken:
+	case PowToken:
 	case RootToken:
-	default:
-		switch k1 {
-		case PiToken:
-		case NumToken:
-		case RightToken:
-		default: // PowToken:
-			return isLeftNumPiRootAddSub(&k2)
-		}
+	default: // Token (Pi||Num||Right)
 		return isOperatorPowRight(&k2)
 	}
 	return isLeftNumPiRoot(&k2)
@@ -205,19 +220,6 @@ func isLeftNumPiRoot(kind *TokenKind) bool {
 	return true
 }
 
-// isLeftNumPiRootAddSub returns true if kind is:
-//
-// (, n, π, √, +, -
-func isLeftNumPiRootAddSub(kind *TokenKind) bool {
-	switch *kind {
-	case AddToken:
-	case SubToken:
-	default:
-		return isLeftNumPiRoot(kind)
-	}
-	return true
-}
-
 // isOperatorPowRight returns true if kind is:
 //
 // %, *, +, -, /, ^, )
@@ -226,7 +228,7 @@ func isOperatorPowRight(kind *TokenKind) bool {
 	case PowToken:
 	case RightToken:
 	default:
-		return IsOperator(*kind)
+		return IsOperatorToken(*kind)
 	}
 	return true
 }

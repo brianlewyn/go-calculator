@@ -197,6 +197,128 @@ func Test_tokenize_rebuild(t *testing.T) {
 		areEqualList(t, gotList, wantList)
 		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList()")
 	})
+
+	t.Run("From a list to a list rebuilded (complex)", func(t *testing.T) {
+		expression := "5^-2 + 5^(2^+(1/2) * 2^+√(π+8)) + 5^+√π"
+		lenght := len(expression)
+
+		tokenizer := tokenize{
+			expression: &expression,
+			lenght:     &lenght,
+		}
+
+		gotList, err := tokenizer.linkedList()
+		assert.NoError(err, "tokenizer.linkedList() error != nil")
+
+		gotList, err = tokenizer.rebuild(gotList)
+		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
+
+		wantList := plugin.NewTokenList()
+		// 10^(0-2)
+		wantList.Append(data.NewNumToken("5"))
+		wantList.Append(data.NewPowToken())
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("0"))
+		wantList.Append(data.NewSubToken())
+		wantList.Append(data.NewNumToken("2"))
+		wantList.Append(data.NewRightToken())
+		// +10^
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewNumToken("5"))
+		wantList.Append(data.NewPowToken())
+		// (2^(0+(1
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("2"))
+		wantList.Append(data.NewPowToken())
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("0"))
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("1"))
+		// /2))*2^
+		wantList.Append(data.NewDivToken())
+		wantList.Append(data.NewNumToken("2"))
+		wantList.Append(data.NewRightToken())
+		wantList.Append(data.NewRightToken())
+		wantList.Append(data.NewMulToken())
+		wantList.Append(data.NewNumToken("2"))
+		wantList.Append(data.NewPowToken())
+		// (0+√
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("0"))
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewRootToken())
+		// (π+8)))
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewPiToken())
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewNumToken("8"))
+		wantList.Append(data.NewRightToken())
+		wantList.Append(data.NewRightToken())
+		wantList.Append(data.NewRightToken())
+		// +5^(0+√π)
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewNumToken("5"))
+		wantList.Append(data.NewPowToken())
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("0"))
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewRootToken())
+		wantList.Append(data.NewPiToken())
+		wantList.Append(data.NewRightToken())
+
+		areEqualList(t, gotList, wantList)
+		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList.Size()")
+	})
+
+	t.Run("From a list to a list rebuilded (bugs complex: single add)", func(t *testing.T) {
+		expression := "^+"
+		lenght := len(expression)
+
+		tokenizer := tokenize{
+			expression: &expression,
+			lenght:     &lenght,
+		}
+
+		gotList, err := tokenizer.linkedList()
+		assert.NoError(err, "tokenizer.linkedList() error != nil")
+
+		gotList, err = tokenizer.rebuild(gotList)
+		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
+
+		wantList := plugin.NewTokenList()
+		// ^++
+		wantList.Append(data.NewPowToken())
+		wantList.Append(data.NewAddToken())
+
+		areEqualList(t, gotList, wantList)
+		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList.Size()")
+	})
+
+	t.Run("From a list to a list rebuilded (bugs complex: double add)", func(t *testing.T) {
+		expression := "^++"
+		lenght := len(expression)
+
+		tokenizer := tokenize{
+			expression: &expression,
+			lenght:     &lenght,
+		}
+
+		gotList, err := tokenizer.linkedList()
+		assert.NoError(err, "tokenizer.linkedList() error != nil")
+
+		gotList, err = tokenizer.rebuild(gotList)
+		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
+
+		wantList := plugin.NewTokenList()
+		// ^++
+		wantList.Append(data.NewPowToken())
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewAddToken())
+
+		areEqualList(t, gotList, wantList)
+		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList.Size()")
+	})
 }
 
 func areEqualList(t *testing.T, got, want *plugin.TokenList) {
@@ -205,7 +327,7 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 	for node1 != nil && node2 != nil {
 		token1, token2 := node1.Token(), node2.Token()
 
-		if assert.EqualValues(t, token1.Kind(), token2.Kind(), "kind1 != kind2") {
+		if assert.Equalf(t, token1.Kind(), token2.Kind(), "kind1 != kind2 %v %v", token1.Kind(), token2.Kind()) {
 			if token1.Kind() == data.NumToken {
 				assert.EqualValues(t, *token1.Value(), *token2.Value(), "value1 != value2")
 			}

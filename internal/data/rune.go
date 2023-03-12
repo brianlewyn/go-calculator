@@ -98,17 +98,7 @@ func IsNumber(r *rune) bool {
 // 0-9, .
 func IsFloat(r *rune) bool {
 	if !IsNumber(r) {
-		return IsDot(r)
-	}
-	return true
-}
-
-// IsMoreLess returns true if r is:
-//
-// +, -
-func IsMoreLess(r *rune) bool {
-	if !IsAdd(r) {
-		return IsSub(r)
+		return *r == Dot
 	}
 	return true
 }

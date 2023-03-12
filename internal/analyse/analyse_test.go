@@ -68,9 +68,9 @@ func TestAnalyser(t *testing.T) {
 		{
 			name: "Bug: Together: Elements together",
 			Bug:  Bug{kind: As, as: new(ierr.Kind)},
-			list: Expr("0++0"),
+			list: Expr("0++0)"),
 			// Try these: %% ** ++ -- // )) ^^ %+ %- %/ %) %^ () ...
-			// All except these: +0+, +., +π+, +√, ...
+			// All except these: +0+, +.0, +π+, +√, 0^+0 ...
 		},
 		{
 			name: "Bug: Together: Numbers together (1)",
@@ -100,7 +100,7 @@ func TestAnalyser(t *testing.T) {
 			name: "NotBug: Expression",
 			Bug:  Bug{kind: Nil},
 			list: Expr("(0.5 + 4.5 - 1) * 10 * √(7-2) / 4^2"),
-			// Try these: 0) (0)) ...
+			// Try this with a correct expression
 		},
 	}
 
