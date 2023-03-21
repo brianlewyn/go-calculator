@@ -1,8 +1,6 @@
 package tokenize
 
 import (
-	"fmt"
-
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/plugin"
@@ -17,18 +15,26 @@ type tokenize struct {
 // Tokenizer tokenizes the expression in a linked list,
 //
 // but while creating the list, the expression is removed
-func Tokenizer(data *data.Data) (*plugin.TokenList, error) {
+func Tokenizer(expData *data.ExpData) (*plugin.TokenList, data.IErrData) {
+	exp := expData.Expression()
+	lenght := expData.Lenght()
+
 	tokenizer := tokenize{
-		expression: data.Expression(),
-		lenght:     data.Lenght(),
+		expression: exp,
+		lenght:     lenght,
 	}
 
 	list, err := tokenizer.linkedList()
 	if err != nil {
-		return nil, err
+		return nil, data.NewErrData(*exp, err)
 	}
 
-	return tokenizer.rebuild(list)
+	list, err = tokenizer.rebuild(list)
+	if err != nil {
+		return nil, data.NewErrData(*exp, err)
+	}
+
+	return list, nil
 }
 
 // linkedList returns an tokenized linked list and a possible error
@@ -265,6 +271,6 @@ func isKindButNodeIsNil(node *plugin.TokenNode, token data.TokenKind) bool {
 
 // addParentheses adds a left token at position i and a right token at position j
 func addParentheses(i, j int, list *plugin.TokenList) {
-	fmt.Println(list.Insert(i, data.NewLeftToken()))
-	fmt.Println(list.Insert(j, data.NewRightToken()))
+	list.Insert(i, data.NewLeftToken())
+	list.Insert(j, data.NewRightToken())
 }

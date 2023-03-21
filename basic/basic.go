@@ -11,20 +11,20 @@ Calculate solves a basic math expression and
 returns the result if it is correct and nil,
 otherwise, returns a zero value and an error.
 */
-func Calculate(expr string) (float64, string, error) {
-	dataExpr := data.New(&expr)
+func Calculate(exp string) (float64, data.IErrData) {
+	expData := data.NewExpData(&exp)
 
-	list, err := tokenize.Tokenizer(dataExpr)
+	list, err := tokenize.Tokenizer(expData)
 	if err != nil {
-		return 0, expr, err
+		return 0, err
 	}
 
 	err = analyse.Analyser(list)
 	if err != nil {
-		return 0, list.String(), err
+		return 0, err
 	}
 
-	return 0 /*Answer*/, "" /*Expression*/, nil
+	return 0 /*Answer*/, nil
 }
 
 /*

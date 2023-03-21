@@ -36,70 +36,70 @@ func TestAnalyser(t *testing.T) {
 		{
 			name: "Bug: First: The first element",
 			Bug:  Bug{kind: Is, is: ierr.StartKind},
-			list: Expr("%"),
+			list: expression("%"),
 			// Try these: % * + - / ) ^
 			// All except these: 0-9, (, ., π, √
 		},
 		{
 			name: "Bug: Last: The last element",
 			Bug:  Bug{kind: Is, is: ierr.EndKind},
-			list: Expr("(("),
+			list: expression("(("),
 			// Try these: (( √√ (√ √( 0+ 0^ 0+√ 0+(
 			// All except these: 0-9, ), π
 		},
 		{
 			name: "Bug: Number: An absurd number",
 			Bug:  Bug{kind: As, as: new(ierr.Number)},
-			list: Expr("1234."),
+			list: expression("1234."),
 			// Try these: . 0. ...
 		},
 		{
 			name: "Bug: Number: Almost number",
 			Bug:  Bug{kind: As, as: new(ierr.Number)},
-			list: Expr("1.234.5"),
+			list: expression("1.234.5"),
 			// Try these: .. .0. .0.0. ...
 		},
 		{
 			name: "Bug: Number: Digit limit",
 			Bug:  Bug{kind: As, as: new(ierr.Number)},
-			list: Expr(strings.Repeat("0", int(data.DigitLimit))),
+			list: expression(strings.Repeat("0", int(data.DigitLimit))),
 			// Try these: Any number with or more than 617 digits
 		},
 		{
 			name: "Bug: Together: Elements together",
 			Bug:  Bug{kind: As, as: new(ierr.Kind)},
-			list: Expr("0++0)"),
+			list: expression("0++0)"),
 			// Try these: %% ** ++ -- // )) ^^ %+ %- %/ %) %^ () ...
 			// All except these: +0+, +.0, +π+, +√, 0^+0 ...
 		},
 		{
 			name: "Bug: Together: Numbers together (1)",
 			Bug:  Bug{kind: As, as: new(ierr.Kind)},
-			list: Expr("π3.14"),
+			list: expression("π3.14"),
 			// Try these: A number pi next to any number
 		},
 		{
 			name: "Bug: Together: Numbers together (2)",
 			Bug:  Bug{kind: As, as: new(ierr.Kind)},
-			list: Expr("3.14π"),
+			list: expression("3.14π"),
 			// Try these: Any number next to number pi
 		},
 		{
 			name: "Bug: Parentheses: Left parentheses",
 			Bug:  Bug{kind: Is, is: ierr.IncompleteLeft},
-			list: Expr("(0"),
+			list: expression("(0"),
 			// Try these: (0 ((0) ...
 		},
 		{
 			name: "Bug: Parentheses: Right parentheses",
 			Bug:  Bug{kind: Is, is: ierr.IncompleteRight},
-			list: Expr("0)"),
+			list: expression("0)"),
 			// Try these: 0) (0)) ...
 		},
 		{
 			name: "NotBug: Expression",
 			Bug:  Bug{kind: Nil},
-			list: Expr("(0.5 + 4.5 - 1) * 10 * √(7-2) / 4^2"),
+			list: expression("(0.5 + 4.5 - 1) * 10 * √(7-2) / 4^2"),
 			// Try this with a correct expression
 		},
 	}
@@ -110,9 +110,9 @@ func TestAnalyser(t *testing.T) {
 
 			switch tt.kind {
 			case As:
-				assert.ErrorAsf(err, &tt.as, "Analyser() error != As: %v", err)
+				assert.ErrorAsf(err.Bug(), &tt.as, "Analyser() error != As: %v", err.Bug())
 			case Is:
-				assert.ErrorIsf(err, tt.is, "Analyser() error != Is: %v", err)
+				assert.ErrorIsf(err.Bug(), tt.is, "Analyser() error != Is: %v", err.Bug())
 			default:
 				assert.Nilf(err, "Analyser() error != Nil: %v", err)
 			}
@@ -120,7 +120,7 @@ func TestAnalyser(t *testing.T) {
 	}
 }
 
-func Expr(expr string) *plugin.TokenList {
-	list, _ := tokenize.Tokenizer(data.New(&expr))
+func expression(exp string) *plugin.TokenList {
+	list, _ := tokenize.Tokenizer(data.NewExpData(&exp))
 	return list
 }

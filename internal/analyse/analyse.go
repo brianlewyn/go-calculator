@@ -12,8 +12,15 @@ type analyse struct {
 }
 
 // Analyser returns nil if the basic math expression is correct, otherwise returns an error
-func Analyser(list *plugin.TokenList) error {
-	return analyse{list: list}.isCorrect()
+func Analyser(list *plugin.TokenList) data.IErrData {
+	analyzer := analyse{list: list}
+
+	err := analyzer.isCorrect()
+	if err != nil {
+		return data.NewErrData(list.String(), err)
+	}
+
+	return nil
 }
 
 // isCorrect returns nil if the syntax is correct, otherwise returns an error

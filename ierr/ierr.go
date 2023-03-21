@@ -22,8 +22,8 @@ const (
 // What error occurred?
 var (
 	EmptyField      = wrap(Syntax, errors.New("empty field"))
-	StartKind       = wrap(Syntax, errors.New("this can't be the beginning"))
-	EndKind         = wrap(Syntax, errors.New("this can't be the end"))
+	StartKind       = wrap(Syntax, errors.New("the start of the expression can't be the beginning"))
+	EndKind         = wrap(Syntax, errors.New("the end of the expression can't be the end"))
 	IncompleteLeft  = wrap(Syntax, errors.New("there are incomplete left parentheses"))
 	IncompleteRight = wrap(Syntax, errors.New("there are incomplete right parentheses"))
 )
