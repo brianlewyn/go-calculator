@@ -41,16 +41,12 @@ func Tokenizer(expData *data.ExpData) (*plugin.TokenList, data.IErrData) {
 func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 	list := plugin.NewTokenList()
 	var value string
-	var num int
 
 	if *t.lenght == 0 {
 		return list, ierr.EmptyField
 	}
 
-	for *t.lenght > 0 {
-		r := rune((*t.expression)[0])
-		num = 1
-
+	for i, r := range *t.expression {
 		switch {
 
 		// opeartors
@@ -75,36 +71,30 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 		case data.IsPow(&r):
 			list.Append(data.NewPowToken())
 
-		// prefix of pi or root
-		case data.IsPrefix(&r):
-
-			if data.IsPrefixPi(&r) {
-				list.Append(data.NewPiToken())
-				num = int(data.PiLenght)
-
-			} else if data.IsPrefixRoot(&r) {
-				list.Append(data.NewRootToken())
-				num = int(data.RootLenght)
-			}
+		// pi or root
+		case data.IsPi(&r):
+			list.Append(data.NewPiToken())
+		case data.IsRoot(&r):
+			list.Append(data.NewRootToken())
 
 		// numbers
 		case data.IsFloat(&r):
 			value += string(r)
 
-			if !t.isFloat() {
+			if !t.isFloat(i) {
 				list.Append(data.NewNumToken(value))
 				value = ""
 			}
 
 		default:
 			if !data.IsGap(&r) {
-				return nil, ierr.NewRune(r).Unknown()
+				return nil, ierr.NewRune(r, i).Unknown()
 			}
 		}
-
-		*t.expression = (*t.expression)[num:]
-		*t.lenght -= num
 	}
+
+	*t.expression = ""
+	*t.lenght = 0
 
 	return list, nil
 }
@@ -133,13 +123,13 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 // !Tool Methods
 
 // isFloat return true if the first rune of the expression is float, otherwise returns false
-func (t tokenize) isFloat() bool {
+func (t tokenize) isFloat(i int) bool {
 	var after rune
 
-	if *t.lenght >= 2 {
-		after = rune((*t.expression)[1])
-	} else {
+	if *t.lenght < 1 || *t.lenght-1 <= i {
 		after = data.Jocker
+	} else {
+		after = rune((*t.expression)[i+1])
 	}
 
 	return data.IsFloat(&after)

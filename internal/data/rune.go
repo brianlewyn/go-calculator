@@ -15,22 +15,15 @@ const ( // Parenthese
 	Right rune = ')' // Right Parentheses = ')'
 )
 
+const ( // Pi & Root
+	Pi   rune = 'π' // Pi Number = 'π'
+	Root rune = '√' // Square Root = '√'
+)
+
 const ( // Others
 	Gap rune = ' ' // Gap = '\0'
 	Dot rune = '.' // Dot = '.'
 	Pow rune = '^' // Power = '^'
-)
-
-const ( // Pi
-	Pi       rune  = 'π' // Pi Number = 'π'
-	PrefixPi rune  = 207 // The prefix of Pi
-	PiLenght uint8 = 2   // Pi lenght
-)
-
-const ( // Root
-	Root       rune  = '√' // Square Root = '√'
-	PrefixRoot rune  = 226 // The prefix of Root
-	RootLenght uint8 = 3   // Root lenght
 )
 
 // !For each rune
@@ -68,23 +61,10 @@ func IsPow(r *rune) bool { return *r == Pow }
 // IsPi returns true if r is a Pi number
 func IsPi(r *rune) bool { return *r == Pi }
 
-// IsPrefixPi returns true if r is a Pi number
-func IsPrefixPi(r *rune) bool { return *r == PrefixPi }
-
 // IsRoot returns true if r is a square root
 func IsRoot(r *rune) bool { return *r == Root }
 
-// IsPrefixRoot returns true if r is a square root
-func IsPrefixRoot(r *rune) bool { return *r == PrefixRoot }
-
 // !For each rune group
-
-// IsPrefix returns true if r is a prefix:
-//
-// π, √
-func IsPrefix(r *rune) bool {
-	return *r == PrefixPi || *r == PrefixRoot
-}
 
 // IsNumber returns true if r is:
 //

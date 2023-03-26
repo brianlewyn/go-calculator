@@ -17,7 +17,7 @@ func TestAnalyser(t *testing.T) {
 	type ErrKind uint8
 	type Bug struct {
 		kind ErrKind
-		as   interface{}
+		as   ierr.KindOf
 		is   error
 	}
 
@@ -35,52 +35,52 @@ func TestAnalyser(t *testing.T) {
 	}{
 		{
 			name: "Bug: First: The first element",
-			Bug:  Bug{kind: Is, is: ierr.StartKind},
+			Bug:  Bug{kind: As, as: ierr.Kind_Start},
 			list: expression("%"),
 			// Try these: % * + - / ) ^
 			// All except these: 0-9, (, ., π, √
 		},
 		{
 			name: "Bug: Last: The last element",
-			Bug:  Bug{kind: Is, is: ierr.EndKind},
+			Bug:  Bug{kind: As, as: ierr.Kind_End},
 			list: expression("(("),
 			// Try these: (( √√ (√ √( 0+ 0^ 0+√ 0+(
 			// All except these: 0-9, ), π
 		},
 		{
 			name: "Bug: Number: An absurd number",
-			Bug:  Bug{kind: As, as: new(ierr.Number)},
+			Bug:  Bug{kind: As, as: ierr.Number_Misspelled},
 			list: expression("1234."),
 			// Try these: . 0. ...
 		},
 		{
 			name: "Bug: Number: Almost number",
-			Bug:  Bug{kind: As, as: new(ierr.Number)},
+			Bug:  Bug{kind: As, as: ierr.Number_Misspelled},
 			list: expression("1.234.5"),
 			// Try these: .. .0. .0.0. ...
 		},
 		{
 			name: "Bug: Number: Digit limit",
-			Bug:  Bug{kind: As, as: new(ierr.Number)},
+			Bug:  Bug{kind: As, as: ierr.Number_Limit},
 			list: expression(strings.Repeat("0", int(data.DigitLimit))),
 			// Try these: Any number with or more than 617 digits
 		},
 		{
 			name: "Bug: Together: Elements together",
-			Bug:  Bug{kind: As, as: new(ierr.Kind)},
+			Bug:  Bug{kind: As, as: ierr.Kind_Together},
 			list: expression("0++0)"),
 			// Try these: %% ** ++ -- // )) ^^ %+ %- %/ %) %^ () ...
 			// All except these: +0+, +.0, +π+, +√, 0^+0 ...
 		},
 		{
 			name: "Bug: Together: Numbers together (1)",
-			Bug:  Bug{kind: As, as: new(ierr.Kind)},
+			Bug:  Bug{kind: As, as: ierr.Kind_Together},
 			list: expression("π3.14"),
 			// Try these: A number pi next to any number
 		},
 		{
 			name: "Bug: Together: Numbers together (2)",
-			Bug:  Bug{kind: As, as: new(ierr.Kind)},
+			Bug:  Bug{kind: As, as: ierr.Kind_Together},
 			list: expression("3.14π"),
 			// Try these: Any number next to number pi
 		},
@@ -110,7 +110,7 @@ func TestAnalyser(t *testing.T) {
 
 			switch tt.kind {
 			case As:
-				assert.ErrorAsf(err.Bug(), &tt.as, "Analyser() error != As: %v", err.Bug())
+				assert.Truef(ierr.As(err.Bug(), tt.as), "Analyser() error != As: %v", err.Bug())
 			case Is:
 				assert.ErrorIsf(err.Bug(), tt.is, "Analyser() error != Is: %v", err.Bug())
 			default:

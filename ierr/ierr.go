@@ -6,63 +6,105 @@ import (
 	"strings"
 )
 
-type kind string
+// KindOf represents the type of context error
+type KindOf string
+
+// These represents the type of Error Interface
+const (
+	single uint8 = 1
+	double uint8 = 2
+
+	unknown string = "unknown"
+)
 
 // What kind of main error occurred?
-const Syntax = kind("syntax error")
+const Syntax = KindOf("syntax error")
 
 // What kind of context error occurred?
 const (
-	Rune_Unknown      = kind("this is an unknown rune")
-	Number_Misspelled = kind("this is a misspelled number")
-	Number_Limit      = kind("this number exceeds the digit limit")
-	Kind_Together     = kind("these data types cannot be together")
+	Rune_Unknown      = KindOf("this is an unknown rune")
+	Number_Misspelled = KindOf("this is a misspelled number")
+	Number_Limit      = KindOf("this number exceeds the digit limit")
+	Kind_Together     = KindOf("these data types cannot be together")
+	Kind_Start        = KindOf("this can't be the beginning")
+	Kind_End          = KindOf("this can't be the end")
 )
 
 // What error occurred?
 var (
 	EmptyField      = wrap(Syntax, errors.New("empty field"))
-	StartKind       = wrap(Syntax, errors.New("the start of the expression can't be the beginning"))
-	EndKind         = wrap(Syntax, errors.New("the end of the expression can't be the end"))
 	IncompleteLeft  = wrap(Syntax, errors.New("there are incomplete left parentheses"))
 	IncompleteRight = wrap(Syntax, errors.New("there are incomplete right parentheses"))
 )
 
 // Interface errors
 
-type Rune struct{ r rune }
-type Number struct{ n string }
-type Kind struct{ k1, k2 string }
+type Rune struct {
+	r rune
+	i int
+}
+
+type Number struct {
+	n string
+}
+
+type Kind struct {
+	k1, k2 rune
+	mode   uint8
+}
 
 // Functions to create an instance with New
 
-func NewRune(r rune) *Rune {
-	return &Rune{r: r}
+func NewRune(r rune, i int) *Rune {
+	return &Rune{r: r, i: i}
 }
+
 func NewNumber(n string) *Number {
 	return &Number{n: n}
 }
-func NewKind(k1, k2 string) *Kind {
+
+func NewKind(k1, k2 rune) *Kind {
 	return &Kind{k1: k1, k2: k2}
 }
 
 // The data error
 
 func (r Rune) Error() string {
-	return string(r.r)
+	return fmt.Sprintf("'%c' in index: %d", r.r, r.i)
 }
+
 func (n Number) Error() string {
 	return n.n
 }
+
 func (k Kind) Error() string {
-	return fmt.Sprintf("%s:%s", k.k1, k.k2)
+	switch k.mode {
+	case single:
+		return fmt.Sprintf("%c", k.k1)
+	case double:
+		return fmt.Sprintf("%c:%c", k.k1, k.k2)
+	default:
+		return unknown
+	}
+}
+
+// Those represents the mode of the Error interface
+
+func (k *Kind) Single() *Kind {
+	k.mode = single
+	return k
+}
+
+func (k *Kind) Double() *Kind {
+	k.mode = double
+	return k
 }
 
 // Add context to the data error
 
 // Unknown returns an error with the kind of context: Rune_Unknown
 func (r Rune) Unknown() error {
-	return doubleWrap(Syntax, Rune_Unknown, NewRune(r.r))
+	return doubleWrap(Syntax, Rune_Unknown, NewRune(r.r, r.i))
 }
 
 // Misspelled returns an error with the kind of context: Number_Misspelled
@@ -77,22 +119,32 @@ func (n Number) Limit() error {
 
 // NotTogether returns an error with the kind of context: Kind_Together
 func (k Kind) NotTogether() error {
-	return doubleWrap(Syntax, Kind_Together, NewKind(k.k1, k.k2))
+	return doubleWrap(Syntax, Kind_Together, NewKind(k.k1, k.k2).Double())
+}
+
+// NotTogether returns an error with the kind of context: Kind_Start
+func (k Kind) Start() error {
+	return doubleWrap(Syntax, Kind_Start, NewKind(k.k1, k.k2).Single())
+}
+
+// NotTogether returns an error with the kind of context: Kind_End
+func (k Kind) End() error {
+	return doubleWrap(Syntax, Kind_End, NewKind(k.k1, k.k2).Single())
 }
 
 // !Tool Functions
 
 // wrap adds a wrapper of type error to the already created error
-func wrap(kind kind, err error) error {
+func wrap(kind KindOf, err error) error {
 	return fmt.Errorf("%s: %w", kind, err)
 }
 
 // doubleWrap adds double wrapper of type error to the already created error
-func doubleWrap(k1, k2 kind, err error) error {
+func doubleWrap(k1, k2 KindOf, err error) error {
 	return wrap(k1, wrap(k2, err))
 }
 
 // As is similar to errors.As func of standard library
-func As(err error, target kind) bool {
+func As(err error, target KindOf) bool {
 	return strings.Contains(fmt.Sprint(err), string(target))
 }

@@ -22,7 +22,6 @@ func TestTokenizer(t *testing.T) {
 	t.Run("From an expression to a empty linked list", func(t *testing.T) {
 		expression := "  "
 		gotList, err := Tokenizer(data.NewExpData(&expression))
-		// t.Log(gotList, err.Bug())
 		assert.ErrorIsf(err.Bug(), ierr.EmptyField, "ierr.EmptyField != %v", err.Bug())
 		assert.Nil(gotList, "gotList != nil")
 	})

@@ -11,7 +11,7 @@ func TestCalculate(t *testing.T) {
 		// TODO: Add test cases
 		{
 			name: "first test",
-			exp:  "(0.5 + 4.5 - 1) * 10 * √(7-2) / 4^2-",
+			exp:  "(0.5 + 4.5 - 1) * 10 * √(7-2) / 4^2",
 			want: 120,
 		},
 	}
@@ -21,7 +21,9 @@ func TestCalculate(t *testing.T) {
 			if got != tt.want {
 				t.Errorf("Calculate() = %v, want %v", got, tt.want)
 			}
-			t.Logf("MyError:\n%v", err)
+			if err != nil {
+				t.Logf("MyError:\n%s", err)
+			}
 		})
 	}
 }
