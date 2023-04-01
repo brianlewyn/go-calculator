@@ -121,6 +121,6 @@ func TestAnalyser(t *testing.T) {
 }
 
 func expression(expr string) *plugin.TokenList {
-	list, _ := tokenize.Tokenizer(data.Abstraction(&expr))
+	list, _ := tokenize.Tokenizer(data.NewInfo(&expr))
 	return list
 }

@@ -6,8 +6,8 @@ type Info struct {
 	lenght     int
 }
 
-// Abstraction gets the information of an expression
-func Abstraction(expr *string) *Info {
+// NewInfo abstracts the information of an expression
+func NewInfo(expr *string) *Info {
 	return &Info{
 		expression: expr,
 		lenght:     len(*expr),

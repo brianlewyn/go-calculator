@@ -12,7 +12,7 @@ returns the result if it is correct and nil,
 otherwise, returns a zero value and an error.
 */
 func Calculate(expr string) (float64, data.Error) {
-	info := data.Abstraction(&expr)
+	info := data.NewInfo(&expr)
 
 	list, err := tokenize.Tokenizer(info)
 	if err != nil {
