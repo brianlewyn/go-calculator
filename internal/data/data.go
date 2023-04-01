@@ -2,32 +2,32 @@ package data
 
 import "fmt"
 
-// ExpData represents the data to calculate an expression
-type ExpData struct {
+// Info represents the data to calculate an expression
+type Info struct {
 	expression *string
 	lenght     int
 }
 
-// New creates a ExpData instance
-func NewExpData(exp *string) *ExpData {
-	return &ExpData{
-		expression: exp,
-		lenght:     len(*exp),
+// Abstraction gets the information of an expression
+func Abstraction(expr *string) *Info {
+	return &Info{
+		expression: expr,
+		lenght:     len(*expr),
 	}
 }
 
 // Expression returns the basic math expression
-func (e ExpData) Expression() *string {
+func (e Info) Expression() *string {
 	return e.expression
 }
 
 // Lenght return the lenght of the basic string expression
-func (e ExpData) Lenght() *int {
+func (e Info) Lenght() *int {
 	return &e.lenght
 }
 
-// IErrData represents the error data as a complex error
-type IErrData interface {
+// Error represents a complex error with methods
+type Error interface {
 	Bug() error
 	Exp() string
 	String() string
@@ -35,18 +35,18 @@ type IErrData interface {
 
 // ErrData represents the error data to calculate an expression
 type ErrData struct {
-	bug error
-	exp string
+	bug  error
+	expr string
 }
 
-// New creates a ExpData instance
-func NewErrData(exp string, bug error) *ErrData {
-	return &ErrData{exp: exp, bug: bug}
+// New creates a Info instance
+func NewErrData(expr string, bug error) *ErrData {
+	return &ErrData{expr: expr, bug: bug}
 }
 
 // Exp returns the state of the basic math expression
 func (e ErrData) Exp() string {
-	return e.exp
+	return e.expr
 }
 
 // Bug return the error of the basic string expression
@@ -56,5 +56,5 @@ func (e ErrData) Bug() error {
 
 // String converts the error data to a string
 func (e ErrData) String() string {
-	return fmt.Sprintf("%s\n%s", e.bug, e.exp)
+	return fmt.Sprintf("%s\n%s", e.bug, e.expr)
 }

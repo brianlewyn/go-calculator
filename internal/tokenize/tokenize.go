@@ -15,23 +15,23 @@ type tokenize struct {
 // Tokenizer tokenizes the expression in a linked list,
 //
 // but while creating the list, the expression is removed
-func Tokenizer(expData *data.ExpData) (*plugin.TokenList, data.IErrData) {
-	exp := expData.Expression()
-	lenght := expData.Lenght()
+func Tokenizer(info *data.Info) (*plugin.TokenList, data.Error) {
+	expr := info.Expression()
+	lenght := info.Lenght()
 
 	tokenizer := tokenize{
-		expression: exp,
+		expression: expr,
 		lenght:     lenght,
 	}
 
 	list, err := tokenizer.linkedList()
 	if err != nil {
-		return nil, data.NewErrData(*exp, err)
+		return nil, data.NewErrData(*expr, err)
 	}
 
 	list, err = tokenizer.rebuild(list)
 	if err != nil {
-		return nil, data.NewErrData(*exp, err)
+		return nil, data.NewErrData(*expr, err)
 	}
 
 	return list, nil

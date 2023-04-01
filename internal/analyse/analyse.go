@@ -12,7 +12,7 @@ type analyse struct {
 }
 
 // Analyser returns nil if the basic math expression is correct, otherwise returns an error
-func Analyser(list *plugin.TokenList) data.IErrData {
+func Analyser(list *plugin.TokenList) data.Error {
 	analyzer := analyse{list: list}
 
 	err := analyzer.isCorrect()
