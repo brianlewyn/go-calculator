@@ -220,10 +220,10 @@ func addParenthesesInLoop(i int, node *plugin.TokenNode, list *plugin.TokenList)
 	j := i
 
 	for temp := node; temp != nil; j, temp = j+1, temp.Next() {
-		if isKindButNodeIsNil(temp, data.LeftToken) {
+		if isKindButNodeIsNotNil(temp, data.LeftToken) {
 			nLeft++
 
-		} else if isKindButNodeIsNil(temp, data.RightToken) {
+		} else if isKindButNodeIsNotNil(temp, data.RightToken) {
 			nRight++
 
 			if nLeft == nRight {
@@ -241,7 +241,7 @@ func addParenthesesInLoop(i int, node *plugin.TokenNode, list *plugin.TokenList)
 // isKind returns true if node can be token, otherwise returns false
 func isKind(node *plugin.TokenNode, token data.TokenKind) bool {
 	if node != nil {
-		return isKindButNodeIsNil(node, token)
+		return isKindButNodeIsNotNil(node, token)
 	}
 	return false
 }
@@ -254,8 +254,8 @@ func isKindFn(node *plugin.TokenNode, tokenFn func(token data.TokenKind) bool) b
 	return false
 }
 
-// isKindButNodeIsNil returns true if node can be token, otherwise returns false
-func isKindButNodeIsNil(node *plugin.TokenNode, token data.TokenKind) bool {
+// isKindButNodeIsNotNil returns true if node can be token, otherwise returns false
+func isKindButNodeIsNotNil(node *plugin.TokenNode, token data.TokenKind) bool {
 	return (*node.Token()).Kind() == token
 }
 

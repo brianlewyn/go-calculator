@@ -51,7 +51,7 @@ const (
 	NumToken // Number = n
 )
 
-// // NewKind returns a Kind Token
+// NewToken returns a Kind Token
 func NewToken(kind TokenKind) *Token {
 	var token Token = Kind{kind: kind}
 	return &token
