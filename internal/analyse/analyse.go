@@ -97,25 +97,25 @@ func isCorrectNumber(token data.Token) error {
 		return nil
 	}
 
-	var number = token.(data.Number).Value()
+	var num = token.(data.Number).Value()
 
-	if isAbsurdDot(number) {
-		return ierr.NewNumber(*number).Misspelled()
+	if isAbsurdDot(num) {
+		return ierr.NewNumber(num).Misspelled()
 	}
 
 	var flagDot bool
 	var nDigit uint16
 
-	for _, r := range *number {
+	for _, r := range num {
 		if data.IsDot(&r) {
 			if flagDot {
-				return ierr.NewNumber(*number).Misspelled()
+				return ierr.NewNumber(num).Misspelled()
 			}
 			flagDot = true
 		}
 
 		if nDigit++; nDigit >= data.DigitLimit {
-			return ierr.NewNumber(*number).Limit()
+			return ierr.NewNumber(num).Limit()
 		}
 	}
 
@@ -123,8 +123,8 @@ func isCorrectNumber(token data.Token) error {
 }
 
 // isAbsurdDot returns true if there is a dot in absurd position, otherwise returns false
-func isAbsurdDot(num *string) bool {
-	return data.Dot == rune((*num)[len(*num)-1])
+func isAbsurdDot(num string) bool {
+	return data.Dot == rune(num[len(num)-1])
 }
 
 // canBeTogether returns nil if there are not duplicate kinds, otherwise returns an error

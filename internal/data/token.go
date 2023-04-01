@@ -12,14 +12,14 @@ type Kind struct {
 	kind TokenKind
 }
 
-type Number struct {
-	kind  TokenKind
-	value string
-}
-
 // Kind returns the kind of Kind Token
 func (k Kind) Kind() TokenKind {
 	return k.kind
+}
+
+type Number struct {
+	kind  TokenKind
+	value string
 }
 
 // Kind returns the kind of Number Token
@@ -28,8 +28,8 @@ func (n Number) Kind() TokenKind {
 }
 
 // Value returns the value of the Number Token
-func (n Number) Value() *string {
-	return &n.value
+func (n Number) Value() string {
+	return n.value
 }
 
 const (

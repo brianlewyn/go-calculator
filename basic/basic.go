@@ -2,6 +2,7 @@ package basic
 
 import (
 	"github.com/brianlewyn/go-calculator/internal/analyse"
+	"github.com/brianlewyn/go-calculator/internal/convert"
 	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/tokenize"
 )
@@ -20,6 +21,11 @@ func Calculate(expr string) (float64, data.Error) {
 	}
 
 	err = analyse.Analyser(list)
+	if err != nil {
+		return 0, err
+	}
+
+	err = convert.Converter(list)
 	if err != nil {
 		return 0, err
 	}
