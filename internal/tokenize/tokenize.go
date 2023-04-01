@@ -143,11 +143,11 @@ func canBeAddedAsterisk(node *plugin.TokenNode) bool {
 		return false
 	}
 
-	if node.Token().Kind() != data.RightToken {
+	if (*node.Token()).Kind() != data.RightToken {
 		return false
 	}
 
-	return node.Next().Token().Kind() == data.LeftToken
+	return (*node.Next().Token()).Kind() == data.LeftToken
 }
 
 // canBeAddedZero returns true if an zero can be added
@@ -157,11 +157,11 @@ func canBeAddedZero(node *plugin.TokenNode) bool {
 		return false
 	}
 
-	if node.Token().Kind() != data.LeftToken {
+	if (*node.Token()).Kind() != data.LeftToken {
 		return false
 	}
 
-	return data.IsAddSubToken(node.Next().Token().Kind())
+	return data.IsAddSubToken((*node.Next().Token()).Kind())
 }
 
 // addParenthesesIfPossible adds parentheses as follows:
@@ -249,14 +249,14 @@ func isKind(node *plugin.TokenNode, token data.TokenKind) bool {
 // isKindFn returns true if node can be token, otherwise returns false
 func isKindFn(node *plugin.TokenNode, tokenFn func(token data.TokenKind) bool) bool {
 	if node != nil {
-		return tokenFn(node.Token().Kind())
+		return tokenFn((*node.Token()).Kind())
 	}
 	return false
 }
 
 // isKindButNodeIsNil returns true if node can be token, otherwise returns false
 func isKindButNodeIsNil(node *plugin.TokenNode, token data.TokenKind) bool {
-	return node.Token().Kind() == token
+	return (*node.Token()).Kind() == token
 }
 
 // addParentheses adds a left token at position i and a right token at position j

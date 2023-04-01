@@ -303,9 +303,11 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 	for node1 != nil && node2 != nil {
 		token1, token2 := node1.Token(), node2.Token()
 
-		if assert.Equalf(t, token1.Kind(), token2.Kind(), "kind1 != kind2 %v %v", token1.Kind(), token2.Kind()) {
-			if token1.Kind() == data.NumToken {
-				assert.EqualValues(t, *token1.Value(), *token2.Value(), "value1 != value2")
+		if assert.Equalf(t, (*token1).Kind(), (*token2).Kind(), "kind1 != kind2 %v %v", (*token1).Kind(), (*token2).Kind()) {
+			if (*token1).Kind() == data.NumToken {
+				value1 := (*token1).(data.Number).Value()
+				value2 := (*token2).(data.Number).Value()
+				assert.EqualValues(t, value1, value2, "value1 != value2")
 			}
 		}
 

@@ -1,22 +1,35 @@
 package data
 
-// TokenKind is the data type of the value
+// TokenKind is the data type of the Token
 type TokenKind uint8
 
 // Token represents a token from the list
-type Token struct {
+type Token interface {
+	Kind() TokenKind
+}
+
+type Kind struct {
+	kind TokenKind
+}
+
+type Number struct {
 	kind  TokenKind
 	value string
 }
 
-// Kind returns the kind of Token
-func (t Token) Kind() TokenKind {
-	return t.kind
+// Kind returns the kind of Kind Token
+func (k Kind) Kind() TokenKind {
+	return k.kind
 }
 
-// Value returns the value of the Token
-func (t Token) Value() *string {
-	return &t.value
+// Kind returns the kind of Number Token
+func (n Number) Kind() TokenKind {
+	return n.kind
+}
+
+// Value returns the value of the Number Token
+func (n Number) Value() *string {
+	return &n.value
 }
 
 const (
@@ -38,8 +51,11 @@ const (
 	NumToken // Number = n
 )
 
-// NewToken returns a Token
-func NewToken(kind TokenKind) *Token { return &Token{kind: kind} }
+// // NewKind returns a Kind Token
+func NewToken(kind TokenKind) *Token {
+	var token Token = Kind{kind: kind}
+	return &token
+}
 
 // NewModToken returns a Token with ModToken kind
 func NewModToken() *Token { return NewToken(ModToken) }
@@ -71,9 +87,10 @@ func NewRootToken() *Token { return NewToken(RootToken) }
 // NewPiToken returns a Token with PiToken kind
 func NewPiToken() *Token { return NewToken(PiToken) }
 
-// NewNumToken returns a Token with NumToken kind
+// NewNumToken returns a Number Token
 func NewNumToken(value string) *Token {
-	return &Token{kind: NumToken, value: value}
+	var token Token = Number{kind: NumToken, value: value}
+	return &token
 }
 
 // !For each token group
