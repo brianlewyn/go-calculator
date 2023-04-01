@@ -25,10 +25,7 @@ func Calculate(expr string) (float64, data.Error) {
 		return 0, err
 	}
 
-	err = convert.Converter(list)
-	if err != nil {
-		return 0, err
-	}
+	convert.Converter(list)
 
 	return 0 /*Answer*/, nil
 }

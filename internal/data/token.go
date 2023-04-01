@@ -32,6 +32,21 @@ func (n Number) Value() string {
 	return n.value
 }
 
+type Float struct {
+	kind  TokenKind
+	value float64
+}
+
+// Kind returns the kind of Float Token
+func (f Float) Kind() TokenKind {
+	return f.kind
+}
+
+// Value returns the value of the Float Token
+func (f Float) Value() float64 {
+	return f.value
+}
+
 const (
 	_ = TokenKind(iota)
 
@@ -90,6 +105,12 @@ func NewPiToken() *Token { return NewToken(PiToken) }
 // NewNumToken returns a Number Token
 func NewNumToken(value string) *Token {
 	var token Token = Number{kind: NumToken, value: value}
+	return &token
+}
+
+// NewFloatToken returns a Float Token
+func NewFloatToken(value float64) *Token {
+	var token Token = Float{kind: NumToken, value: value}
 	return &token
 }
 
