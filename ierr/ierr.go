@@ -9,14 +9,6 @@ import (
 // KindOf represents the type of context error
 type KindOf string
 
-// These represents the type of Error Interface
-const (
-	single uint8 = 1
-	double uint8 = 2
-
-	unknown string = "unknown"
-)
-
 // What kind of main error occurred?
 const Syntax = KindOf("syntax error")
 
@@ -50,7 +42,6 @@ type Number struct {
 
 type Kind struct {
 	k1, k2 rune
-	mode   uint8
 }
 
 // Functions to create an instance with New
@@ -78,26 +69,10 @@ func (n Number) Error() string {
 }
 
 func (k Kind) Error() string {
-	switch k.mode {
-	case single:
+	if k.k2 == 0 {
 		return fmt.Sprintf("%c", k.k1)
-	case double:
-		return fmt.Sprintf("%c:%c", k.k1, k.k2)
-	default:
-		return unknown
 	}
-}
-
-// Those represents the mode of the Error interface
-
-func (k *Kind) Single() *Kind {
-	k.mode = single
-	return k
-}
-
-func (k *Kind) Double() *Kind {
-	k.mode = double
-	return k
+	return fmt.Sprintf("%c:%c", k.k1, k.k2)
 }
 
 // Add context to the data error
@@ -119,17 +94,17 @@ func (n Number) Limit() error {
 
 // NotTogether returns an error with the kind of context: Kind_Together
 func (k Kind) NotTogether() error {
-	return doubleWrap(Syntax, Kind_Together, NewKind(k.k1, k.k2).Double())
+	return doubleWrap(Syntax, Kind_Together, NewKind(k.k1, k.k2))
 }
 
 // NotTogether returns an error with the kind of context: Kind_Start
 func (k Kind) Start() error {
-	return doubleWrap(Syntax, Kind_Start, NewKind(k.k1, k.k2).Single())
+	return doubleWrap(Syntax, Kind_Start, NewKind(k.k1, k.k2))
 }
 
 // NotTogether returns an error with the kind of context: Kind_End
 func (k Kind) End() error {
-	return doubleWrap(Syntax, Kind_End, NewKind(k.k1, k.k2).Single())
+	return doubleWrap(Syntax, Kind_End, NewKind(k.k1, k.k2))
 }
 
 // !Tool Functions

@@ -68,7 +68,7 @@ func (a analyse) isCorrectFirst(token *data.Token) error {
 
 	if !data.IsFirstToken(token.Kind()) {
 		kind := data.FromTokenKindToRune(token.Kind())
-		return ierr.NewKind(kind, kind).Start()
+		return ierr.NewKind(kind, 0).Start()
 	}
 
 	return nil
@@ -82,7 +82,7 @@ func (a analyse) isCorrectLast(token *data.Token) error {
 
 	if !data.IsLastToken(token.Kind()) {
 		kind := data.FromTokenKindToRune(token.Kind())
-		return ierr.NewKind(kind, kind).End()
+		return ierr.NewKind(kind, 0).End()
 	}
 
 	return nil
