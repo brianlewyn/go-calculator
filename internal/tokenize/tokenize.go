@@ -12,9 +12,8 @@ type tokenize struct {
 	lenght     *int
 }
 
-// Tokenizer tokenizes the expression in a linked list,
-//
-// but while creating the list, the expression is removed
+// Tokenizer returns the expression in a linked list and nil,
+// otherwise returns nil and an error
 func Tokenizer(info *data.Info) (*plugin.TokenList, data.Error) {
 	expr := info.Expression()
 	lenght := info.Lenght()

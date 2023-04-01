@@ -11,7 +11,8 @@ type analyse struct {
 	list *plugin.TokenList
 }
 
-// Analyser returns nil if the basic math expression is correct, otherwise returns an error
+// Analyser returns nil if the math expression is correct,
+// otherwise returns an error
 func Analyser(list *plugin.TokenList) data.Error {
 	analyzer := analyse{list: list}
 
