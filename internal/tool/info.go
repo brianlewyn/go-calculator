@@ -1,4 +1,4 @@
-package data
+package tool
 
 // Info represents the data to calculate an expression
 type Info struct {

@@ -4,6 +4,7 @@ import (
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/plugin"
+	"github.com/brianlewyn/go-calculator/internal/tool"
 )
 
 // tokenize represent the tokenized linked list
@@ -14,7 +15,7 @@ type tokenize struct {
 
 // Tokenizer returns the expression in a linked list and nil,
 // otherwise returns nil and an error
-func Tokenizer(info *data.Info) (*plugin.TokenList, data.Error) {
+func Tokenizer(info *tool.Info) (*plugin.TokenList, data.Error) {
 	expr := info.Expression()
 	lenght := info.Lenght()
 

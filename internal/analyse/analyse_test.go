@@ -8,6 +8,7 @@ import (
 	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/plugin"
 	"github.com/brianlewyn/go-calculator/internal/tokenize"
+	"github.com/brianlewyn/go-calculator/internal/tool"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -121,6 +122,6 @@ func TestAnalyser(t *testing.T) {
 }
 
 func expression(expr string) *plugin.TokenList {
-	list, _ := tokenize.Tokenizer(data.NewInfo(&expr))
+	list, _ := tokenize.Tokenizer(tool.NewInfo(&expr))
 	return list
 }

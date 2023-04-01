@@ -19,16 +19,16 @@ func NewError(expr string, bug error) Error {
 }
 
 // Exp returns the state of the basic math expression
-func (e data) Exp() string {
-	return e.expr
+func (d data) Exp() string {
+	return d.expr
 }
 
 // Bug return the error of the basic string expression
-func (e data) Bug() error {
-	return e.bug
+func (d data) Bug() error {
+	return d.bug
 }
 
 // String converts the error data to a string
-func (e data) String() string {
-	return e.bug.Error() + "\n" + e.expr
+func (d data) String() string {
+	return d.bug.Error() + "\n" + d.expr
 }

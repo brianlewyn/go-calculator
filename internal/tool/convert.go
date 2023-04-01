@@ -1,4 +1,4 @@
-package convert
+package tool
 
 import (
 	"strconv"
@@ -18,15 +18,6 @@ func Converter(list *plugin.TokenList) {
 			slice[i] = *data.NewFloatToken(float)
 		}
 	}
-
-	// for _, token := range slice {
-	// 	if token.Kind() == data.NumToken {
-	// 		fmt.Printf("%.2f", token.(data.Float).Value())
-	// 	} else {
-	// 		fmt.Printf(" %c ", data.FromTokenKindToRune(token.Kind()))
-	// 	}
-	// }
-	// fmt.Println()
 
 	list.Marshal(&slice)
 }

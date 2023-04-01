@@ -6,6 +6,7 @@ import (
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/plugin"
+	"github.com/brianlewyn/go-calculator/internal/tool"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,14 +15,14 @@ func TestTokenizer(t *testing.T) {
 
 	t.Run("From an empty expression to a linked list", func(t *testing.T) {
 		expression := ""
-		gotList, err := Tokenizer(data.NewInfo(&expression))
+		gotList, err := Tokenizer(tool.NewInfo(&expression))
 		assert.ErrorIsf(err.Bug(), ierr.EmptyField, "ierr.EmptyField != %v", err.Bug())
 		assert.Nil(gotList, "gotList != nil")
 	})
 
 	t.Run("From an expression to a empty linked list", func(t *testing.T) {
 		expression := "  "
-		gotList, err := Tokenizer(data.NewInfo(&expression))
+		gotList, err := Tokenizer(tool.NewInfo(&expression))
 		assert.ErrorIsf(err.Bug(), ierr.EmptyField, "ierr.EmptyField != %v", err.Bug())
 		assert.Nil(gotList, "gotList != nil")
 	})
@@ -29,7 +30,7 @@ func TestTokenizer(t *testing.T) {
 	t.Run("From an expression to a linked list", func(t *testing.T) {
 		expression := "(0 - 1 + 2 * 3 / 4 ^ 5 % 6 + √π)(-1.234)"
 
-		gotList, err := Tokenizer(data.NewInfo(&expression))
+		gotList, err := Tokenizer(tool.NewInfo(&expression))
 		assert.Nil(err, "Tokenizer(data) error != nil")
 
 		wantList := plugin.NewTokenList()

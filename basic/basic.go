@@ -2,9 +2,9 @@ package basic
 
 import (
 	"github.com/brianlewyn/go-calculator/internal/analyse"
-	"github.com/brianlewyn/go-calculator/internal/convert"
 	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/tokenize"
+	"github.com/brianlewyn/go-calculator/internal/tool"
 )
 
 /*
@@ -13,7 +13,7 @@ returns the result if it is correct and nil,
 otherwise, returns a zero value and an error.
 */
 func Calculate(expr string) (float64, data.Error) {
-	info := data.NewInfo(&expr)
+	info := tool.NewInfo(&expr)
 
 	list, err := tokenize.Tokenizer(info)
 	if err != nil {
@@ -25,7 +25,7 @@ func Calculate(expr string) (float64, data.Error) {
 		return 0, err
 	}
 
-	convert.Converter(list)
+	tool.Converter(list)
 
 	return 0 /*Answer*/, nil
 }
