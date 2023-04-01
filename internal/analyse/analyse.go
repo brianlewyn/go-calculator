@@ -62,13 +62,13 @@ func (a analyse) isCorrect() error {
 // !Tool Methods
 
 // isCorrectFirst returns nil is the number is correct, otherwise returns an error
-func (a analyse) isCorrectFirst(token *data.Token) error {
-	if *token != *a.list.Head().Token() {
+func (a analyse) isCorrectFirst(token data.Token) error {
+	if token != a.list.Head().Token() {
 		return nil
 	}
 
-	if !data.IsFirstToken((*token).Kind()) {
-		kind := data.FromTokenKindToRune((*token).Kind())
+	if !data.IsFirstToken(token.Kind()) {
+		kind := data.FromTokenKindToRune(token.Kind())
 		return ierr.NewKind(kind, 0).Start()
 	}
 
@@ -76,13 +76,13 @@ func (a analyse) isCorrectFirst(token *data.Token) error {
 }
 
 // isCorrectLast returns nil is the number is correct, otherwise returns an error
-func (a analyse) isCorrectLast(token *data.Token) error {
-	if *token != *a.list.Tail().Token() {
+func (a analyse) isCorrectLast(token data.Token) error {
+	if token != a.list.Tail().Token() {
 		return nil
 	}
 
-	if !data.IsLastToken((*token).Kind()) {
-		kind := data.FromTokenKindToRune((*token).Kind())
+	if !data.IsLastToken(token.Kind()) {
+		kind := data.FromTokenKindToRune(token.Kind())
 		return ierr.NewKind(kind, 0).End()
 	}
 
@@ -92,12 +92,12 @@ func (a analyse) isCorrectLast(token *data.Token) error {
 // !Tool Functions
 
 // isCorrectNumber returns nil is the number is correct, otherwise returns an error
-func isCorrectNumber(token *data.Token) error {
-	if (*token).Kind() != data.NumToken {
+func isCorrectNumber(token data.Token) error {
+	if token.Kind() != data.NumToken {
 		return nil
 	}
 
-	var number = (*token).(data.Number).Value()
+	var number = token.(data.Number).Value()
 
 	if isAbsurdDot(number) {
 		return ierr.NewNumber(*number).Misspelled()
@@ -134,7 +134,7 @@ func canBeTogether(curr, next *plugin.TokenNode) error {
 	}
 
 	token1, token2 := curr.Token(), next.Token()
-	kind1, kind2 := (*token1).Kind(), (*token2).Kind()
+	kind1, kind2 := token1.Kind(), token2.Kind()
 
 	beTogether := data.CanTokensBeTogether(kind1, kind2)
 
@@ -154,7 +154,7 @@ func format(token1, token2 data.TokenKind) (rune, rune) {
 
 // areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error
 func areCorrectParentheses(nLeft, nRight *int, curr, last *plugin.TokenNode) error {
-	kind := (*curr.Token()).Kind()
+	kind := curr.Token().Kind()
 
 	if kind == data.LeftToken {
 		*nLeft++
