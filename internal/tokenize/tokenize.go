@@ -26,12 +26,12 @@ func Tokenizer(info *data.Info) (*plugin.TokenList, data.Error) {
 
 	list, err := tokenizer.linkedList()
 	if err != nil {
-		return nil, data.NewErrData(*expr, err)
+		return nil, data.NewError(*expr, err)
 	}
 
 	list, err = tokenizer.rebuild(list)
 	if err != nil {
-		return nil, data.NewErrData(*expr, err)
+		return nil, data.NewError(*expr, err)
 	}
 
 	return list, nil

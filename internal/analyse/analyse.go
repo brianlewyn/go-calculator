@@ -17,7 +17,7 @@ func Analyser(list *plugin.TokenList) data.Error {
 
 	err := analyzer.isCorrect()
 	if err != nil {
-		return data.NewErrData(list.String(), err)
+		return data.NewError(list.String(), err)
 	}
 
 	return nil
