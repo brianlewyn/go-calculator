@@ -118,16 +118,6 @@ func NewFloatToken(value float64) *Token {
 
 // IsAddSubToken returns true if r is:
 //
-// +, -
-func IsAddSubToken(kind TokenKind) bool {
-	if kind != AddToken {
-		return kind == SubToken
-	}
-	return true
-}
-
-// IsAddSubToken returns true if r is:
-//
 // n, π
 func IsNumPiToken(kind TokenKind) bool {
 	if kind != NumToken {

@@ -89,6 +89,12 @@ func (l *TokenList) Insert(i int, token *data.Token) error {
 	return l.list.Insert(i, doubly.NewNode(*token))
 }
 
+// Remove removes the token at the given index and returns nil, and otherwise
+// returns an error if the list is empty or the index doesn't exist
+func (l *TokenList) Remove(i int) error {
+	return l.list.Remove(i)
+}
+
 // Prepend adds a new token to the end of the list and returns nil,
 // and otherwise returns an error
 func (l *TokenList) Append(token *data.Token) error {

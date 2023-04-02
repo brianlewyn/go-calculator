@@ -28,7 +28,7 @@ func TestTokenizer(t *testing.T) {
 	})
 
 	t.Run("From an expression to a linked list", func(t *testing.T) {
-		expression := "(0 - 1 + 2 * 3 / 4 ^ 5 % 6 + √π)(-1.234)"
+		expression := "+(0 - 1 + 2 * 3 / 4 ^ 5 % 6 + √π)(-1.234)"
 
 		gotList, err := Tokenizer(tool.NewInfo(&expression))
 		assert.Nil(err, "Tokenizer(data) error != nil")
@@ -160,10 +160,8 @@ func Test_tokenize_rebuild(t *testing.T) {
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
-		// (0+10)
+		// (10)
 		wantList.Append(data.NewLeftToken())
-		wantList.Append(data.NewNumToken("0"))
-		wantList.Append(data.NewAddToken())
 		wantList.Append(data.NewNumToken("10"))
 		wantList.Append(data.NewRightToken())
 		// *(0-12)
@@ -184,8 +182,8 @@ func Test_tokenize_rebuild(t *testing.T) {
 		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList()")
 	})
 
-	t.Run("From a list to a list rebuilded (complex)", func(t *testing.T) {
-		expr := "5^-2 + 5^(2^+(1/2) * 2^+√(π+8)) + 5*+√π ++4"
+	t.Run("From a list to a list rebuilded (complex)(+)", func(t *testing.T) {
+		expr := "5^-2 - 5^(2^-(1/2) * 2^-√(π-8)) - 5*-√π --4"
 		lenght := len(expr)
 
 		tokenizer := tokenize{expression: &expr, lenght: &lenght}
@@ -205,20 +203,19 @@ func Test_tokenize_rebuild(t *testing.T) {
 		wantList.Append(data.NewSubToken())
 		wantList.Append(data.NewNumToken("2"))
 		wantList.Append(data.NewRightToken())
-		// +5^
-		wantList.Append(data.NewAddToken())
+		// -5^
+		wantList.Append(data.NewSubToken())
 		wantList.Append(data.NewNumToken("5"))
 		wantList.Append(data.NewPowToken())
-		// (2^(0+(1
+		// (2^(0-(1/2))*2^
 		wantList.Append(data.NewLeftToken())
 		wantList.Append(data.NewNumToken("2"))
 		wantList.Append(data.NewPowToken())
 		wantList.Append(data.NewLeftToken())
 		wantList.Append(data.NewNumToken("0"))
-		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewSubToken())
 		wantList.Append(data.NewLeftToken())
 		wantList.Append(data.NewNumToken("1"))
-		// /2))*2^
 		wantList.Append(data.NewDivToken())
 		wantList.Append(data.NewNumToken("2"))
 		wantList.Append(data.NewRightToken())
@@ -226,36 +223,90 @@ func Test_tokenize_rebuild(t *testing.T) {
 		wantList.Append(data.NewMulToken())
 		wantList.Append(data.NewNumToken("2"))
 		wantList.Append(data.NewPowToken())
-		// (0+√
+		// (0-√(π-8)))
 		wantList.Append(data.NewLeftToken())
 		wantList.Append(data.NewNumToken("0"))
-		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewSubToken())
 		wantList.Append(data.NewRootToken())
-		// (π+8)))
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewPiToken())
+		wantList.Append(data.NewSubToken())
+		wantList.Append(data.NewNumToken("8"))
+		wantList.Append(data.NewRightToken())
+		wantList.Append(data.NewRightToken())
+		wantList.Append(data.NewRightToken())
+		// -5*-√π
+		wantList.Append(data.NewSubToken())
+		wantList.Append(data.NewNumToken("5"))
+		wantList.Append(data.NewMulToken())
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("0"))
+		wantList.Append(data.NewSubToken())
+		wantList.Append(data.NewRootToken())
+		wantList.Append(data.NewPiToken())
+		wantList.Append(data.NewRightToken())
+		// --4
+		wantList.Append(data.NewSubToken())
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("0"))
+		wantList.Append(data.NewSubToken())
+		wantList.Append(data.NewNumToken("4"))
+		wantList.Append(data.NewRightToken())
+
+		areEqualList(t, gotList, wantList)
+		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList.Size()")
+	})
+
+	t.Run("From a list to a list rebuilded (complex)(-)", func(t *testing.T) {
+		expr := "5^+2 + 5^(2^+(1/2) * 2^+√(π+8)) + 5*+√π ++4"
+		lenght := len(expr)
+
+		tokenizer := tokenize{expression: &expr, lenght: &lenght}
+
+		gotList, err := tokenizer.linkedList()
+		assert.NoError(err, "tokenizer.linkedList() error != nil")
+
+		gotList, err = tokenizer.rebuild(gotList)
+		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
+
+		wantList := plugin.NewTokenList()
+		// 5^2
+		wantList.Append(data.NewNumToken("5"))
+		wantList.Append(data.NewPowToken())
+		wantList.Append(data.NewNumToken("2"))
+		// +5^
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewNumToken("5"))
+		wantList.Append(data.NewPowToken())
+		// (2^(1/2)*2^
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("2"))
+		wantList.Append(data.NewPowToken())
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("1"))
+		wantList.Append(data.NewDivToken())
+		wantList.Append(data.NewNumToken("2"))
+		wantList.Append(data.NewRightToken())
+		wantList.Append(data.NewMulToken())
+		wantList.Append(data.NewNumToken("2"))
+		wantList.Append(data.NewPowToken())
+		// √(π+8))
+		wantList.Append(data.NewRootToken())
 		wantList.Append(data.NewLeftToken())
 		wantList.Append(data.NewPiToken())
 		wantList.Append(data.NewAddToken())
 		wantList.Append(data.NewNumToken("8"))
 		wantList.Append(data.NewRightToken())
 		wantList.Append(data.NewRightToken())
-		wantList.Append(data.NewRightToken())
-		// +5*(0+√π)
+		// +5*√π
 		wantList.Append(data.NewAddToken())
 		wantList.Append(data.NewNumToken("5"))
 		wantList.Append(data.NewMulToken())
-		wantList.Append(data.NewLeftToken())
-		wantList.Append(data.NewNumToken("0"))
-		wantList.Append(data.NewAddToken())
 		wantList.Append(data.NewRootToken())
 		wantList.Append(data.NewPiToken())
-		wantList.Append(data.NewRightToken())
-		// +(0+4)
-		wantList.Append(data.NewAddToken())
-		wantList.Append(data.NewLeftToken())
-		wantList.Append(data.NewNumToken("0"))
+		// +4
 		wantList.Append(data.NewAddToken())
 		wantList.Append(data.NewNumToken("4"))
-		wantList.Append(data.NewRightToken())
 
 		areEqualList(t, gotList, wantList)
 		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList.Size()")
@@ -274,7 +325,7 @@ func Test_tokenize_rebuild(t *testing.T) {
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
-		// ^++
+		// ^+
 		wantList.Append(data.NewPowToken())
 		wantList.Append(data.NewAddToken())
 
@@ -299,6 +350,29 @@ func Test_tokenize_rebuild(t *testing.T) {
 		wantList.Append(data.NewPowToken())
 		wantList.Append(data.NewAddToken())
 		wantList.Append(data.NewAddToken())
+
+		areEqualList(t, gotList, wantList)
+		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList.Size()")
+	})
+
+	t.Run("From a list to a list rebuilded (bugs complex: √{%,*,+,-,/,^})", func(t *testing.T) {
+		expr := "*-√%"
+		lenght := len(expr)
+
+		tokenizer := tokenize{expression: &expr, lenght: &lenght}
+
+		gotList, err := tokenizer.linkedList()
+		assert.NoError(err, "tokenizer.linkedList() error != nil")
+
+		gotList, err = tokenizer.rebuild(gotList)
+		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
+
+		wantList := plugin.NewTokenList()
+		// *-√%
+		wantList.Append(data.NewMulToken())
+		wantList.Append(data.NewSubToken())
+		wantList.Append(data.NewRootToken())
+		wantList.Append(data.NewModToken())
 
 		areEqualList(t, gotList, wantList)
 		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList.Size()")
