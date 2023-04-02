@@ -9,15 +9,13 @@ import (
 
 // Converter converts the 'Number' data.Node from TokenList to 'Float'
 func Converter(list *plugin.TokenList) {
-	slice := *list.Unmarshal()
+	for temp := list.Head(); temp != nil; temp = temp.Next() {
+		token := temp.Token()
 
-	for i, token := range slice {
 		if token.Kind() == data.NumToken {
-			value := token.(data.Number).Value()
+			value := temp.Token().(data.Number).Value()
 			float, _ := strconv.ParseFloat(value, 64)
-			slice[i] = *data.NewFloatToken(float)
+			temp.Update(data.NewFloatToken(float))
 		}
 	}
-
-	list.Marshal(&slice)
 }

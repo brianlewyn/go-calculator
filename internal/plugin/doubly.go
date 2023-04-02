@@ -18,6 +18,11 @@ func (n TokenNode) Token() data.Token {
 	return n.node.Data()
 }
 
+// Update updates a data.Token
+func (n TokenNode) Update(data *data.Token) {
+	n.node.UpdateData(*data)
+}
+
 // Prev return the previous node
 func (n TokenNode) Prev() *TokenNode {
 	if n.node.Prev() != nil {
@@ -99,14 +104,4 @@ func (l *TokenList) Remove(i int) error {
 // and otherwise returns an error
 func (l *TokenList) Append(token *data.Token) error {
 	return l.list.Append(doubly.NewNode(*token))
-}
-
-// Marshal converts a slice of type data.Token to TokenList
-func (l *TokenList) Marshal(slice *[]data.Token) {
-	l.list.Marshal(slice)
-}
-
-// Unmarshal converts a TokenList to a slice of type data.Token and returns it
-func (l *TokenList) Unmarshal() *[]data.Token {
-	return l.list.Unmarshal()
 }
