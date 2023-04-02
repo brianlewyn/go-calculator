@@ -2,28 +2,24 @@ package data
 
 // !Runes
 
-const ( // Operators
+const (
 	Mod rune = '%' // Module = '%'
 	Mul rune = '*' // Multiplication = '*'
 	Add rune = '+' // Addition = '+'
 	Sub rune = '-' // Subtraction = '-'
 	Div rune = '/' // Division = '/'
-)
 
-const ( // Parenthese
 	Left  rune = '(' // Left Parentheses = '('
 	Right rune = ')' // Right Parentheses = ')'
-)
 
-const ( // Pi & Root
-	Pi   rune = 'π' // Pi Number = 'π'
+	Pow  rune = '^' // Power = '^'
 	Root rune = '√' // Square Root = '√'
-)
 
-const ( // Others
-	Gap rune = ' ' // Gap = '\0'
+	Pi     rune = 'π' // Pi Number = 'π'
+	Jocker rune = 'n' // Jocker = 'n'
+
+	Gap rune = ' ' // Gap = ' '
 	Dot rune = '.' // Dot = '.'
-	Pow rune = '^' // Power = '^'
 )
 
 // !For each rune
@@ -49,20 +45,20 @@ func IsLeft(r *rune) bool { return *r == Left }
 // IsRight returns true if r is a right parentheses operator
 func IsRight(r *rune) bool { return *r == Right }
 
+// IsPow returns true if r is a power
+func IsPow(r *rune) bool { return *r == Pow }
+
+// IsRoot returns true if r is a square root
+func IsRoot(r *rune) bool { return *r == Root }
+
+// IsPi returns true if r is a Pi number
+func IsPi(r *rune) bool { return *r == Pi }
+
 // IsGap returns true if r is a gap
 func IsGap(r *rune) bool { return *r == Gap }
 
 // IsDot returns true if r is a dot
 func IsDot(r *rune) bool { return *r == Dot }
-
-// IsPow returns true if r is a power
-func IsPow(r *rune) bool { return *r == Pow }
-
-// IsPi returns true if r is a Pi number
-func IsPi(r *rune) bool { return *r == Pi }
-
-// IsRoot returns true if r is a square root
-func IsRoot(r *rune) bool { return *r == Root }
 
 // !For each rune group
 

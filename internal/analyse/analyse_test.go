@@ -69,9 +69,10 @@ func TestAnalyser(t *testing.T) {
 		{
 			name: "Bug: Together: Elements together",
 			Bug:  Bug{kind: As, as: ierr.Kind_Together},
-			list: expression("0++0)"),
-			// Try these: %% ** ++ -- // )) ^^ %+ %- %/ %) %^ () ...
-			// All except these: +0+, +.0, +π+, +√, 0^+0 ...
+			list: expression("0^^0"),
+			// # := {%, *, +, -, /, ^, √}
+			// Try these: %% ** // )) ^^  %/ %) %^ () ...
+			// All except these: #± ...
 		},
 		{
 			name: "Bug: Together: Numbers together (1)",

@@ -165,12 +165,13 @@ func canBeAddedZero(node *plugin.TokenNode) bool {
 }
 
 // addParenthesesIfPossible adds parentheses as follows:
+// # := {%, *, +, -, /, ^, √}
 //
-// From: ^±n, ^±π, ^±(, ^±√n, ^±√π, ^±√(...)
+// From: #±n, #±π, #±(, #±√n, #±√π, #±√(...)
 //
-// To ^(±n), ^(±π), ^(±(...)), ^(±√n) ^(±√π) ^(±√(...))
+// To #(±n), #(±π), #(±(...)), #(±√n) #(±√π) #(±√(...))
 func addParenthesesIfPossible(i int, node *plugin.TokenNode, list *plugin.TokenList) bool {
-	if !isKind(node, data.PowToken) {
+	if !isKindFn(node, data.IsSpecialToken) {
 		return false
 	}
 
@@ -181,29 +182,29 @@ func addParenthesesIfPossible(i int, node *plugin.TokenNode, list *plugin.TokenL
 
 	temp = temp.Next()
 
-	// ^±n, ^±π
+	// #±n, #±π
 	if isKindFn(temp, data.IsNumPiToken) {
 		addParentheses(i+1, i+4, list)
 		return true
 	}
 
-	// ^±(...)
+	// #±(...)
 	if isKind(temp, data.LeftToken) {
 		addParenthesesInLoop(i, node, list)
 		return true
 	}
 
-	// ^±√
+	// #±√
 	if isKind(temp, data.RootToken) {
 		temp = temp.Next()
 
-		// ^±√n, ^±√π
+		// #±√n, #±√π
 		if isKindFn(temp, data.IsNumPiToken) {
-			addParentheses(i+1, i+4, list)
+			addParentheses(i+1, i+5, list)
 			return true
 		}
 
-		// ^±√(...)
+		// #±√(...)
 		if isKind(temp, data.LeftToken) {
 			addParenthesesInLoop(i, node, list)
 			return true

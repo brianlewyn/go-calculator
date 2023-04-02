@@ -138,13 +138,13 @@ func IsNumPiToken(kind TokenKind) bool {
 
 // IsFirstToken returs true if kind is:
 //
-// 0-9, (, ., π, √
+// √, (, π, n
 func IsFirstToken(kind TokenKind) bool {
 	switch kind {
+	case RootToken:
+	case LeftToken:
 	case PiToken:
 	case NumToken:
-	case LeftToken:
-	case RootToken:
 	default:
 		return false
 	}
@@ -153,12 +153,12 @@ func IsFirstToken(kind TokenKind) bool {
 
 // IsLastToken returns true if kind is:
 //
-// 0-9, ), π
+// ), π, n
 func IsLastToken(kind TokenKind) bool {
 	switch kind {
+	case RightToken:
 	case PiToken:
 	case NumToken:
-	case RightToken:
 	default:
 		return false
 	}
@@ -181,10 +181,23 @@ func IsOperatorToken(kind TokenKind) bool {
 	return true
 }
 
-// FromTokenKindToRune returns a TokenKind:
+// IsSpecialToken returns true if kind is:
+//
+// %, *, +, -, /, ^, √
+func IsSpecialToken(kind TokenKind) bool {
+	switch kind {
+	case PowToken:
+	case RootToken:
+	default:
+		return IsOperatorToken(kind)
+	}
+	return true
+}
+
+// ChangeToRune returns a TokenKind:
 //
 // %, *, +, -, /, (, ), ^, √, π, n=#
-func FromTokenKindToRune(kind TokenKind) rune {
+func ChangeToRune(kind TokenKind) rune {
 	switch kind {
 	case ModToken:
 		return Mod

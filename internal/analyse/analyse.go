@@ -68,7 +68,7 @@ func (a analyse) isCorrectFirst(token data.Token) error {
 	}
 
 	if !data.IsFirstToken(token.Kind()) {
-		kind := data.FromTokenKindToRune(token.Kind())
+		kind := data.ChangeToRune(token.Kind())
 		return ierr.NewKind(kind, 0).Start()
 	}
 
@@ -82,7 +82,7 @@ func (a analyse) isCorrectLast(token data.Token) error {
 	}
 
 	if !data.IsLastToken(token.Kind()) {
-		kind := data.FromTokenKindToRune(token.Kind())
+		kind := data.ChangeToRune(token.Kind())
 		return ierr.NewKind(kind, 0).End()
 	}
 
@@ -147,8 +147,8 @@ func canBeTogether(curr, next *plugin.TokenNode) error {
 
 // format returns the value of the kind
 func format(token1, token2 data.TokenKind) (rune, rune) {
-	kindRune1 := data.FromTokenKindToRune(token1)
-	kindRune2 := data.FromTokenKindToRune(token2)
+	kindRune1 := data.ChangeToRune(token1)
+	kindRune2 := data.ChangeToRune(token2)
 	return kindRune1, kindRune2
 }
 

@@ -185,7 +185,7 @@ func Test_tokenize_rebuild(t *testing.T) {
 	})
 
 	t.Run("From a list to a list rebuilded (complex)", func(t *testing.T) {
-		expr := "5^-2 + 5^(2^+(1/2) * 2^+√(π+8)) + 5^+√π"
+		expr := "5^-2 + 5^(2^+(1/2) * 2^+√(π+8)) + 5*+√π ++4"
 		lenght := len(expr)
 
 		tokenizer := tokenize{expression: &expr, lenght: &lenght}
@@ -197,7 +197,7 @@ func Test_tokenize_rebuild(t *testing.T) {
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
-		// 10^(0-2)
+		// 5^(0-2)
 		wantList.Append(data.NewNumToken("5"))
 		wantList.Append(data.NewPowToken())
 		wantList.Append(data.NewLeftToken())
@@ -205,7 +205,7 @@ func Test_tokenize_rebuild(t *testing.T) {
 		wantList.Append(data.NewSubToken())
 		wantList.Append(data.NewNumToken("2"))
 		wantList.Append(data.NewRightToken())
-		// +10^
+		// +5^
 		wantList.Append(data.NewAddToken())
 		wantList.Append(data.NewNumToken("5"))
 		wantList.Append(data.NewPowToken())
@@ -239,15 +239,22 @@ func Test_tokenize_rebuild(t *testing.T) {
 		wantList.Append(data.NewRightToken())
 		wantList.Append(data.NewRightToken())
 		wantList.Append(data.NewRightToken())
-		// +5^(0+√π)
+		// +5*(0+√π)
 		wantList.Append(data.NewAddToken())
 		wantList.Append(data.NewNumToken("5"))
-		wantList.Append(data.NewPowToken())
+		wantList.Append(data.NewMulToken())
 		wantList.Append(data.NewLeftToken())
 		wantList.Append(data.NewNumToken("0"))
 		wantList.Append(data.NewAddToken())
 		wantList.Append(data.NewRootToken())
 		wantList.Append(data.NewPiToken())
+		wantList.Append(data.NewRightToken())
+		// +(0+4)
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewLeftToken())
+		wantList.Append(data.NewNumToken("0"))
+		wantList.Append(data.NewAddToken())
+		wantList.Append(data.NewNumToken("4"))
 		wantList.Append(data.NewRightToken())
 
 		areEqualList(t, gotList, wantList)
@@ -304,7 +311,8 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 	for node1 != nil && node2 != nil {
 		token1, token2 := node1.Token(), node2.Token()
 
-		if assert.Equalf(t, token1.Kind(), token2.Kind(), "kind1 != kind2 %v %v", token1.Kind(), token2.Kind()) {
+		if assert.Equalf(t, token1.Kind(), token2.Kind(), "kind1: %c != kind2: %c",
+			data.ChangeToRune(token1.Kind()), data.ChangeToRune(token2.Kind())) {
 			if token1.Kind() == data.NumToken {
 				value1 := token1.(data.Number).Value()
 				value2 := token2.(data.Number).Value()
