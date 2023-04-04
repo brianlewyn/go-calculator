@@ -107,13 +107,13 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 
 	for i, temp := 0, list.Head(); temp != nil; i, temp = i+1, temp.Next() {
 		if canBeAddedAsterisk(temp) {
-			list.Insert(i+1, data.NewMulToken())
+			list.Connect(temp, data.NewMulToken())
 
 		} else if canBeAddedZero(temp) {
-			list.Insert(i+1, data.NewNumToken("0"))
+			list.Connect(temp, data.NewNumToken("0"))
 
 		} else if canBeRemovedPlus(temp) {
-			list.Remove(i + 1)
+			list.Disconnect(temp.Next())
 
 		} else {
 			addParenthesesIfPossible(i, temp, list)
@@ -121,7 +121,7 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 	}
 
 	if isKindPlus(list.Head()) {
-		list.Remove(0)
+		list.Disconnect(list.Head())
 	}
 
 	return list, nil
@@ -211,28 +211,29 @@ func canBeRemovedPlus(node *plugin.TokenNode) bool {
 // From: #-n, #-π, #-(, #-√n, #-√π, #-√(...)
 //
 // To #(-n), #(-π), #(-(...)), #(-√n) #(-√π) #(-√(...))
-func addParenthesesIfPossible(i int, node *plugin.TokenNode, list *plugin.TokenList) bool {
+func addParenthesesIfPossible(i int, node *plugin.TokenNode, list *plugin.TokenList) {
 	if !isKindFnRaw(node, data.IsSpecialToken) {
-		return false
+		return
 	}
 
 	temp := node.Next()
+
 	if !isKind(temp, data.SubToken) {
-		return false
+		return
 	}
 
 	temp = temp.Next()
 
 	// #-n, #-π
 	if isKindFn(temp, data.IsNumPiToken) {
-		addParentheses(i+1, i+4, list)
-		return true
+		addParentheses(node, 4, list)
+		return
 	}
 
 	// #-(...)
 	if isKind(temp, data.LeftToken) {
 		addParenthesesInLoop(i, node, list)
-		return true
+		return
 	}
 
 	// #-√
@@ -241,27 +242,23 @@ func addParenthesesIfPossible(i int, node *plugin.TokenNode, list *plugin.TokenL
 
 		// #-√n, #-√π
 		if isKindFn(temp, data.IsNumPiToken) {
-			addParentheses(i+1, i+5, list)
-			return true
+			addParentheses(node, 5, list)
+			return
 		}
 
 		// #-√(...)
 		if isKind(temp, data.LeftToken) {
 			addParenthesesInLoop(i, node, list)
-			return true
+			return
 		}
 	}
-
-	return false
 }
 
 // addParenthesesInLoop add parentheses wrapping a sign and another operation with parentheses
 func addParenthesesInLoop(i int, node *plugin.TokenNode, list *plugin.TokenList) {
 	var nLeft, nRight int
-	var flag bool
-	j := i
 
-	for temp := node; temp != nil; j, temp = j+1, temp.Next() {
+	for temp := node; temp != nil; i, temp = i+1, temp.Next() {
 		if isKindRaw(temp, data.LeftToken) {
 			nLeft++
 
@@ -269,14 +266,11 @@ func addParenthesesInLoop(i int, node *plugin.TokenNode, list *plugin.TokenList)
 			nRight++
 
 			if nLeft == nRight {
-				flag = true
+				list.Connect(node, data.NewLeftToken())
+				list.Connect(temp, data.NewRightToken())
 				break
 			}
 		}
-	}
-
-	if flag {
-		addParentheses(i+1, j+1, list)
 	}
 }
 
@@ -306,8 +300,12 @@ func isKindFnRaw(node *plugin.TokenNode, tokenFn func(token data.TokenKind) bool
 	return tokenFn(node.Token().Kind())
 }
 
-// addParentheses adds a left token at position i and a right token at position j
-func addParentheses(i, j int, list *plugin.TokenList) {
-	list.Insert(i, data.NewLeftToken())
-	list.Insert(j, data.NewRightToken())
+// addParentheses adds a left token the of the node and a right token at position k afther node
+func addParentheses(node *plugin.TokenNode, k int, list *plugin.TokenList) {
+	list.Connect(node, data.NewLeftToken())
+	for i, temp := 1, node; i <= k; i, temp = i+1, temp.Next() {
+		if i == k {
+			list.Connect(temp, data.NewRightToken())
+		}
+	}
 }

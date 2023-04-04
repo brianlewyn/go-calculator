@@ -20,7 +20,7 @@ func (n TokenNode) Token() data.Token {
 
 // Update updates a data.Token
 func (n TokenNode) Update(data *data.Token) {
-	n.node.UpdateData(*data)
+	n.node.Update(*data)
 }
 
 // Prev return the previous node
@@ -82,22 +82,16 @@ func (l TokenList) IsEmpty() bool {
 	return l.list.IsEmpty()
 }
 
-// Prepend adds a new token to the start of the list and returns nil,
+// Connect connets one node to another and returns nil,
 // and otherwise returns an error
-func (l *TokenList) Prepend(token *data.Token) error {
-	return l.list.Prepend(doubly.NewNode(*token))
+func (l *TokenList) Connect(from *TokenNode, token *data.Token) error {
+	return l.list.Connect(from.node, doubly.NewNode(*token))
 }
 
-// Insert inserts a new token at the given index and returns nil,
+// Connect connets one node to another and returns nil,
 // and otherwise returns an error
-func (l *TokenList) Insert(i int, token *data.Token) error {
-	return l.list.Insert(i, doubly.NewNode(*token))
-}
-
-// Remove removes the token at the given index and returns nil, and otherwise
-// returns an error if the list is empty or the index doesn't exist
-func (l *TokenList) Remove(i int) error {
-	return l.list.Remove(i)
+func (l *TokenList) Disconnect(node *TokenNode) error {
+	return l.list.Disconnect(node.node)
 }
 
 // Prepend adds a new token to the end of the list and returns nil,
