@@ -1,18 +1,27 @@
 package math
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 
+	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/plugin"
 )
 
 // Math returns the result of calculating the expression inside the list of tokens
-func Math(list *plugin.TokenList) float64 {
+func Math(list *plugin.TokenList) (float64, data.Error) {
 	for calculateDeepestExpression(list) {
 	}
-	return operateNodes(list)
+
+	answer := operateNodes(list)
+	if math.IsNaN(answer) {
+		return 0, data.NewError(
+			fmt.Sprint(answer), ierr.AnswerIsNaN)
+	}
+
+	return answer, nil
 }
 
 // calculateDeepestExpression returns true if it can calculate the deepest expression in parentheses

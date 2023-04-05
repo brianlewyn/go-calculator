@@ -13,31 +13,31 @@ func TestCalculate(t *testing.T) {
 		name string
 		expr string
 		want float64
-		bug  ierr.KindOf
-		nan  bool
+		as   ierr.KindOf
+		is   error
 	}{
 		// TODO: Add test cases
 		{
 			name: "Root Square: NaN",
 			expr: "√-2",
 			want: math.Sqrt(-2),
-			nan:  true,
+			is:   ierr.AnswerIsNaN,
 		},
 		{
 			name: "Power: NaN",
 			expr: "(-2)^(1/2)",
 			want: math.Pow(-2, 1.0/2),
-			nan:  true,
+			is:   ierr.AnswerIsNaN,
 		},
 		{
 			name: "Tokenizer: Bug",
 			expr: "#π3.14",
-			bug:  ierr.Rune_Unknown,
+			as:   ierr.Rune_Unknown,
 		},
 		{
 			name: "Analyser: Bug",
 			expr: "π3.14",
-			bug:  ierr.Kind_Together,
+			as:   ierr.Kind_Together,
 		},
 		{
 			name: "Pi number & Multiplication",
@@ -74,14 +74,14 @@ func TestCalculate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Calculate(tt.expr)
 
-			if tt.bug != "" {
-				assert.Truef(t, ierr.As(err.Bug(), tt.bug), "Bug != %v", tt.bug)
+			if tt.as != "" {
+				assert.Truef(t, ierr.As(err.Bug(), tt.as), "Bug != %v", tt.as)
 				if err != nil {
 					t.Logf("Error:\n%s", err)
 				}
 
-			} else if tt.nan {
-				assert.True(t, math.IsNaN(got), "got != NaN")
+			} else if tt.is != nil {
+				assert.ErrorIs(t, err.Bug(), tt.is, "Bug != nil")
 				if err != nil {
 					t.Logf("Error:\n%s", err)
 				}

@@ -10,7 +10,10 @@ import (
 type KindOf string
 
 // What kind of main error occurred?
-const Syntax = KindOf("syntax error")
+const (
+	Syntax = KindOf("syntax error")
+	Math   = KindOf("math error")
+)
 
 // What kind of context error occurred?
 const (
@@ -27,6 +30,7 @@ var (
 	EmptyField      = wrap(Syntax, errors.New("empty field"))
 	IncompleteLeft  = wrap(Syntax, errors.New("there are incomplete left parentheses"))
 	IncompleteRight = wrap(Syntax, errors.New("there are incomplete right parentheses"))
+	AnswerIsNaN     = wrap(Math, errors.New("reports that the value is \"not a number\""))
 )
 
 // Interface errors

@@ -25,7 +25,7 @@ func Calculate(expr string) (float64, data.Error) {
 		return 0, err
 	}
 
-	return math.Math(list), nil
+	return math.Math(list)
 }
 
 /*
