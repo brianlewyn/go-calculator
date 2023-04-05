@@ -8,37 +8,6 @@ import (
 	"github.com/brianlewyn/go-linked-list/doubly"
 )
 
-// TokenNode represents the Token Node
-type TokenNode struct {
-	node *doubly.Node[data.Token]
-}
-
-// Token returns the data of the node
-func (n TokenNode) Token() data.Token {
-	return n.node.Data()
-}
-
-// Update updates a data.Token
-func (n TokenNode) Update(data *data.Token) {
-	n.node.Update(*data)
-}
-
-// Prev return the previous node
-func (n TokenNode) Prev() *TokenNode {
-	if n.node.Prev() != nil {
-		return &TokenNode{node: n.node.Prev()}
-	}
-	return nil
-}
-
-// Next return the next node
-func (n TokenNode) Next() *TokenNode {
-	if n.node.Next() != nil {
-		return &TokenNode{node: n.node.Next()}
-	}
-	return nil
-}
-
 // TokenList represents the Token List
 type TokenList struct {
 	list *doubly.Doubly[data.Token]
@@ -82,20 +51,32 @@ func (l TokenList) IsEmpty() bool {
 	return l.list.IsEmpty()
 }
 
+// Prepend adds a new token to the end of the list and returns nil,
+// and otherwise returns an error
+func (l *TokenList) Append(token *data.Token) error {
+	return l.list.Append(doubly.NewNode(*token))
+}
+
+// Pop removes the last token from the list and return nil,
+// and otherwise returns an error if the list is empty
+func (l *TokenList) Pop() error {
+	return l.list.Pop()
+}
+
 // Connect connets one node to another and returns nil,
 // and otherwise returns an error
 func (l *TokenList) Connect(from *TokenNode, token *data.Token) error {
+	if from == nil {
+		return l.list.Connect(nil, doubly.NewNode(*token))
+	}
 	return l.list.Connect(from.node, doubly.NewNode(*token))
 }
 
 // Connect connets one node to another and returns nil,
 // and otherwise returns an error
 func (l *TokenList) Disconnect(node *TokenNode) error {
+	if node == nil {
+		return l.list.Disconnect(nil)
+	}
 	return l.list.Disconnect(node.node)
-}
-
-// Prepend adds a new token to the end of the list and returns nil,
-// and otherwise returns an error
-func (l *TokenList) Append(token *data.Token) error {
-	return l.list.Append(doubly.NewNode(*token))
 }
