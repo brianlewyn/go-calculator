@@ -118,7 +118,7 @@ func NewFloatToken(value float64) *Token {
 
 // IsAddSubToken returns true if r is:
 //
-// n, π
+//	n, π
 func IsNumPiToken(kind TokenKind) bool {
 	if kind != NumToken {
 		return kind == PiToken
@@ -128,7 +128,7 @@ func IsNumPiToken(kind TokenKind) bool {
 
 // IsFirstToken returs true if kind is:
 //
-// √, (, π, n
+//	√, (, π, n
 func IsFirstToken(kind TokenKind) bool {
 	switch kind {
 	case RootToken:
@@ -143,7 +143,7 @@ func IsFirstToken(kind TokenKind) bool {
 
 // IsLastToken returns true if kind is:
 //
-// ), π, n
+//	), π, n
 func IsLastToken(kind TokenKind) bool {
 	switch kind {
 	case RightToken:
@@ -157,7 +157,7 @@ func IsLastToken(kind TokenKind) bool {
 
 // IsOperatorToken returns true if kind is:
 //
-// %, *, +, -, /
+//	%, *, +, -, /
 func IsOperatorToken(kind TokenKind) bool {
 	switch kind {
 	case ModToken:
@@ -173,7 +173,7 @@ func IsOperatorToken(kind TokenKind) bool {
 
 // IsSpecialToken returns true if kind is:
 //
-// %, *, +, -, /, ^, √
+//	%, *, +, -, /, ^, √
 func IsSpecialToken(kind TokenKind) bool {
 	switch kind {
 	case PowToken:
@@ -186,7 +186,7 @@ func IsSpecialToken(kind TokenKind) bool {
 
 // ChangeToRune returns a TokenKind:
 //
-// %, *, +, -, /, (, ), ^, √, π, n=#
+//	%, *, +, -, /, (, ), ^, √, π, n
 func ChangeToRune(kind TokenKind) rune {
 	switch kind {
 	case ModToken:
@@ -248,7 +248,7 @@ func CanTokensBeTogether(k1, k2 TokenKind) bool {
 
 // isLeftNumPiRoot returns true if kind is:
 //
-// (, n, π, √
+//	(, n, π, √
 func isLeftNumPiRoot(kind *TokenKind) bool {
 	switch *kind {
 	case LeftToken:
@@ -263,7 +263,7 @@ func isLeftNumPiRoot(kind *TokenKind) bool {
 
 // isOperatorPowRight returns true if kind is:
 //
-// %, *, +, -, /, ^, )
+//	%, *, +, -, /, ^, )
 func isOperatorPowRight(kind *TokenKind) bool {
 	switch *kind {
 	case PowToken:

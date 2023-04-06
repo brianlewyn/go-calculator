@@ -119,10 +119,7 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 		}
 	}
 
-	if isKindPlus(list.Head()) {
-		list.Disconnect(list.Head())
-	}
-
+	modifyFirstToken(list)
 	return list, nil
 }
 
@@ -143,8 +140,23 @@ func (t tokenize) isFloat(i int) bool {
 
 // !Tool Functions
 
+// modifyFirstToken
+//   - removes the Head node if it is some kind of AddToken, and otherwise,
+//   - adds as the Head node a NumToken if it is some kind of SubToken
+func modifyFirstToken(list *plugin.TokenList) {
+	node := list.Head()
+
+	switch {
+	case isKind(node, data.AddToken):
+		list.Disconnect(node)
+	case isKind(node, data.SubToken):
+		list.Connect(nil, data.NewNumToken("0"))
+	}
+}
+
 // canBeAddedAsterisk returns true if an asterisk can be added
-// )( => )*(
+//
+//	)( => )*(
 func canBeAddedAsterisk(node *plugin.TokenNode) bool {
 	if !isKind(node, data.RightToken) {
 		return false
@@ -153,7 +165,8 @@ func canBeAddedAsterisk(node *plugin.TokenNode) bool {
 }
 
 // canBeAddedZero returns true if an zero can be added
-// (-	=> (0-
+//
+//	(-	=> (0-
 func canBeAddedZero(node *plugin.TokenNode) bool {
 	if !isKind(node, data.LeftToken) {
 		return false
@@ -161,16 +174,10 @@ func canBeAddedZero(node *plugin.TokenNode) bool {
 	return isKind(node.Next(), data.SubToken)
 }
 
-// isKindPlus returns true if a AddToken can be removed
-func isKindPlus(node *plugin.TokenNode) bool {
-	return isKind(node, data.AddToken)
-}
-
 // canBeRemovedPlus returns true if a AddToken can be removed
 //
-// From: #+n, #+π, #+(, #+√n, #+√π, #+√(...)
-//
-// To #n, #π, #(, #√n, #√π, #√(...)
+//	From: #+n, #+π, #+(, #+√n, #+√π, #+√(...)
+//	To #n, #π, #(, #√n, #√π, #√(...)
 func canBeRemovedPlus(node *plugin.TokenNode) bool {
 	if !isKindFnRaw(node, data.IsSpecialToken) {
 		if !isKindRaw(node, data.LeftToken) {
@@ -205,11 +212,9 @@ func canBeRemovedPlus(node *plugin.TokenNode) bool {
 
 // addParenthesesIfPossible adds parentheses as follows:
 //
-// # := {%, *, +, -, /, ^, √}
-//
-// From: #-n, #-π, #-(, #-√n, #-√π, #-√(...)
-//
-// To #(-n), #(-π), #(-(...)), #(-√n) #(-√π) #(-√(...))
+//	# = {%, *, +, -, /, ^, √}
+//	From: #-n, #-π, #-(, #-√n, #-√π, #-√(...)
+//	To #(-n), #(-π), #(-(...)), #(-√n) #(-√π) #(-√(...))
 func addParenthesesIfPossible(i int, node *plugin.TokenNode, list *plugin.TokenList) {
 	if !isKindFnRaw(node, data.IsSpecialToken) {
 		return

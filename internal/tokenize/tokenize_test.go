@@ -147,7 +147,7 @@ func Test_tokenize_rebuild(t *testing.T) {
 	})
 
 	t.Run("From a list to a list rebuilded", func(t *testing.T) {
-		expr := "(+10)(-12)(*12)"
+		expr := "-(+10)(-12)(*12)"
 		lenght := len(expr)
 
 		tokenizer := tokenize{expression: &expr, lenght: &lenght}
@@ -159,7 +159,9 @@ func Test_tokenize_rebuild(t *testing.T) {
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
-		// (10)
+		// 0-(10)
+		wantList.Append(data.NewNumToken("0"))
+		wantList.Append(data.NewSubToken())
 		wantList.Append(data.NewLeftToken())
 		wantList.Append(data.NewNumToken("10"))
 		wantList.Append(data.NewRightToken())

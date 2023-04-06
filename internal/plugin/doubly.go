@@ -51,7 +51,7 @@ func (l TokenList) IsEmpty() bool {
 	return l.list.IsEmpty()
 }
 
-// Prepend adds a new token to the end of the list and returns nil,
+// Apppend adds a new token to the end of the list and returns nil,
 // and otherwise returns an error
 func (l *TokenList) Append(token *data.Token) error {
 	return l.list.Append(doubly.NewNode(*token))
@@ -72,7 +72,7 @@ func (l *TokenList) Connect(from *TokenNode, token *data.Token) error {
 	return l.list.Connect(from.node, doubly.NewNode(*token))
 }
 
-// Connect connets one node to another and returns nil,
+// Disconnect disconnets one node of list and returns nil,
 // and otherwise returns an error
 func (l *TokenList) Disconnect(node *TokenNode) error {
 	if node == nil {

@@ -40,11 +40,6 @@ func TestCalculate(t *testing.T) {
 			as:   ierr.Kind_Together,
 		},
 		{
-			name: "Pi number & Multiplication",
-			expr: "π * 2",
-			want: math.Pi * 2,
-		},
-		{
 			name: "Root Square",
 			expr: "√2",
 			want: math.Sqrt(2),
@@ -53,6 +48,16 @@ func TestCalculate(t *testing.T) {
 			name: "Power",
 			expr: "2^2",
 			want: math.Pow(2, 2),
+		},
+		{
+			name: "Power: as in NaN but without parentheses",
+			expr: "-2^(1/2)",
+			want: -math.Pow(2, 1.0/2),
+		},
+		{
+			name: "Pi number & Multiplication",
+			expr: "π * 2",
+			want: math.Pi * 2,
 		},
 		{
 			name: "Multiplication & Division",
