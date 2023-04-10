@@ -70,7 +70,7 @@ func TestCalculate(t *testing.T) {
 			want: 2,
 		},
 		{
-			name: "first test",
+			name: "Solve a complex expression",
 			expr: "(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2",
 			want: 5,
 		},
@@ -79,23 +79,17 @@ func TestCalculate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Calculate(tt.expr)
 
-			if tt.as != "" {
+			switch {
+			case tt.as != "":
 				assert.Truef(t, ierr.As(err.Bug(), tt.as), "Bug != %v", tt.as)
-				if err != nil {
-					t.Logf("Error:\n%s", err)
-				}
-
-			} else if tt.is != nil {
+			case tt.is != nil:
 				assert.ErrorIs(t, err.Bug(), tt.is, "Bug != nil")
-				if err != nil {
-					t.Logf("Error:\n%s", err)
-				}
-
-			} else {
+			default:
 				assert.Equalf(t, got, tt.want, "got: %v, want: %v", got, tt.want)
-				if err != nil {
-					t.Logf("Error:\n%s", err)
-				}
+			}
+
+			if err != nil {
+				t.Logf("Error:\n%s", err)
 			}
 		})
 	}
