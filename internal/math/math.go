@@ -114,7 +114,7 @@ func operateNodes(list *plugin.TokenList) float64 {
 	doAddAndSub(list)
 
 	answer := response(list)
-	emptyList(list)
+	list.Flush()
 	return answer
 }
 
@@ -197,9 +197,4 @@ func response(list *plugin.TokenList) float64 {
 		return list.Head().Token().(data.Float).Value()
 	}
 	return 0
-}
-
-func emptyList(list *plugin.TokenList) {
-	for list.Pop() == nil {
-	}
 }

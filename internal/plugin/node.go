@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-linked-list/doubly"
+	"github.com/brianlewyn/go-linked-list/v2/doubly"
 )
 
 // TokenNode represents the Token Node
@@ -22,16 +22,16 @@ func (n TokenNode) Update(data *data.Token) {
 
 // Prev return the previous node
 func (n TokenNode) Prev() *TokenNode {
-	if n.node.Prev() != nil {
-		return &TokenNode{node: n.node.Prev()}
+	if prev := n.node.NPrev(); prev != nil {
+		return &TokenNode{node: prev}
 	}
 	return nil
 }
 
 // Next return the next node
 func (n TokenNode) Next() *TokenNode {
-	if n.node.Next() != nil {
-		return &TokenNode{node: n.node.Next()}
+	if next := n.node.NNext(); next != nil {
+		return &TokenNode{node: next}
 	}
 	return nil
 }

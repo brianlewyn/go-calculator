@@ -3,7 +3,7 @@ module github.com/brianlewyn/go-calculator
 go 1.20
 
 require (
-	github.com/brianlewyn/go-linked-list v1.4.1
+	github.com/brianlewyn/go-linked-list/v2 v2.0.2
 	github.com/stretchr/testify v1.8.2
 )
 

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-linked-list/doubly"
+	"github.com/brianlewyn/go-linked-list/v2/doubly"
 )
 
 // TokenList represents the Token List
@@ -25,12 +25,12 @@ func (l TokenList) Size() int {
 
 // Head returns the first node in the list, but if the list is empty returns nil
 func (l TokenList) Head() *TokenNode {
-	return &TokenNode{node: l.list.Head()}
+	return &TokenNode{node: l.list.NHead()}
 }
 
 // Tail returns the last node in the list, but if the list is empty returns nil
 func (l TokenList) Tail() *TokenNode {
-	return &TokenNode{node: l.list.Tail()}
+	return &TokenNode{node: l.list.NTail()}
 }
 
 func (l *TokenList) String() string {
@@ -39,7 +39,7 @@ func (l *TokenList) String() string {
 	}
 
 	var b strings.Builder
-	for temp := l.list.Head(); temp != nil; temp = temp.Next() {
+	for temp := l.list.NHead(); temp != nil; temp = temp.NNext() {
 		fmt.Fprintf(&b, "%c", data.ChangeToRune(temp.Data().Kind()))
 	}
 
@@ -51,16 +51,14 @@ func (l TokenList) IsEmpty() bool {
 	return l.list.IsEmpty()
 }
 
-// Apppend adds a new token to the end of the list and returns nil,
-// and otherwise returns an error
-func (l *TokenList) Append(token *data.Token) error {
-	return l.list.Append(doubly.NewNode(*token))
+// Apppend adds a new token to the end of the list
+func (l *TokenList) Append(token *data.Token) {
+	l.list.DAppend(*token)
 }
 
-// Pop removes the last token from the list and return nil,
-// and otherwise returns an error if the list is empty
-func (l *TokenList) Pop() error {
-	return l.list.Pop()
+// Flush delete list
+func (l *TokenList) Flush() {
+	l.list.Flush(false)
 }
 
 // Connect connets one node to another and returns nil,
