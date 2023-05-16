@@ -49,35 +49,35 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 		switch {
 
 		// opeartors
-		case data.IsMod(&r):
+		case data.IsMod(r):
 			list.Append(data.NewModToken())
-		case data.IsMul(&r):
+		case data.IsMul(r):
 			list.Append(data.NewMulToken())
-		case data.IsAdd(&r):
+		case data.IsAdd(r):
 			list.Append(data.NewAddToken())
-		case data.IsSub(&r):
+		case data.IsSub(r):
 			list.Append(data.NewSubToken())
-		case data.IsDiv(&r):
+		case data.IsDiv(r):
 			list.Append(data.NewDivToken())
 
 		// parentheses
-		case data.IsLeft(&r):
+		case data.IsLeft(r):
 			list.Append(data.NewLeftToken())
-		case data.IsRight(&r):
+		case data.IsRight(r):
 			list.Append(data.NewRightToken())
 
 		// power
-		case data.IsPow(&r):
+		case data.IsPow(r):
 			list.Append(data.NewPowToken())
 
 		// pi or root
-		case data.IsPi(&r):
+		case data.IsPi(r):
 			list.Append(data.NewPiToken())
-		case data.IsRoot(&r):
+		case data.IsRoot(r):
 			list.Append(data.NewRootToken())
 
 		// numbers
-		case data.IsFloat(&r):
+		case data.IsFloat(r):
 			value += string(r)
 
 			if !t.isFloat(i) {
@@ -86,7 +86,7 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 			}
 
 		default:
-			if !data.IsGap(&r) {
+			if !data.IsGap(r) {
 				return nil, ierr.NewRune(r, i).Unknown()
 			}
 		}
@@ -135,7 +135,7 @@ func (t tokenize) isFloat(i int) bool {
 		after = rune((*t.expression)[i+1])
 	}
 
-	return data.IsFloat(&after)
+	return data.IsFloat(after)
 }
 
 // !Tool Functions

@@ -107,7 +107,7 @@ func isCorrectNumber(token data.Token) error {
 	var nDigit uint16
 
 	for _, r := range num {
-		if data.IsDot(&r) {
+		if data.IsDot(r) {
 			if flagDot {
 				return ierr.NewNumber(num).Misspelled()
 			}
