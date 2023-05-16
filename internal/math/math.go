@@ -36,7 +36,7 @@ func calculateDeepestExpression(list *plugin.TokenList) bool {
 	}
 
 	result := operateNodes(tempList)
-	list.Connect(connection, data.NewFloatToken(result))
+	list.Connect(connection, data.NewDecToken(result))
 	return true
 }
 
@@ -97,11 +97,11 @@ func convertFloatList(list *plugin.TokenList) {
 		token := temp.Token()
 
 		if token.Kind() == data.PiToken {
-			temp.Update(data.NewFloatToken(math.Pi))
+			temp.Update(data.NewDecToken(math.Pi))
 
 		} else if token, ok := token.(data.Number); ok {
 			float, _ := strconv.ParseFloat(token.Value(), 64)
-			temp.Update(data.NewFloatToken(float))
+			temp.Update(data.NewDecToken(float))
 		}
 	}
 }
@@ -124,17 +124,17 @@ func doPowAndRoot(list *plugin.TokenList) {
 		switch temp.Token().Kind() {
 
 		case data.PowToken:
-			x := temp.Prev().Token().(data.Float).Value()
-			y := temp.Next().Token().(data.Float).Value()
+			x := temp.Prev().Token().(data.Decimal).Value()
+			y := temp.Next().Token().(data.Decimal).Value()
 			list.Disconnect(temp.Prev())
 			list.Disconnect(temp.Next())
 
-			temp.Update(data.NewFloatToken(math.Pow(x, y)))
+			temp.Update(data.NewDecToken(math.Pow(x, y)))
 
 		case data.RootToken:
-			x := temp.Next().Token().(data.Float).Value()
+			x := temp.Next().Token().(data.Decimal).Value()
 			list.Disconnect(temp.Next())
-			temp.Update(data.NewFloatToken(math.Sqrt(x)))
+			temp.Update(data.NewDecToken(math.Sqrt(x)))
 		}
 	}
 }
@@ -147,18 +147,18 @@ func doMulDivAndMod(list *plugin.TokenList) {
 		if token == data.MulToken || token == data.DivToken || token == data.ModToken {
 			prev, next := temp.Prev(), temp.Next()
 
-			x := prev.Token().(data.Float).Value()
-			y := next.Token().(data.Float).Value()
+			x := prev.Token().(data.Decimal).Value()
+			y := next.Token().(data.Decimal).Value()
 			list.Disconnect(prev)
 			list.Disconnect(next)
 
 			switch token {
 			case data.MulToken:
-				temp.Update(data.NewFloatToken(x * y))
+				temp.Update(data.NewDecToken(x * y))
 			case data.DivToken:
-				temp.Update(data.NewFloatToken(x / y))
+				temp.Update(data.NewDecToken(x / y))
 			case data.ModToken:
-				temp.Update(data.NewFloatToken(math.Mod(x, y)))
+				temp.Update(data.NewDecToken(math.Mod(x, y)))
 			}
 		}
 	}
@@ -172,16 +172,16 @@ func doAddAndSub(list *plugin.TokenList) {
 		if token == data.AddToken || token == data.SubToken {
 			prev, next := temp.Prev(), temp.Next()
 
-			x := prev.Token().(data.Float).Value()
-			y := next.Token().(data.Float).Value()
+			x := prev.Token().(data.Decimal).Value()
+			y := next.Token().(data.Decimal).Value()
 			list.Disconnect(prev)
 			list.Disconnect(next)
 
 			switch token {
 			case data.AddToken:
-				temp.Update(data.NewFloatToken(x + y))
+				temp.Update(data.NewDecToken(x + y))
 			case data.SubToken:
-				temp.Update(data.NewFloatToken(x - y))
+				temp.Update(data.NewDecToken(x - y))
 			}
 		}
 	}
@@ -194,7 +194,7 @@ func response(list *plugin.TokenList) float64 {
 	case list.Head().Token() == nil:
 	case list.Head().Token().Kind() != data.NumToken:
 	default:
-		return list.Head().Token().(data.Float).Value()
+		return list.Head().Token().(data.Decimal).Value()
 	}
 	return 0
 }

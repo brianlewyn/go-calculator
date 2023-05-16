@@ -3,49 +3,42 @@ package data
 // TokenKind is the data type of the Token
 type TokenKind uint8
 
-// Token represents a token from the list
+// Token represents both a token Number as well as a token Symbol from the list
 type Token interface {
 	Kind() TokenKind
 }
 
-type Kind struct {
+// Symbol represents a token symbol from the list
+type Symbol struct {
 	kind TokenKind
 }
 
-// Kind returns the kind of Kind Token
-func (k Kind) Kind() TokenKind {
-	return k.kind
-}
+// Kind returns the token Symbol type
+func (s Symbol) Kind() TokenKind { return s.kind }
 
+// Number represents a number token from the list
 type Number struct {
 	kind  TokenKind
 	value string
 }
 
-// Kind returns the kind of Number Token
-func (n Number) Kind() TokenKind {
-	return n.kind
-}
+// Kind returns the token Number type
+func (n Number) Kind() TokenKind { return n.kind }
 
-// Value returns the value of the Number Token
-func (n Number) Value() string {
-	return n.value
-}
+// Value returns the token Number value
+func (n Number) Value() string { return n.value }
 
-type Float struct {
+// Decimal represents
+type Decimal struct {
 	kind  TokenKind
 	value float64
 }
 
-// Kind returns the kind of Float Token
-func (f Float) Kind() TokenKind {
-	return f.kind
-}
+// Kind returns the token Decimal type
+func (d Decimal) Kind() TokenKind { return d.kind }
 
-// Value returns the value of the Float Token
-func (f Float) Value() float64 {
-	return f.value
-}
+// Value returns the token Decimal value
+func (d Decimal) Value() float64 { return d.value }
 
 const (
 	_ = TokenKind(iota)
@@ -66,9 +59,9 @@ const (
 	NumToken // Number = n
 )
 
-// NewToken returns a Kind Token
+// NewToken returns a token Symbol
 func NewToken(kind TokenKind) *Token {
-	var token Token = Kind{kind: kind}
+	var token Token = Symbol{kind: kind}
 	return &token
 }
 
@@ -108,9 +101,9 @@ func NewNumToken(value string) *Token {
 	return &token
 }
 
-// NewFloatToken returns a Float Token
-func NewFloatToken(value float64) *Token {
-	var token Token = Float{kind: NumToken, value: value}
+// NewDecToken returns a token Decimal
+func NewDecToken(value float64) *Token {
+	var token Token = Decimal{kind: NumToken, value: value}
 	return &token
 }
 
@@ -120,10 +113,7 @@ func NewFloatToken(value float64) *Token {
 //
 //	n, π
 func IsNumPiToken(kind TokenKind) bool {
-	if kind != NumToken {
-		return kind == PiToken
-	}
-	return true
+	return kind == NumToken || kind == PiToken
 }
 
 // IsFirstToken returs true if kind is:
