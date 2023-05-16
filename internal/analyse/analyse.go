@@ -6,51 +6,38 @@ import (
 	"github.com/brianlewyn/go-calculator/internal/plugin"
 )
 
-// analyse represents a parser for expression
-type analyse struct {
-	list *plugin.TokenList
-}
-
 // Analyser returns nil if the math expression is correct,
 // otherwise returns an error
 func Analyser(list *plugin.TokenList) data.Error {
-	analyzer := analyse{list: list}
-
-	err := analyzer.isCorrect()
-	if err != nil {
+	if err := isCorrect(list); err != nil {
 		return data.NewError(list.String(), err)
 	}
-
 	return nil
 }
 
 // isCorrect returns nil if the syntax is correct, otherwise returns an error
-func (a analyse) isCorrect() error {
+func isCorrect(list *plugin.TokenList) error {
 	var bug error
 	var nL, nR int
 
-	for temp := a.list.Head(); temp != nil; temp = temp.Next() {
-		bug = a.isCorrectFirst(temp.Token())
-		if bug != nil {
+	for temp := list.Head(); temp != nil; temp = temp.Next() {
+		if bug = isCorrectFirst(temp.Token(), list); bug != nil {
 			return bug
 		}
 
-		bug = a.isCorrectLast(temp.Token())
-		if bug != nil {
+		if bug = isCorrectLast(temp.Token(), list); bug != nil {
 			return bug
 		}
 
-		bug = isCorrectNumber(temp.Token())
-		if bug != nil {
+		if bug = isCorrectNumber(temp.Token()); bug != nil {
 			return bug
 		}
 
-		bug = canBeTogether(temp, temp.Next())
-		if bug != nil {
+		if bug = canBeTogether(temp, temp.Next()); bug != nil {
 			return bug
 		}
 
-		bug = areCorrectParentheses(&nL, &nR, temp, a.list.Tail())
+		bug = areCorrectParentheses(&nL, &nR, temp, list.Tail())
 		if bug != nil {
 			return bug
 		}
@@ -62,8 +49,8 @@ func (a analyse) isCorrect() error {
 // !Tool Methods
 
 // isCorrectFirst returns nil is the number is correct, otherwise returns an error
-func (a analyse) isCorrectFirst(token data.Token) error {
-	if token != a.list.Head().Token() {
+func isCorrectFirst(token data.Token, list *plugin.TokenList) error {
+	if token != list.Head().Token() {
 		return nil
 	}
 
@@ -76,8 +63,8 @@ func (a analyse) isCorrectFirst(token data.Token) error {
 }
 
 // isCorrectLast returns nil is the number is correct, otherwise returns an error
-func (a analyse) isCorrectLast(token data.Token) error {
-	if token != a.list.Tail().Token() {
+func isCorrectLast(token data.Token, list *plugin.TokenList) error {
+	if token != list.Tail().Token() {
 		return nil
 	}
 
@@ -97,8 +84,7 @@ func isCorrectNumber(token data.Token) error {
 		return nil
 	}
 
-	var num = token.(data.Number).Value()
-
+	num := token.(data.Number).Value()
 	if isAbsurdDot(num) {
 		return ierr.NewNumber(num).Misspelled()
 	}
@@ -147,9 +133,7 @@ func canBeTogether(curr, next *plugin.TokenNode) error {
 
 // format returns the value of the kind
 func format(token1, token2 data.TokenKind) (rune, rune) {
-	kindRune1 := data.ChangeToRune(token1)
-	kindRune2 := data.ChangeToRune(token2)
-	return kindRune1, kindRune2
+	return data.ChangeToRune(token1), data.ChangeToRune(token2)
 }
 
 // areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error
