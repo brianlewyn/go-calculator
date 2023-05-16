@@ -17,8 +17,7 @@ func Math(list *plugin.TokenList) (float64, data.Error) {
 
 	answer := operateNodes(list)
 	if math.IsNaN(answer) {
-		return 0, data.NewError(
-			fmt.Sprint(answer), ierr.AnswerIsNaN)
+		return 0, data.NewError(fmt.Sprint(answer), ierr.AnswerIsNaN)
 	}
 
 	return answer, nil

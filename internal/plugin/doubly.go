@@ -61,20 +61,25 @@ func (l *TokenList) Flush() {
 	l.list.Flush(false)
 }
 
-// Connect connets one node to another and returns nil,
-// and otherwise returns an error
-func (l *TokenList) Connect(from *TokenNode, token *data.Token) error {
+// Connect connets one node to another
+func (l *TokenList) Connect(from *TokenNode, token *data.Token) {
 	if from == nil {
-		return l.list.Connect(nil, doubly.NewNode(*token))
+		l.list.Connect(nil, doubly.NewNode(*token))
+	} else {
+		l.list.Connect(from.node, doubly.NewNode(*token))
 	}
-	return l.list.Connect(from.node, doubly.NewNode(*token))
 }
 
-// Disconnect disconnets one node of list and returns nil,
-// and otherwise returns an error
-func (l *TokenList) Disconnect(node *TokenNode) error {
-	if node == nil {
-		return l.list.Disconnect(nil)
+// Disconnect disconnets one node of list
+func (l *TokenList) Disconnect(node *TokenNode) {
+	if node != nil {
+		l.list.Disconnect(node.node)
 	}
-	return l.list.Disconnect(node.node)
+}
+
+// ConnectForwardFrom connects a new node at the given position 'kIndex' forward from the 'from' node
+func (l *TokenList) ConnectFrom(from *TokenNode, kIndex int, token *data.Token) {
+	if from != nil {
+		l.list.ConnectForwardFrom(from.node, kIndex, doubly.NewNode(*token))
+	}
 }

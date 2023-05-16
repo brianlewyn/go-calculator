@@ -10,26 +10,26 @@ import (
 )
 
 func TestTokenizer(t *testing.T) {
-	assert := assert.New(t)
-
 	t.Run("From an empty expression to a linked list", func(t *testing.T) {
-		expression := ""
-		gotList, err := Tokenizer(data.NewInfo(&expression))
+		assert := assert.New(t)
+
+		gotList, err := Tokenizer("")
 		assert.ErrorIsf(err.Bug(), ierr.EmptyField, "ierr.EmptyField != %v", err.Bug())
 		assert.Nil(gotList, "gotList != nil")
 	})
 
 	t.Run("From an expression to a empty linked list", func(t *testing.T) {
-		expression := "  "
-		gotList, err := Tokenizer(data.NewInfo(&expression))
+		assert := assert.New(t)
+
+		gotList, err := Tokenizer("  ")
 		assert.ErrorIsf(err.Bug(), ierr.EmptyField, "ierr.EmptyField != %v", err.Bug())
 		assert.Nil(gotList, "gotList != nil")
 	})
 
 	t.Run("From an expression to a linked list", func(t *testing.T) {
-		expression := "+(0 - 1 + 2 * 3 / 4 ^ 5 % 6 + √π)(-1.234)"
+		assert := assert.New(t)
 
-		gotList, err := Tokenizer(data.NewInfo(&expression))
+		gotList, err := Tokenizer("+(0 - 1 + 2 * 3 / 4 ^ 5 % 6 + √π)(-1.234)")
 		assert.Nil(err, "Tokenizer(data) error != nil")
 
 		wantList := plugin.NewTokenList()
@@ -64,27 +64,11 @@ func TestTokenizer(t *testing.T) {
 	})
 }
 
-func Test_tokenize_linkedList(t *testing.T) {
-	assert := assert.New(t)
-
-	t.Run("From an empty expression to a list", func(t *testing.T) {
-		expr := ""
-		lenght := len(expr)
-
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
-
-		gotList, err := tokenizer.linkedList()
-		assert.ErrorIsf(err, ierr.EmptyField, "ierr.EmptyField != %v", err)
-		assert.Equal(gotList.Size(), 0, "gotList.Size() != 0")
-	})
-
+func TestInitLinkedList(t *testing.T) {
 	t.Run("From an expression with some inappropriate symbols to a list", func(t *testing.T) {
-		expr := "12345 + hola + 12345"
-		lenght := len(expr)
+		assert := assert.New(t)
 
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
-
-		gotList, err := tokenizer.linkedList()
+		gotList, err := initLinkedList("12345 + hola + 12345")
 
 		errRune := new(ierr.Rune)
 		assert.ErrorAsf(err, &errRune, "&ierr.Rune != %v", err)
@@ -92,13 +76,10 @@ func Test_tokenize_linkedList(t *testing.T) {
 	})
 
 	t.Run("From a filled expression to a list", func(t *testing.T) {
-		expr := "(0 - 1 + 2 * 3 / 4 ^ 5 % 6 + √π) - 1.234"
-		lenght := len(expr)
+		assert := assert.New(t)
 
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
-
-		gotList, err := tokenizer.linkedList()
-		assert.NoError(err, "tokenizer.linkedList() error != nil")
+		gotList, err := initLinkedList("(0 - 1 + 2 * 3 / 4 ^ 5 % 6 + √π) - 1.234")
+		assert.NoError(err, "initLinkedList(expression) error != nil")
 
 		wantList := plugin.NewTokenList()
 		wantList.Append(data.NewLeftToken())
@@ -123,39 +104,28 @@ func Test_tokenize_linkedList(t *testing.T) {
 		wantList.Append(data.NewNumToken("1.234"))
 
 		areEqualList(t, gotList, wantList)
-
 		assert.Equal(gotList.Size(), wantList.Size(), "gotList.Size() != wantList()")
-		assert.Equal(expr, "", "expression != \"\"")
 	})
 }
 
-func Test_tokenize_rebuild(t *testing.T) {
-	assert := assert.New(t)
-
+func TestInitRebuild(t *testing.T) {
 	t.Run("From an empty list to a list rebuilded", func(t *testing.T) {
-		expr := "   "
-		lenght := len(expr)
+		assert := assert.New(t)
 
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
+		gotList, err := initLinkedList("   ")
+		assert.NoError(err, "initLinkedList(expression) error != nil")
 
-		gotList, err := tokenizer.linkedList()
-		assert.NoError(err, "tokenizer.linkedList() error != nil")
-
-		gotList, err = tokenizer.rebuild(gotList)
+		err = initRebuild(gotList)
 		assert.ErrorIsf(err, ierr.EmptyField, "ierr.EmptyField != %v", err)
-		assert.Nil(gotList, "gotList != nil")
 	})
 
 	t.Run("From a list to a list rebuilded", func(t *testing.T) {
-		expr := "-(+10)(-12)(*12)"
-		lenght := len(expr)
+		assert := assert.New(t)
 
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
+		gotList, err := initLinkedList("-(+10)(-12)(*12)")
+		assert.NoError(err, "initLinkedList(expression) error != nil")
 
-		gotList, err := tokenizer.linkedList()
-		assert.NoError(err, "tokenizer.linkedList() error != nil")
-
-		gotList, err = tokenizer.rebuild(gotList)
+		err = initRebuild(gotList)
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
@@ -184,15 +154,12 @@ func Test_tokenize_rebuild(t *testing.T) {
 	})
 
 	t.Run("From a list to a list rebuilded (complex)(+)", func(t *testing.T) {
-		expr := "5^-2 - 5^(2^-(1/2) * 2^-√(π-8)) - 5*-√π --4"
-		lenght := len(expr)
+		assert := assert.New(t)
 
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
+		gotList, err := initLinkedList("5^-2 - 5^(2^-(1/2) * 2^-√(π-8)) - 5*-√π --4")
+		assert.NoError(err, "initLinkedList(expression) error != nil")
 
-		gotList, err := tokenizer.linkedList()
-		assert.NoError(err, "tokenizer.linkedList() error != nil")
-
-		gotList, err = tokenizer.rebuild(gotList)
+		err = initRebuild(gotList)
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
@@ -259,15 +226,12 @@ func Test_tokenize_rebuild(t *testing.T) {
 	})
 
 	t.Run("From a list to a list rebuilded (complex)(-)", func(t *testing.T) {
-		expr := "5^+2 + 5^(2^+(1/2) * 2^+√(π+8)) + 5*+√π ++4"
-		lenght := len(expr)
+		assert := assert.New(t)
 
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
+		gotList, err := initLinkedList("5^+2 + 5^(2^+(1/2) * 2^+√(π+8)) + 5*+√π ++4")
+		assert.NoError(err, "initLinkedList(expression) error != nil")
 
-		gotList, err := tokenizer.linkedList()
-		assert.NoError(err, "tokenizer.linkedList() error != nil")
-
-		gotList, err = tokenizer.rebuild(gotList)
+		err = initRebuild(gotList)
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
@@ -314,15 +278,12 @@ func Test_tokenize_rebuild(t *testing.T) {
 	})
 
 	t.Run("From a list to a list rebuilded (bugs complex: single add)", func(t *testing.T) {
-		expr := "^+"
-		lenght := len(expr)
+		assert := assert.New(t)
 
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
+		gotList, err := initLinkedList("^+")
+		assert.NoError(err, "initLinkedList(expression) error != nil")
 
-		gotList, err := tokenizer.linkedList()
-		assert.NoError(err, "tokenizer.linkedList() error != nil")
-
-		gotList, err = tokenizer.rebuild(gotList)
+		err = initRebuild(gotList)
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
@@ -335,15 +296,12 @@ func Test_tokenize_rebuild(t *testing.T) {
 	})
 
 	t.Run("From a list to a list rebuilded (bugs complex: double add)", func(t *testing.T) {
-		expr := "^++"
-		lenght := len(expr)
+		assert := assert.New(t)
 
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
+		gotList, err := initLinkedList("^++")
+		assert.NoError(err, "initLinkedList(expression) error != nil")
 
-		gotList, err := tokenizer.linkedList()
-		assert.NoError(err, "tokenizer.linkedList() error != nil")
-
-		gotList, err = tokenizer.rebuild(gotList)
+		err = initRebuild(gotList)
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
@@ -357,15 +315,12 @@ func Test_tokenize_rebuild(t *testing.T) {
 	})
 
 	t.Run("From a list to a list rebuilded (bugs complex: √{%,*,+,-,/,^})", func(t *testing.T) {
-		expr := "*-√%"
-		lenght := len(expr)
+		assert := assert.New(t)
 
-		tokenizer := tokenize{expression: &expr, lenght: &lenght}
+		gotList, err := initLinkedList("*-√%")
+		assert.NoError(err, "initLinkedList(expression) error != nil")
 
-		gotList, err := tokenizer.linkedList()
-		assert.NoError(err, "tokenizer.linkedList() error != nil")
-
-		gotList, err = tokenizer.rebuild(gotList)
+		err = initRebuild(gotList)
 		assert.NoError(err, "tokenizer.rebuild(gotList) error != nil")
 
 		wantList := plugin.NewTokenList()
@@ -402,7 +357,6 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 // go test -bench=BenchmarkTokenizer -benchmem -count=10 -benchtime=100x > bench.txt
 func BenchmarkTokenizer(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		expression := "(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2"
-		Tokenizer(data.NewInfo(&expression))
+		Tokenizer("(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2")
 	}
 }

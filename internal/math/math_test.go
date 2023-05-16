@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/brianlewyn/go-calculator/internal/analyse"
-	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/plugin"
 	"github.com/brianlewyn/go-calculator/internal/tokenize"
 )
@@ -21,7 +20,7 @@ func TestMath(t *testing.T) {
 
 // toList returns the expression in a raw Tokenized Linked List
 func toList(expression string) *plugin.TokenList {
-	list, err1 := tokenize.Tokenizer(data.NewInfo(&expression))
+	list, err1 := tokenize.Tokenizer(expression)
 	if err1 != nil {
 		fmt.Printf("ERROR [1]: %s\n\n", err1)
 	}

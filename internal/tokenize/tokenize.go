@@ -1,51 +1,39 @@
 package tokenize
 
 import (
+	"strings"
+
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
 	"github.com/brianlewyn/go-calculator/internal/plugin"
 )
 
-// tokenize represent the tokenized linked list
-type tokenize struct {
-	expression *string
-	lenght     *int
-}
-
-// Tokenizer returns the expression in a linked list and nil,
+// Tokenizer returns the expression in a Linked List and nil,
 // otherwise returns nil and an error
-func Tokenizer(info *data.Info) (*plugin.TokenList, data.Error) {
-	expr := info.Expression()
-	lenght := info.Lenght()
-
-	tokenizer := tokenize{
-		expression: expr,
-		lenght:     lenght,
+func Tokenizer(expression string) (*plugin.TokenList, data.Error) {
+	if len(expression) == 0 {
+		return nil, data.NewError(expression, ierr.EmptyField)
 	}
 
-	list, err := tokenizer.linkedList()
+	list, err := initLinkedList(expression)
 	if err != nil {
-		return nil, data.NewError(*expr, err)
+		return nil, data.NewError(expression, err)
 	}
 
-	list, err = tokenizer.rebuild(list)
+	err = initRebuild(list)
 	if err != nil {
-		return nil, data.NewError(*expr, err)
+		return nil, data.NewError(expression, err)
 	}
 
 	return list, nil
 }
 
-// linkedList returns an tokenized linked list and a possible error
-func (t *tokenize) linkedList() (*plugin.TokenList, error) {
+// initLinkedList returns an tokenized Linked List and a possible error
+func initLinkedList(expression string) (*plugin.TokenList, error) {
 	list := plugin.NewTokenList()
-	var value string
+	builder := strings.Builder{}
 
-	if *t.lenght == 0 {
-		return list, ierr.EmptyField
-	}
-
-	for i, r := range *t.expression {
+	for i, r := range expression {
 		switch {
 
 		// opeartors
@@ -78,11 +66,11 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 
 		// numbers
 		case data.IsFloat(r):
-			value += string(r)
+			builder.WriteRune(r)
 
-			if !t.isFloat(i) {
-				list.Append(data.NewNumToken(value))
-				value = ""
+			if !isNextToo(i, expression) {
+				list.Append(data.NewNumToken(builder.String()))
+				builder.Reset()
 			}
 
 		default:
@@ -92,16 +80,13 @@ func (t *tokenize) linkedList() (*plugin.TokenList, error) {
 		}
 	}
 
-	*t.expression = ""
-	*t.lenght = 0
-
 	return list, nil
 }
 
-// rebuild returns a rebuilt tokenized linked list and a possible error
-func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
+// initRebuild returns a rebuilt tokenized Linked List and a possible error
+func initRebuild(list *plugin.TokenList) error {
 	if list.IsEmpty() {
-		return nil, ierr.EmptyField
+		return ierr.EmptyField
 	}
 
 	for i, temp := 0, list.Head(); temp != nil; i, temp = i+1, temp.Next() {
@@ -120,22 +105,7 @@ func (t tokenize) rebuild(list *plugin.TokenList) (*plugin.TokenList, error) {
 	}
 
 	modifyFirstToken(list)
-	return list, nil
-}
-
-// !Tool Methods
-
-// isFloat return true if the first rune of the expression is float, otherwise returns false
-func (t tokenize) isFloat(i int) bool {
-	var after rune
-
-	if *t.lenght < 1 || *t.lenght-1 <= i {
-		after = data.Jocker
-	} else {
-		after = rune((*t.expression)[i+1])
-	}
-
-	return data.IsFloat(after)
+	return nil
 }
 
 // !Tool Functions
@@ -144,12 +114,12 @@ func (t tokenize) isFloat(i int) bool {
 //   - removes the Head node if it is some kind of AddToken, and otherwise,
 //   - adds as the Head node a NumToken if it is some kind of SubToken
 func modifyFirstToken(list *plugin.TokenList) {
-	node := list.Head()
+	if isKind(list.Head(), data.AddToken) {
+		list.Disconnect(list.Head())
+		return
+	}
 
-	switch {
-	case isKind(node, data.AddToken):
-		list.Disconnect(node)
-	case isKind(node, data.SubToken):
+	if isKind(list.Head(), data.SubToken) {
 		list.Connect(nil, data.NewNumToken("0"))
 	}
 }
@@ -166,7 +136,7 @@ func canBeAddedAsterisk(node *plugin.TokenNode) bool {
 
 // canBeAddedZero returns true if an zero can be added
 //
-//	(-	=> (0-
+//	(- => (0-
 func canBeAddedZero(node *plugin.TokenNode) bool {
 	if !isKind(node, data.LeftToken) {
 		return false
@@ -278,6 +248,14 @@ func addParenthesesInLoop(i int, node *plugin.TokenNode, list *plugin.TokenList)
 	}
 }
 
+// isNextToo returns true if the first rune of the expression is float, otherwise returns false
+func isNextToo(i int, expression string) bool {
+	if i < len(expression)-1 {
+		return data.IsFloat(rune(expression[i+1]))
+	}
+	return false
+}
+
 // isKind returns true if node can be token, otherwise returns false
 func isKind(node *plugin.TokenNode, token data.TokenKind) bool {
 	if node != nil {
@@ -307,9 +285,5 @@ func isKindFnRaw(node *plugin.TokenNode, tokenFn func(token data.TokenKind) bool
 // addParentheses adds a left token the of the node and a right token at position k afther node
 func addParentheses(node *plugin.TokenNode, k int, list *plugin.TokenList) {
 	list.Connect(node, data.NewLeftToken())
-	for i, temp := 1, node; i <= k; i, temp = i+1, temp.Next() {
-		if i == k {
-			list.Connect(temp, data.NewRightToken())
-		}
-	}
+	list.ConnectFrom(node, k, data.NewRightToken())
 }

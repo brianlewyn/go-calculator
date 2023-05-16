@@ -121,8 +121,8 @@ func TestAnalyser(t *testing.T) {
 	}
 }
 
-func expression(expr string) *plugin.TokenList {
-	list, _ := tokenize.Tokenizer(data.NewInfo(&expr))
+func expression(expression string) *plugin.TokenList {
+	list, _ := tokenize.Tokenizer(expression)
 	return list
 }
 
