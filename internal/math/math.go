@@ -79,8 +79,7 @@ func deeperList(left, right *plugin.TokenNode, list *plugin.TokenList) *plugin.T
 		flag := temp.Token() != left.Token() && temp.Token() != right.Token()
 
 		if flag {
-			token := temp.Token()
-			tempList.Append(&token)
+			tempList.Append(temp.Token())
 			list.Disconnect(temp.Prev())
 
 		} else if temp.Token() == right.Token() {

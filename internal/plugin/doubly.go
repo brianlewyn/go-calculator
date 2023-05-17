@@ -52,8 +52,8 @@ func (l TokenList) IsEmpty() bool {
 }
 
 // Apppend adds a new token to the end of the list
-func (l *TokenList) Append(token *data.Token) {
-	l.list.DAppend(*token)
+func (l *TokenList) Append(token data.Token) {
+	l.list.DAppend(token)
 }
 
 // Flush delete list
@@ -62,8 +62,8 @@ func (l *TokenList) Flush() {
 }
 
 // Connect connets one node to another
-func (l *TokenList) Connect(from *TokenNode, token *data.Token) {
-	l.list.Connect(from.node, doubly.NewNode(*token))
+func (l *TokenList) Connect(from *TokenNode, token data.Token) {
+	l.list.Connect(from.node, doubly.NewNode(token))
 }
 
 // Disconnect disconnets one node of list
@@ -72,8 +72,8 @@ func (l *TokenList) Disconnect(node *TokenNode) {
 }
 
 // ConnectForwardFrom connects a new node at the given position 'kIndex' forward from the 'from' node
-func (l *TokenList) ConnectFrom(from *TokenNode, kIndex int, token *data.Token) {
-	l.list.ConnectForwardFrom(from.node, kIndex, doubly.NewNode(*token))
+func (l *TokenList) ConnectFrom(from *TokenNode, kIndex int, token data.Token) {
+	l.list.ConnectForwardFrom(from.node, kIndex, doubly.NewNode(token))
 }
 
 // Delete removes a Token from the list
@@ -82,6 +82,6 @@ func (l *TokenList) Delete(index int) {
 }
 
 // Prepend adds a new Token to the beginning of the list
-func (l *TokenList) Prepend(token *data.Token) {
-	l.list.DPrepend(*token)
+func (l *TokenList) Prepend(token data.Token) {
+	l.list.DPrepend(token)
 }

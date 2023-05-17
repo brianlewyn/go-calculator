@@ -16,8 +16,8 @@ func (n TokenNode) Token() data.Token {
 }
 
 // Update updates a data.Token
-func (n TokenNode) Update(data *data.Token) {
-	n.node.Update(*data)
+func (n TokenNode) Update(data data.Token) {
+	n.node.Update(data)
 }
 
 // Prev return the previous node

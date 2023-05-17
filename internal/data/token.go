@@ -77,21 +77,18 @@ var TokenKindMap = map[rune]TokenKind{
 }
 
 // NewToken returns a token Symbol
-func NewToken(kind TokenKind) *Token {
-	var token Token = Symbol{kind: kind}
-	return &token
+func NewToken(kind TokenKind) Token {
+	return Symbol{kind: kind}
 }
 
 // NewNumToken returns a Number Token
-func NewNumToken(value string) *Token {
-	var token Token = Number{kind: NumToken, value: value}
-	return &token
+func NewNumToken(value string) Token {
+	return Number{kind: NumToken, value: value}
 }
 
 // NewDecToken returns a token Decimal
-func NewDecToken(value float64) *Token {
-	var token Token = Decimal{kind: NumToken, value: value}
-	return &token
+func NewDecToken(value float64) Token {
+	return Decimal{kind: NumToken, value: value}
 }
 
 // !For each token group
