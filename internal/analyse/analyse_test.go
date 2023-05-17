@@ -14,114 +14,103 @@ import (
 func TestAnalyser(t *testing.T) {
 	assert := assert.New(t)
 
-	type ErrKind uint8
-	type Bug struct {
-		kind ErrKind
-		as   ierr.KindOf
-		is   error
-	}
-
-	const (
-		_ = ErrKind(iota)
-		As
-		Is
-		Nil
-	)
-
 	test := []struct {
-		Bug
 		name string
 		list *plugin.TokenList
+		as   ierr.KindOf
+		is   error
 	}{
 		{
 			name: "Bug: First: The first element",
-			Bug:  Bug{kind: As, as: ierr.Kind_Start},
-			list: expression("%"),
+			list: toList("%"),
+			as:   ierr.CtxKindStart,
 			// Try these: % * + - / ) ^
 			// All except these: 0-9, (, ., π, √
 		},
 		{
 			name: "Bug: Last: The last element",
-			Bug:  Bug{kind: As, as: ierr.Kind_End},
-			list: expression("(("),
+			list: toList("(("),
+			as:   ierr.CtxKindEnd,
 			// Try these: (( √√ (√ √( 0+ 0^ 0+√ 0+(
 			// All except these: 0-9, ), π
 		},
 		{
 			name: "Bug: Number: An absurd number",
-			Bug:  Bug{kind: As, as: ierr.Number_Misspelled},
-			list: expression("1234."),
+			as:   ierr.CtxNumberMisspelled,
+			list: toList("1234."),
 			// Try these: . 0. ...
 		},
 		{
 			name: "Bug: Number: Almost number",
-			Bug:  Bug{kind: As, as: ierr.Number_Misspelled},
-			list: expression("1.234.5"),
+			as:   ierr.CtxNumberMisspelled,
+			list: toList("1.234.5"),
 			// Try these: .. .0. .0.0. ...
 		},
 		{
 			name: "Bug: Number: Digit limit",
-			Bug:  Bug{kind: As, as: ierr.Number_Limit},
-			list: expression(strings.Repeat("0", int(data.DigitLimit))),
+			list: toList(strings.Repeat("0", int(data.DigitLimit))),
+			as:   ierr.CtxNumberLimit,
 			// Try these: Any number with or more than 617 digits
 		},
 		{
 			name: "Bug: Together: Elements together",
-			Bug:  Bug{kind: As, as: ierr.Kind_Together},
-			list: expression("0^^0"),
+			list: toList("0^^0"),
+			as:   ierr.CtxKindNotTogether,
 			// # := {%, *, +, -, /, ^, √}
 			// Try these: %% ** // )) ^^  %/ %) %^ () ...
 			// All except these: #± ...
 		},
 		{
 			name: "Bug: Together: Numbers together (1)",
-			Bug:  Bug{kind: As, as: ierr.Kind_Together},
-			list: expression("π3.14"),
+			list: toList("π3.14"),
+			as:   ierr.CtxKindNotTogether,
 			// Try these: A number pi next to any number
 		},
 		{
 			name: "Bug: Together: Numbers together (2)",
-			Bug:  Bug{kind: As, as: ierr.Kind_Together},
-			list: expression("3.14π"),
+			list: toList("3.14π"),
+			as:   ierr.CtxKindNotTogether,
 			// Try these: Any number next to number pi
 		},
 		{
 			name: "Bug: Parentheses: Left parentheses",
-			Bug:  Bug{kind: Is, is: ierr.IncompleteLeft},
-			list: expression("(0"),
+			is:   ierr.IncompleteLeft,
+			list: toList("(0"),
 			// Try these: (0 ((0) ...
 		},
 		{
 			name: "Bug: Parentheses: Right parentheses",
-			Bug:  Bug{kind: Is, is: ierr.IncompleteRight},
-			list: expression("0)"),
+			is:   ierr.IncompleteRight,
+			list: toList("0)"),
 			// Try these: 0) (0)) ...
 		},
 		{
 			name: "NotBug: Expression",
-			Bug:  Bug{kind: Nil},
-			list: expression("(0.5 + 4.5 - 1) * 10 * √(7-2) / 4^2"),
+			list: toList("(0.5 + 4.5 - 1) * 10 * √(7-2) / 4^2"),
 			// Try this with a correct expression
 		},
 	}
 
 	for _, tt := range test {
 		t.Run(tt.name, func(t *testing.T) {
-			err := Analyser(tt.list)
+			bug := Analyser(tt.list)
+			if bug != nil {
+				t.Logf("Error:\n%s", bug)
+			}
 
-			switch tt.kind {
-			case As:
-				assert.Truef(ierr.As(err.Bug(), tt.as), "Analyser() error != As: %v", err.Bug())
-			case Is:
-				assert.ErrorIsf(err.Bug(), tt.is, "Analyser() error != Is: %v", err.Bug())
+			switch {
+			case tt.as != "":
+				assert.Truef(ierr.As(bug, tt.as), "[error != As]: %v", bug)
+			case tt.is != nil:
+				assert.ErrorIsf(bug, tt.is, "[error != Is]: %v", bug)
 			default:
-				assert.Nilf(err, "Analyser() error != Nil: %v", err)
+				assert.Nilf(bug, "[error != Nil]: %v", bug)
 			}
 		})
 	}
 }
 
-func expression(expression string) *plugin.TokenList {
+func toList(expression string) *plugin.TokenList {
 	list, _ := tokenize.Tokenizer(expression)
 	return list
 }
@@ -129,6 +118,6 @@ func expression(expression string) *plugin.TokenList {
 // go test -bench=BenchmarkAnalyser -benchmem -count=10 -benchtime=100x > bench.txt
 func BenchmarkAnalyser(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		Analyser(expression("(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2"))
+		Analyser(toList("(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2"))
 	}
 }

@@ -17,12 +17,12 @@ const (
 
 // What kind of context error occurred?
 const (
-	Rune_Unknown      = KindOf("this is an unknown rune")
-	Number_Misspelled = KindOf("this is a misspelled number")
-	Number_Limit      = KindOf("this number exceeds the digit limit")
-	Kind_Together     = KindOf("these data types cannot be together")
-	Kind_Start        = KindOf("this can't be the beginning")
-	Kind_End          = KindOf("this can't be the end")
+	CtxRuneUnknown      = KindOf("this is an unknown rune")
+	CtxNumberMisspelled = KindOf("this is a misspelled number")
+	CtxNumberLimit      = KindOf("this number exceeds the digit limit")
+	CtxKindNotTogether  = KindOf("these data types cannot be together")
+	CtxKindStart        = KindOf("this can't be the beginning")
+	CtxKindEnd          = KindOf("this can't be the end")
 )
 
 // What error occurred?
@@ -30,7 +30,7 @@ var (
 	EmptyField      = wrap(Syntax, errors.New("empty field"))
 	IncompleteLeft  = wrap(Syntax, errors.New("there are incomplete left parentheses"))
 	IncompleteRight = wrap(Syntax, errors.New("there are incomplete right parentheses"))
-	AnswerIsNaN     = wrap(Math, errors.New("reports that the value is \"not a number\""))
+	ResultIsNaN     = wrap(Math, errors.New("reports that the value is \"not a number\""))
 )
 
 // Interface errors
@@ -79,36 +79,36 @@ func (k Kind) Error() string {
 	return fmt.Sprintf("%c:%c", k.k1, k.k2)
 }
 
-// Add context to the data error
+// !Add context to the data error
 
-// Unknown returns an error with the kind of context: Rune_Unknown
-func (r Rune) Unknown() error {
-	return doubleWrap(Syntax, Rune_Unknown, NewRune(r.r, r.i))
+// RuneUnknown returns an error with the kind of context: CtxRuneUnknown
+func RuneUnknown(r rune, i int) error {
+	return doubleWrap(Syntax, CtxRuneUnknown, NewRune(r, i))
 }
 
-// Misspelled returns an error with the kind of context: Number_Misspelled
-func (n Number) Misspelled() error {
-	return doubleWrap(Syntax, Number_Misspelled, NewNumber(n.n))
+// NumberMisspelled returns an error with the kind of context: CtxNumberMisspelled
+func NumberMisspelled(n string) error {
+	return doubleWrap(Syntax, CtxNumberMisspelled, NewNumber(n))
 }
 
-// Limit returns an error with the kind of context: Number_Limit
-func (n Number) Limit() error {
-	return doubleWrap(Syntax, Number_Limit, NewNumber(n.n))
+// NumberLimit returns an error with the kind of context: CtxNumberLimit
+func NumberLimit(n string) error {
+	return doubleWrap(Syntax, CtxNumberLimit, NewNumber(n))
 }
 
-// NotTogether returns an error with the kind of context: Kind_Together
-func (k Kind) NotTogether() error {
-	return doubleWrap(Syntax, Kind_Together, NewKind(k.k1, k.k2))
+// KindNotTogether returns an error with the kind of context: CtxKindTogether
+func KindNotTogether(k1, k2 rune) error {
+	return doubleWrap(Syntax, CtxKindNotTogether, NewKind(k1, k2))
 }
 
-// NotTogether returns an error with the kind of context: Kind_Start
-func (k Kind) Start() error {
-	return doubleWrap(Syntax, Kind_Start, NewKind(k.k1, k.k2))
+// KindStart returns an error with the kind of context: CtxKindStart
+func KindStart(k rune) error {
+	return doubleWrap(Syntax, CtxKindStart, NewKind(k, 0))
 }
 
-// NotTogether returns an error with the kind of context: Kind_End
-func (k Kind) End() error {
-	return doubleWrap(Syntax, Kind_End, NewKind(k.k1, k.k2))
+// KindEnd returns an error with the kind of context: CtxKindEnd
+func KindEnd(k rune) error {
+	return doubleWrap(Syntax, CtxKindEnd, NewKind(k, 0))
 }
 
 // !Tool Functions

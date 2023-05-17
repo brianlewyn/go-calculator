@@ -1,7 +1,6 @@
 package math
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 
@@ -11,13 +10,13 @@ import (
 )
 
 // Math returns the result of calculating the expression inside the list of tokens
-func Math(list *plugin.TokenList) (float64, data.Error) {
+func Math(list *plugin.TokenList) (float64, error) {
 	for calculateDeepestExpression(list) {
 	}
 
 	answer := operateNodes(list)
 	if math.IsNaN(answer) {
-		return 0, data.NewError(fmt.Sprint(answer), ierr.AnswerIsNaN)
+		return 0, ierr.ResultIsNaN
 	}
 
 	return answer, nil

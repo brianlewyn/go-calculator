@@ -21,23 +21,23 @@ func TestCalculate(t *testing.T) {
 			name: "Root Square: NaN",
 			expr: "√-2",
 			want: math.Sqrt(-2),
-			is:   ierr.AnswerIsNaN,
+			is:   ierr.ResultIsNaN,
 		},
 		{
 			name: "Power: NaN",
 			expr: "(-2)^(1/2)",
 			want: math.Pow(-2, 1.0/2),
-			is:   ierr.AnswerIsNaN,
+			is:   ierr.ResultIsNaN,
 		},
 		{
 			name: "Tokenizer: Bug",
 			expr: "#π3.14",
-			as:   ierr.Rune_Unknown,
+			as:   ierr.CtxRuneUnknown,
 		},
 		{
 			name: "Analyser: Bug",
 			expr: "π3.14",
-			as:   ierr.Kind_Together,
+			as:   ierr.CtxKindNotTogether,
 		},
 		{
 			name: "Root Square",
@@ -77,19 +77,18 @@ func TestCalculate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Calculate(tt.expr)
+			got, bug := Calculate(tt.expr)
+			if bug != nil {
+				t.Logf("Error:\n%s", bug)
+			}
 
 			switch {
 			case tt.as != "":
-				assert.Truef(t, ierr.As(err.Bug(), tt.as), "Bug != %v", tt.as)
+				assert.Truef(t, ierr.As(bug, tt.as), "Bug != %v", tt.as)
 			case tt.is != nil:
-				assert.ErrorIs(t, err.Bug(), tt.is, "Bug != nil")
+				assert.ErrorIs(t, bug, tt.is, "Bug != nil")
 			default:
 				assert.Equalf(t, got, tt.want, "got: %v, want: %v", got, tt.want)
-			}
-
-			if err != nil {
-				t.Logf("Error:\n%s", err)
 			}
 		})
 	}

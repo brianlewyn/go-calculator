@@ -40,7 +40,7 @@ func (l *TokenList) String() string {
 
 	var b strings.Builder
 	for temp := l.list.NHead(); temp != nil; temp = temp.NNext() {
-		fmt.Fprintf(&b, "%c", data.ChangeToRune(temp.Data().Kind()))
+		fmt.Fprintf(&b, "%c", data.ToRune(temp.Data().Kind()))
 	}
 
 	return b.String()
@@ -63,23 +63,25 @@ func (l *TokenList) Flush() {
 
 // Connect connets one node to another
 func (l *TokenList) Connect(from *TokenNode, token *data.Token) {
-	if from == nil {
-		l.list.Connect(nil, doubly.NewNode(*token))
-	} else {
-		l.list.Connect(from.node, doubly.NewNode(*token))
-	}
+	l.list.Connect(from.node, doubly.NewNode(*token))
 }
 
 // Disconnect disconnets one node of list
 func (l *TokenList) Disconnect(node *TokenNode) {
-	if node != nil {
-		l.list.Disconnect(node.node)
-	}
+	l.list.Disconnect(node.node)
 }
 
 // ConnectForwardFrom connects a new node at the given position 'kIndex' forward from the 'from' node
 func (l *TokenList) ConnectFrom(from *TokenNode, kIndex int, token *data.Token) {
-	if from != nil {
-		l.list.ConnectForwardFrom(from.node, kIndex, doubly.NewNode(*token))
-	}
+	l.list.ConnectForwardFrom(from.node, kIndex, doubly.NewNode(*token))
+}
+
+// Delete removes a Token from the list
+func (l *TokenList) Delete(index int) {
+	l.list.NPull(index)
+}
+
+// Prepend adds a new Token to the beginning of the list
+func (l *TokenList) Prepend(token *data.Token) {
+	l.list.DPrepend(*token)
 }

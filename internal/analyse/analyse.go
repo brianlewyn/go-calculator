@@ -8,15 +8,7 @@ import (
 
 // Analyser returns nil if the math expression is correct,
 // otherwise returns an error
-func Analyser(list *plugin.TokenList) data.Error {
-	if err := isCorrect(list); err != nil {
-		return data.NewError(list.String(), err)
-	}
-	return nil
-}
-
-// isCorrect returns nil if the syntax is correct, otherwise returns an error
-func isCorrect(list *plugin.TokenList) error {
+func Analyser(list *plugin.TokenList) error {
 	var bug error
 	var nL, nR int
 
@@ -55,8 +47,8 @@ func isCorrectFirst(token data.Token, list *plugin.TokenList) error {
 	}
 
 	if !data.IsFirstToken(token.Kind()) {
-		kind := data.ChangeToRune(token.Kind())
-		return ierr.NewKind(kind, 0).Start()
+		kind := data.ToRune(token.Kind())
+		return ierr.KindStart(kind)
 	}
 
 	return nil
@@ -69,8 +61,8 @@ func isCorrectLast(token data.Token, list *plugin.TokenList) error {
 	}
 
 	if !data.IsLastToken(token.Kind()) {
-		kind := data.ChangeToRune(token.Kind())
-		return ierr.NewKind(kind, 0).End()
+		kind := data.ToRune(token.Kind())
+		return ierr.KindEnd(kind)
 	}
 
 	return nil
@@ -86,22 +78,22 @@ func isCorrectNumber(token data.Token) error {
 
 	num := token.(data.Number).Value()
 	if isAbsurdDot(num) {
-		return ierr.NewNumber(num).Misspelled()
+		return ierr.NumberMisspelled(num)
 	}
 
 	var flagDot bool
 	var nDigit uint16
 
 	for _, r := range num {
-		if data.IsDot(r) {
+		if r == data.Dot {
 			if flagDot {
-				return ierr.NewNumber(num).Misspelled()
+				return ierr.NumberMisspelled(num)
 			}
 			flagDot = true
 		}
 
 		if nDigit++; nDigit >= data.DigitLimit {
-			return ierr.NewNumber(num).Limit()
+			return ierr.NumberLimit(num)
 		}
 	}
 
@@ -125,15 +117,10 @@ func canBeTogether(curr, next *plugin.TokenNode) error {
 	beTogether := data.CanTokensBeTogether(kind1, kind2)
 
 	if !beTogether {
-		return ierr.NewKind(format(kind1, kind2)).NotTogether()
+		return ierr.KindNotTogether(data.ToRune(kind1), data.ToRune(kind2))
 	}
 
 	return nil
-}
-
-// format returns the value of the kind
-func format(token1, token2 data.TokenKind) (rune, rune) {
-	return data.ChangeToRune(token1), data.ChangeToRune(token2)
 }
 
 // areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error
