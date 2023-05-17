@@ -18,21 +18,22 @@ func NewTokenList() *TokenList {
 	return &TokenList{list: &doubly.Doubly[data.Token]{}}
 }
 
-// Size returns the total number of nodes in the list
+// Size returns the size list
 func (l TokenList) Size() int {
 	return l.list.Size()
 }
 
-// Head returns the first node in the list, but if the list is empty returns nil
+// Head returns the first TokenNode in the list
 func (l TokenList) Head() *TokenNode {
 	return &TokenNode{node: l.list.NHead()}
 }
 
-// Tail returns the last node in the list, but if the list is empty returns nil
+// Tail returns the last TokenNode in the list
 func (l TokenList) Tail() *TokenNode {
 	return &TokenNode{node: l.list.NTail()}
 }
 
+// String converts a TokenList to string
 func (l *TokenList) String() string {
 	if l.list.IsEmpty() {
 		return "list <nil>"
@@ -46,7 +47,7 @@ func (l *TokenList) String() string {
 	return b.String()
 }
 
-// IsEmpty returns true if list is empty and otherwise returns false
+// IsEmpty returns true if list is empty, otherwise returns false
 func (l TokenList) IsEmpty() bool {
 	return l.list.IsEmpty()
 }
@@ -56,32 +57,32 @@ func (l *TokenList) Append(token data.Token) {
 	l.list.DAppend(token)
 }
 
-// Flush delete list
+// Flush deletes all list items
 func (l *TokenList) Flush() {
 	l.list.Flush(false)
 }
 
-// Connect connets one node to another
+// Connect connets a TokenNode to a new TokenNode with the data.Token
 func (l *TokenList) Connect(from *TokenNode, token data.Token) {
 	l.list.Connect(from.node, doubly.NewNode(token))
 }
 
-// Disconnect disconnets one node of list
+// Disconnect disconnets a TokenNode from the list
 func (l *TokenList) Disconnect(node *TokenNode) {
 	l.list.Disconnect(node.node)
 }
 
-// ConnectForwardFrom connects a new node at the given position 'kIndex' forward from the 'from' node
+// ConnectFrom connects a new TokenNode at 'kIndex' forward from the 'from' TokenNode
 func (l *TokenList) ConnectFrom(from *TokenNode, kIndex int, token data.Token) {
 	l.list.ConnectForwardFrom(from.node, kIndex, doubly.NewNode(token))
 }
 
-// Delete removes a Token from the list
+// Delete removes a TokenNode from the list
 func (l *TokenList) Delete(index int) {
 	l.list.NPull(index)
 }
 
-// Prepend adds a new Token to the beginning of the list
+// Prepend adds a new data.Token to the beginning of the list
 func (l *TokenList) Prepend(token data.Token) {
 	l.list.DPrepend(token)
 }
