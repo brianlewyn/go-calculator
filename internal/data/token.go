@@ -188,35 +188,35 @@ func CanTokensBeTogether(k1, k2 TokenKind) bool {
 	case PowToken:
 	case RootToken:
 	default: // Token (Pi||Num||Right)
-		return isOperatorPowRight(&k2)
+		return isOperatorPowRight(k2)
 	}
-	return isLeftNumPiRoot(&k2)
+	return isLeftNumPiRoot(k2)
+}
+
+// isOperatorPowRight returns true if kind is:
+//
+//	%, *, +, -, /, ^, )
+func isOperatorPowRight(kind TokenKind) bool {
+	switch kind {
+	case PowToken:
+	case RightToken:
+	default:
+		return IsOperatorToken(kind)
+	}
+	return true
 }
 
 // isLeftNumPiRoot returns true if kind is:
 //
 //	(, n, π, √
-func isLeftNumPiRoot(kind *TokenKind) bool {
-	switch *kind {
+func isLeftNumPiRoot(kind TokenKind) bool {
+	switch kind {
 	case LeftToken:
 	case NumToken:
 	case PiToken:
 	case RootToken:
 	default:
 		return false
-	}
-	return true
-}
-
-// isOperatorPowRight returns true if kind is:
-//
-//	%, *, +, -, /, ^, )
-func isOperatorPowRight(kind *TokenKind) bool {
-	switch *kind {
-	case PowToken:
-	case RightToken:
-	default:
-		return IsOperatorToken(*kind)
 	}
 	return true
 }

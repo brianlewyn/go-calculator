@@ -34,7 +34,12 @@ func calculateDeepestExpression(list *plugin.TokenList) bool {
 	}
 
 	result := operateNodes(tempList)
-	list.Connect(connection, data.NewDecToken(result))
+
+	if connection == nil {
+		list.Prepend(data.NewDecToken(result))
+	} else {
+		list.Connect(connection, data.NewDecToken(result))
+	}
 	return true
 }
 

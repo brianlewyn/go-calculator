@@ -1,6 +1,7 @@
 package analyse
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -12,8 +13,6 @@ import (
 )
 
 func TestAnalyser(t *testing.T) {
-	assert := assert.New(t)
-
 	test := []struct {
 		name string
 		list *plugin.TokenList
@@ -93,25 +92,32 @@ func TestAnalyser(t *testing.T) {
 
 	for _, tt := range test {
 		t.Run(tt.name, func(t *testing.T) {
+			assert := assert.New(t)
+
 			bug := Analyser(tt.list)
 			if bug != nil {
 				t.Logf("Error:\n%s", bug)
 			}
 
-			switch {
-			case tt.as != "":
+			if tt.as != "" {
 				assert.Truef(ierr.As(bug, tt.as), "[error != As]: %v", bug)
-			case tt.is != nil:
-				assert.ErrorIsf(bug, tt.is, "[error != Is]: %v", bug)
-			default:
-				assert.Nilf(bug, "[error != Nil]: %v", bug)
+				return
 			}
+			if tt.is != nil {
+				assert.ErrorIsf(bug, tt.is, "[error != Is]: %v", bug)
+				return
+			}
+			assert.Nilf(bug, "[error != Nil]: %v", bug)
 		})
 	}
 }
 
+// toList returns the expression in a raw Tokenized Linked List
 func toList(expression string) *plugin.TokenList {
-	list, _ := tokenize.Tokenizer(expression)
+	list, err := tokenize.Tokenizer(expression)
+	if err != nil {
+		fmt.Printf("ERROR: %s\n\n", err)
+	}
 	return list
 }
 
