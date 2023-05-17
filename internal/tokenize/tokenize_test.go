@@ -156,13 +156,13 @@ func toList(expression string) *plugin.TokenList {
 
 	for i, r := range expression {
 		if kind, ok = data.TokenKindMap[r]; ok {
-			list.Append(data.NewToken(kind))
+			list.Append(data.NewSymbolToken(kind))
 			continue
 		}
 
 		if data.IsDecimal(r) {
 			if isFullNumber(expression, i, start, lock, num) {
-				list.Append(data.NewNumToken(*num))
+				list.Append(data.NewNumberToken(*num))
 			}
 			continue
 		}

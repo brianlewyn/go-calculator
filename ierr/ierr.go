@@ -6,16 +6,16 @@ import (
 	"strings"
 )
 
-// KindOf represents the type of context error
+// !KindOf represents the type of context error
 type KindOf string
 
-// What kind of main error occurred?
+// !What kind of main error occurred?
 const (
 	Syntax = KindOf("syntax error")
 	Math   = KindOf("math error")
 )
 
-// What kind of context error occurred?
+// !What kind of context error occurred?
 const (
 	CtxRuneUnknown      = KindOf("this is an unknown rune")
 	CtxNumberMisspelled = KindOf("this is a misspelled number")
@@ -25,7 +25,7 @@ const (
 	CtxKindEnd          = KindOf("this can't be the end")
 )
 
-// What error occurred?
+// !What error occurred?
 var (
 	EmptyField      = wrap(Syntax, errors.New("empty field"))
 	IncompleteLeft  = wrap(Syntax, errors.New("there are incomplete left parentheses"))
@@ -33,7 +33,7 @@ var (
 	ResultIsNaN     = wrap(Math, errors.New("reports that the value is \"not a number\""))
 )
 
-// Interface errors
+// !Interface errors
 
 type Rune struct {
 	r rune
@@ -48,7 +48,7 @@ type Kind struct {
 	k1, k2 rune
 }
 
-// Functions to create an instance with New
+// !Functions to create an instance with New
 
 func NewRune(r rune, i int) *Rune {
 	return &Rune{r: r, i: i}
@@ -62,7 +62,7 @@ func NewKind(k1, k2 rune) *Kind {
 	return &Kind{k1: k1, k2: k2}
 }
 
-// The data error
+// !The data error
 
 func (r Rune) Error() string {
 	return fmt.Sprintf("'%c' in index: %d", r.r, r.i)

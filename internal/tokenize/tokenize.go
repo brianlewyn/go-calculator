@@ -32,13 +32,13 @@ func toTokenizedLinkedList(expression string) (*plugin.TokenList, error) {
 	for i, r := range expression {
 		if data.IsDecimal(r) {
 			if isFullNumber(expression, i, start, lock, num) {
-				list.Append(data.NewNumToken(*num))
+				list.Append(data.NewNumberToken(*num))
 			}
 			continue
 		}
 
 		if kind, ok = data.TokenKindMap[r]; ok {
-			list.Append(data.NewToken(kind))
+			list.Append(data.NewSymbolToken(kind))
 			continue
 		}
 
@@ -59,12 +59,12 @@ func rebuildTokenizedLinkedList(list *plugin.TokenList) {
 	for temp := list.Head(); temp != nil; temp = temp.Next() {
 
 		if areRightAndLeftTokenTogether(temp) {
-			list.Connect(temp, data.NewToken(data.MulToken))
+			list.Connect(temp, data.NewSymbolToken(data.MulToken))
 			continue
 		}
 
 		if areLeftAndSubTokenTogether(temp) {
-			list.Connect(temp, data.NewNumToken(data.Zero))
+			list.Connect(temp, data.NewNumberToken(data.Zero))
 			continue
 		}
 
@@ -81,7 +81,7 @@ func rebuildTokenizedLinkedList(list *plugin.TokenList) {
 	}
 
 	if isKind(list.Head(), data.SubToken) {
-		list.Prepend(data.NewNumToken(data.Zero))
+		list.Prepend(data.NewNumberToken(data.Zero))
 	}
 }
 
@@ -257,8 +257,8 @@ func addParenthesesIfPossible(node *plugin.TokenNode, list *plugin.TokenList) {
 // addParentheseInRangeAfterNode adds a LeftToken at the next index of the node and
 // a RightToken at given index after the node
 func addParentheseInRangeAfterNode(node *plugin.TokenNode, index int, list *plugin.TokenList) {
-	list.Connect(node, data.NewToken(data.LeftToken))
-	list.ConnectFrom(node, index, data.NewToken(data.RightToken))
+	list.Connect(node, data.NewSymbolToken(data.LeftToken))
+	list.ConnectFrom(node, index, data.NewSymbolToken(data.RightToken))
 }
 
 // wrapWithOtherParentheses add add parentheses wrapping a sign and another operation with parentheses
@@ -275,8 +275,8 @@ func wrapWithOtherParentheses(node *plugin.TokenNode, list *plugin.TokenList) {
 			nRight++
 
 			if nLeft == nRight {
-				list.Connect(node, data.NewToken(data.LeftToken))
-				list.Connect(temp, data.NewToken(data.RightToken))
+				list.Connect(node, data.NewSymbolToken(data.LeftToken))
+				list.Connect(temp, data.NewSymbolToken(data.RightToken))
 				break
 			}
 		}

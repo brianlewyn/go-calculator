@@ -25,6 +25,21 @@ type Decimal struct {
 	value float64
 }
 
+// NewSymbolToken returns a token Symbol
+func NewSymbolToken(kind TokenKind) Token {
+	return Symbol{kind: kind}
+}
+
+// NewNumberToken returns a token Number
+func NewNumberToken(value string) Token {
+	return Number{kind: NumToken, value: value}
+}
+
+// NewDecimalToken returns a token Decimal
+func NewDecimalToken(value float64) Token {
+	return Decimal{kind: NumToken, value: value}
+}
+
 // Kind returns the token Symbol type
 func (s Symbol) Kind() TokenKind { return s.kind }
 
@@ -74,21 +89,6 @@ var TokenKindMap = map[rune]TokenKind{
 	Pow:   PowToken,
 	Root:  RootToken,
 	Pi:    PiToken,
-}
-
-// NewToken returns a token Symbol
-func NewToken(kind TokenKind) Token {
-	return Symbol{kind: kind}
-}
-
-// NewNumToken returns a Number Token
-func NewNumToken(value string) Token {
-	return Number{kind: NumToken, value: value}
-}
-
-// NewDecToken returns a token Decimal
-func NewDecToken(value float64) Token {
-	return Decimal{kind: NumToken, value: value}
 }
 
 // !For each token group
