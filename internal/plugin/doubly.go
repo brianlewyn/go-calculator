@@ -35,11 +35,8 @@ func (l TokenList) Tail() *TokenNode {
 
 // String converts a TokenList to string
 func (l *TokenList) String() string {
-	if l.list.IsEmpty() {
-		return "list <nil>"
-	}
-
 	var b strings.Builder
+
 	for temp := l.list.NHead(); temp != nil; temp = temp.NNext() {
 		fmt.Fprintf(&b, "%c", data.ToRune(temp.Data().Kind()))
 	}
@@ -77,9 +74,9 @@ func (l *TokenList) ConnectFrom(from *TokenNode, kIndex int, token data.Token) {
 	l.list.ConnectForwardFrom(from.node, kIndex, doubly.NewNode(token))
 }
 
-// Delete removes a TokenNode from the list
-func (l *TokenList) Delete(index int) {
-	l.list.NPull(index)
+// RemoveHead removes a head TokenNode from the list
+func (l *TokenList) RemoveHead() {
+	l.list.NPullHead()
 }
 
 // Prepend adds a new data.Token to the beginning of the list

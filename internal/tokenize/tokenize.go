@@ -77,7 +77,7 @@ func rebuildTokenizedLinkedList(list *plugin.TokenList) {
 	}
 
 	if isKind(list.Head(), data.AddToken) {
-		list.Delete(0)
+		list.RemoveHead()
 	}
 
 	if isKind(list.Head(), data.SubToken) {
