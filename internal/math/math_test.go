@@ -33,3 +33,10 @@ func toList(expression string) *plugin.TokenList {
 
 	return list
 }
+
+// go test -bench=BenchmarkMath -benchmem -count=10 -benchtime=100x > bench.txt
+func BenchmarkMath(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Math(toList("(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2"))
+	}
+}

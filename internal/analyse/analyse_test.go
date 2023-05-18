@@ -125,3 +125,10 @@ func expression(expr string) *plugin.TokenList {
 	list, _ := tokenize.Tokenizer(data.NewInfo(&expr))
 	return list
 }
+
+// go test -bench=BenchmarkAnalyser -benchmem -count=10 -benchtime=100x > bench.txt
+func BenchmarkAnalyser(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Analyser(expression("(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2"))
+	}
+}

@@ -1,0 +1,16 @@
+goos: linux
+goarch: amd64
+pkg: github.com/brianlewyn/go-calculator/basic
+cpu: Intel(R) Core(TM) i3-8130U CPU @ 2.20GHz
+BenchmarkCalculate-2   	     100	     19879 ns/op	    2616 B/op	     204 allocs/op
+BenchmarkCalculate-2   	     100	     30140 ns/op	    2616 B/op	     204 allocs/op
+BenchmarkCalculate-2   	     100	     19706 ns/op	    2616 B/op	     204 allocs/op
+BenchmarkCalculate-2   	     100	     19539 ns/op	    2616 B/op	     204 allocs/op
+BenchmarkCalculate-2   	     100	     36484 ns/op	    2616 B/op	     204 allocs/op
+BenchmarkCalculate-2   	     100	     17530 ns/op	    2616 B/op	     204 allocs/op
+BenchmarkCalculate-2   	     100	     18592 ns/op	    2616 B/op	     204 allocs/op
+BenchmarkCalculate-2   	     100	     34810 ns/op	    2616 B/op	     204 allocs/op
+BenchmarkCalculate-2   	     100	     19501 ns/op	    2616 B/op	     204 allocs/op
+BenchmarkCalculate-2   	     100	     18016 ns/op	    2616 B/op	     204 allocs/op
+PASS
+ok  	github.com/brianlewyn/go-calculator/basic	0.056s

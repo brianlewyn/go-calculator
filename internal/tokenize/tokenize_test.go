@@ -396,3 +396,11 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 		node1, node2 = node1.Next(), node2.Next()
 	}
 }
+
+// go test -bench=BenchmarkTokenizer -benchmem -count=10 -benchtime=100x > bench.txt
+func BenchmarkTokenizer(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		expression := "(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2"
+		Tokenizer(data.NewInfo(&expression))
+	}
+}

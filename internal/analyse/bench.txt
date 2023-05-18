@@ -1,0 +1,16 @@
+goos: linux
+goarch: amd64
+pkg: github.com/brianlewyn/go-calculator/internal/analyse
+cpu: Intel(R) Core(TM) i3-8130U CPU @ 2.20GHz
+BenchmarkAnalyser-2   	     100	     29717 ns/op	    1240 B/op	      86 allocs/op
+BenchmarkAnalyser-2   	     100	     11537 ns/op	    1240 B/op	      86 allocs/op
+BenchmarkAnalyser-2   	     100	     11433 ns/op	    1240 B/op	      86 allocs/op
+BenchmarkAnalyser-2   	     100	      9264 ns/op	    1240 B/op	      86 allocs/op
+BenchmarkAnalyser-2   	     100	     18060 ns/op	    1240 B/op	      86 allocs/op
+BenchmarkAnalyser-2   	     100	     17067 ns/op	    1240 B/op	      86 allocs/op
+BenchmarkAnalyser-2   	     100	     22999 ns/op	    1240 B/op	      86 allocs/op
+BenchmarkAnalyser-2   	     100	     12940 ns/op	    1240 B/op	      86 allocs/op
+BenchmarkAnalyser-2   	     100	     22584 ns/op	    1240 B/op	      86 allocs/op
+BenchmarkAnalyser-2   	     100	     24846 ns/op	    1240 B/op	      86 allocs/op
+PASS
+ok  	github.com/brianlewyn/go-calculator/internal/analyse	0.082s
