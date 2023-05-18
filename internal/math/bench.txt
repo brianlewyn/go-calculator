@@ -14,3 +14,20 @@ BenchmarkMath-2   	     100	     22448 ns/op	    2616 B/op	     204 allocs/op
 BenchmarkMath-2   	     100	     18004 ns/op	    2616 B/op	     204 allocs/op
 PASS
 ok  	github.com/brianlewyn/go-calculator/internal/math	0.070s
+
+goos: linux
+goarch: amd64
+pkg: github.com/brianlewyn/go-calculator/internal/math
+cpu: Intel(R) Core(TM) i3-8130U CPU @ 2.20GHz
+BenchmarkMath-2   	     100	     40451 ns/op	    2544 B/op	     186 allocs/op
+BenchmarkMath-2   	     100	     41328 ns/op	    2544 B/op	     186 allocs/op
+BenchmarkMath-2   	     100	     19983 ns/op	    2544 B/op	     186 allocs/op
+BenchmarkMath-2   	     100	     15889 ns/op	    2544 B/op	     186 allocs/op
+BenchmarkMath-2   	     100	     32674 ns/op	    2544 B/op	     186 allocs/op
+BenchmarkMath-2   	     100	     19951 ns/op	    2544 B/op	     186 allocs/op
+BenchmarkMath-2   	     100	     28991 ns/op	    2544 B/op	     186 allocs/op
+BenchmarkMath-2   	     100	     27635 ns/op	    2544 B/op	     186 allocs/op
+BenchmarkMath-2   	     100	     29449 ns/op	    2544 B/op	     186 allocs/op
+BenchmarkMath-2   	     100	     39930 ns/op	    2544 B/op	     186 allocs/op
+PASS
+ok  	github.com/brianlewyn/go-calculator/internal/math	0.112s

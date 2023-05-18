@@ -171,7 +171,7 @@ func toList(expression string) *plugin.TokenList {
 	return list
 }
 
-// go test -bench=BenchmarkTokenizer -benchmem -count=10 -benchtime=100x > bench.txt
+// go test -bench=BenchmarkTokenizer -benchmem -count=10 -benchtime=100x >> bench.txt
 func BenchmarkTokenizer(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		Tokenizer("(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2")

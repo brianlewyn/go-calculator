@@ -94,7 +94,7 @@ func TestCalculate(t *testing.T) {
 	}
 }
 
-// go test -bench=BenchmarkCalculate -benchmem -count=10 -benchtime=100x > bench.txt
+// go test -bench=BenchmarkCalculate -benchmem -count=10 -benchtime=100x >> bench.txt
 func BenchmarkCalculate(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		Calculate("(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2")
