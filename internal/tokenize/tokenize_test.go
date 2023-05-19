@@ -150,21 +150,20 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 
 // toList returns the expression in a raw Tokenized Linked List
 func toList(expression string) *plugin.TokenList {
-	num, start, lock := new(string), new(int), new(bool)
-	kind, ok := data.TokenKind(0), false
-	list := plugin.NewTokenList()
+	k, list := 0, plugin.NewTokenList()
 
 	for i, r := range expression {
-		if kind, ok = data.TokenKindMap[r]; ok {
-			list.Append(data.NewSymbolToken(kind))
+		if data.IsDecimal(r) {
+			if i >= k {
+				num := getFullNumber(expression[i:])
+				list.Append(data.NewNumberToken(num))
+				k = i + len(num)
+			}
 			continue
 		}
 
-		if data.IsDecimal(r) {
-			if isFullNumber(expression, i, start, lock, num) {
-				list.Append(data.NewNumberToken(*num))
-			}
-			continue
+		if kind, ok := data.TokenKindMap[r]; ok {
+			list.Append(data.NewSymbolToken(kind))
 		}
 	}
 

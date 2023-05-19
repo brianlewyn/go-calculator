@@ -25,13 +25,14 @@ func Tokenizer(expression string) (*plugin.TokenList, error) {
 // toTokenizedLinkedList returns the expression in a raw Tokenized Linked List and nil,
 // otherwise returns nil and an error
 func toTokenizedLinkedList(expression string) (*plugin.TokenList, error) {
-	num, start, lock := new(string), new(int), new(bool)
-	list := plugin.NewTokenList()
+	k, list := 0, plugin.NewTokenList()
 
 	for i, r := range expression {
 		if data.IsDecimal(r) {
-			if isFullNumber(expression, i, start, lock, num) {
-				list.Append(data.NewNumberToken(*num))
+			if i >= k {
+				num := getFullNumber(expression[i:])
+				list.Append(data.NewNumberToken(num))
+				k = i + len(num)
 			}
 			continue
 		}
@@ -86,35 +87,15 @@ func rebuildTokenizedLinkedList(list *plugin.TokenList) {
 
 // !Tool Functions
 
-// cutNumberRange cuts a string of numbers from the expression in a specified range
-func cutNumberRange(expression string, start, end int) string {
-	if end == len(expression) {
-		return expression[start:]
+// getFullNumber returns a full number
+func getFullNumber(expression string) string {
+	for i, r := range expression {
+		if data.IsDecimal(r) {
+			continue
+		}
+		return expression[0:i]
 	}
-	return expression[start:end]
-}
-
-// isFullNumber returns true if the string number is complete
-func isFullNumber(expression string, index int, start *int, lock *bool, num *string) bool {
-	if !*lock {
-		*start, *lock = index, true
-	}
-
-	if isNextDecimal(index+1, expression) {
-		return false
-	}
-
-	*num = cutNumberRange(expression, *start, index+1)
-	*lock = false
-	return true
-}
-
-// isNextDecimal returns true if the rune in the given index is a Decimal, otherwise returns false
-func isNextDecimal(iNext int, expression string) bool {
-	if iNext < len(expression) {
-		return data.IsDecimal(rune(expression[iNext]))
-	}
-	return false
+	return expression[0:]
 }
 
 // areRightAndLeftTokenTogether returns true there are a RightToken and a LeftToken together
