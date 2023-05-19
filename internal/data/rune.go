@@ -13,9 +13,9 @@ const (
 	Pow   rune = '^' // Power = '^'
 	Root  rune = '√' // Square Root = '√'
 
-	Pi     rune = 'π' // Pi Number = 'π'
-	Dot    rune = '.' // Dot = '.'
-	Jocker rune = 'n' // Jocker = 'n'
+	Pi  rune = 'π' // Pi Number = 'π'
+	Dot rune = '.' // Dot = '.'
+	Num rune = 'n' // Num = 'n'
 
 	Gap rune = ' ' // Gap = ' '
 )
@@ -24,8 +24,8 @@ const (
 
 // RuneMap represent the follow symbols:
 //
-//	1  2  3  4  5  6  7  8  9  10
-//	%, *, +, -, /, (, ), ^, √,  π
+//	1  2  3  4  5  6  7  8  9  10  11
+//	%, *, +, -, /, (, ), ^, √,  π,  n
 var RuneMap = map[TokenKind]rune{
 	ModToken:   Mod,
 	MulToken:   Mul,
@@ -37,17 +37,7 @@ var RuneMap = map[TokenKind]rune{
 	PowToken:   Pow,
 	RootToken:  Root,
 	PiToken:    Pi,
-}
-
-// ToRune returns a TokenKind:
-//
-//	1  2  3  4  5  6  7  8  9  10  11
-//	%, *, +, -, /, (, ), ^, √,  π,  n
-func ToRune(kind TokenKind) rune {
-	if r, ok := RuneMap[kind]; ok {
-		return r
-	}
-	return Jocker
+	NumToken:   Num,
 }
 
 // !For each rune group

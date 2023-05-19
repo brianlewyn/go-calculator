@@ -132,7 +132,7 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 		t1, t2 := n1.Token(), n2.Token()
 		k1, k2 := t1.Kind(), t2.Kind()
 
-		if assert.Equalf(t, k1, k2, "k1: %c != k2: %c", data.ToRune(k1), data.ToRune(k2)) {
+		if assert.Equalf(t, k1, k2, "k1: %c != k2: %c", data.RuneMap[k1], data.RuneMap[k2]) {
 			if k1 == data.NumToken {
 				v1 := t1.(data.Number).Value()
 				v2 := t2.(data.Number).Value()

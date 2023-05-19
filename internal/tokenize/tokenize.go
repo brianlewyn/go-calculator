@@ -26,7 +26,6 @@ func Tokenizer(expression string) (*plugin.TokenList, error) {
 // otherwise returns nil and an error
 func toTokenizedLinkedList(expression string) (*plugin.TokenList, error) {
 	num, start, lock := new(string), new(int), new(bool)
-	kind, ok := data.TokenKind(0), false
 	list := plugin.NewTokenList()
 
 	for i, r := range expression {
@@ -37,7 +36,7 @@ func toTokenizedLinkedList(expression string) (*plugin.TokenList, error) {
 			continue
 		}
 
-		if kind, ok = data.TokenKindMap[r]; ok {
+		if kind, ok := data.TokenKindMap[r]; ok {
 			list.Append(data.NewSymbolToken(kind))
 			continue
 		}

@@ -50,7 +50,7 @@ func isFirstTokenCorrect(token data.Token) error {
 	if data.IsFirstToken(token.Kind()) {
 		return nil
 	}
-	return ierr.KindStart(data.ToRune(token.Kind()))
+	return ierr.KindStart(data.RuneMap[token.Kind()])
 }
 
 // isLastTokenCorrect returns nil if the last Token int the list is a correct Token to be last,
@@ -59,7 +59,7 @@ func isLastTokenCorrect(token data.Token) error {
 	if data.IsLastToken(token.Kind()) {
 		return nil
 	}
-	return ierr.KindEnd(data.ToRune(token.Kind()))
+	return ierr.KindEnd(data.RuneMap[token.Kind()])
 }
 
 // isNumTokenCorrect returns nil is the number is correct, otherwise returns an error
@@ -128,7 +128,7 @@ func canBeTogether(current, next *plugin.TokenNode) error {
 		return nil
 	}
 
-	return ierr.KindNotTogether(data.ToRune(kc1), data.ToRune(kn2))
+	return ierr.KindNotTogether(data.RuneMap[kc1], data.RuneMap[kn2])
 }
 
 // areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error

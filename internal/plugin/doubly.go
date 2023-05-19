@@ -38,7 +38,7 @@ func (l *TokenList) String() string {
 	var b strings.Builder
 
 	for temp := l.list.NHead(); temp != nil; temp = temp.NNext() {
-		fmt.Fprintf(&b, "%c", data.ToRune(temp.Data().Kind()))
+		fmt.Fprintf(&b, "%c", data.RuneMap[temp.Data().Kind()])
 	}
 
 	return b.String()
