@@ -11,192 +11,172 @@ import (
 
 // Math returns the result of calculating the expression inside the list of tokens
 func Math(list *doubly.Doubly[data.Token]) (float64, error) {
-	for calculateDeepestExpression(list) {
+	alwaysWrapInParentheses(list)
+
+	for {
+		left, right := obtainDeeperParentheses(list.NHead())
+		if left != nil && right != nil {
+			fromNumberToDecimalFrom(left, right)
+			calculateExpression(list, left, right)
+			deleteParentheses(list, left, right)
+			continue
+		}
+		break
 	}
 
-	answer := operateNodes(list)
-	if math.IsNaN(answer) {
-		return 0, ierr.ResultIsNaN
-	}
-
-	return answer, nil
+	return result(list.NHead())
 }
 
-// calculateDeepestExpression returns true if it can calculate the deepest expression in parentheses
-func calculateDeepestExpression(list *doubly.Doubly[data.Token]) bool {
-	right := rightTokenNode(list.NHead())
-	left := leftTokenNode(right)
-
-	connection := nodeConnection(left)
-	tempList := deeperList(left, right, list)
-	if tempList == nil {
-		return false
-	}
-
-	result := operateNodes(tempList)
-
-	if connection == nil {
-		list.DPrepend(data.NewDecimalToken(result))
-	} else {
-		list.Connect(connection, doubly.NewNode(data.NewDecimalToken(result)))
-	}
-	return true
+// alwaysWrapInParentheses always wrap tokenized list in parentheses
+func alwaysWrapInParentheses(list *doubly.Doubly[data.Token]) {
+	list.DPrepend(data.NewSymbolToken(data.LeftToken))
+	list.DAppend(data.NewSymbolToken(data.RightToken))
 }
 
-// rightTokenNode gets the first Right Token in the list from left to right
-func rightTokenNode(node *doubly.Node[data.Token]) *doubly.Node[data.Token] {
-	for temp := node; temp != nil; temp = temp.NNext() {
-		if temp.Data().Kind() == data.RightToken {
+// obtainDeeperParentheses gets the deepest LeftToken and RightToken nodes of the Tokenize Linked List
+func obtainDeeperParentheses(head *doubly.Node[data.Token]) (left, right *doubly.Node[data.Token]) {
+	right = searchFirstRightTokenNodeWith(head)
+	return searchFirstLeftTokenNodeWith(right), right
+}
+
+// searchFirstRightTokenNodeWith gets the first RightToken in the list from left to right from 'head' node
+func searchFirstRightTokenNodeWith(head *doubly.Node[data.Token]) *doubly.Node[data.Token] {
+	for temp := head; temp != nil; temp = temp.NNext() {
+		if isKind(temp, data.RightToken) {
 			return temp
 		}
 	}
 	return nil
 }
 
-// leftTokenNode gets the first Left Token in the list from right to left
-func leftTokenNode(node *doubly.Node[data.Token]) *doubly.Node[data.Token] {
-	for temp := node; temp != nil; temp = temp.NPrev() {
-		if temp.Data().Kind() == data.LeftToken {
+// searchFirstLeftTokenNodeWith gets the first LeftToken in the list from right to left from 'right' node
+func searchFirstLeftTokenNodeWith(right *doubly.Node[data.Token]) *doubly.Node[data.Token] {
+	for temp := right; temp != nil; temp = temp.NPrev() {
+		if isKind(temp, data.LeftToken) {
 			return temp
 		}
 	}
 	return nil
 }
 
-// nodeConnection returns the converted node as node connection
-func nodeConnection(node *doubly.Node[data.Token]) *doubly.Node[data.Token] {
-	if node == nil {
-		return nil
-	}
-	return node.NPrev()
-}
+// fromNumberToDecimalFrom converts the following:
+//   - the 'Number' nodes of the Tokenized Linked List to a 'Decimal'
+//   - the PiToken with math.Pi as a 'Float'
+func fromNumberToDecimalFrom(left, right *doubly.Node[data.Token]) {
+	for temp := left.NNext(); temp != right; temp = temp.NNext() {
 
-// deeperList returns the deepest expression in parentheses as a list
-func deeperList(left, right *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) *doubly.Doubly[data.Token] {
-	tempList := doubly.NewDoubly[data.Token]()
-
-	for temp := left; temp != nil; temp = temp.NNext() {
-		flag := temp.Data() != left.Data() && temp.Data() != right.Data()
-
-		if flag {
-			tempList.DAppend(temp.Data())
-			list.Disconnect(temp.NPrev())
-
-		} else if temp.Data() == right.Data() {
-			list.Disconnect(right.NPrev())
-			list.Disconnect(right)
-			return tempList
-		}
-	}
-
-	return nil
-}
-
-// convertFloatList converts the 'Number' node of the TokenList to a 'Float'
-// and also converts the PiToken with math.Pi as a 'Float'
-func convertFloatList(list *doubly.Doubly[data.Token]) {
-	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
-		token := temp.Data()
-
-		if token.Kind() == data.PiToken {
+		if isKind(temp, data.PiToken) {
 			temp.Update(data.NewDecimalToken(math.Pi))
-
-		} else if token, ok := token.(data.Number); ok {
-			float, _ := strconv.ParseFloat(token.Value(), 64)
-			temp.Update(data.NewDecimalToken(float))
+			continue
 		}
+
+		if token, ok := temp.Data().(data.Number); ok {
+			decimal, _ := strconv.ParseFloat(token.Value(), 64)
+			temp.Update(data.NewDecimalToken(decimal))
+		}
+
 	}
-}
-
-func operateNodes(list *doubly.Doubly[data.Token]) float64 {
-	convertFloatList(list)
-
-	doPowAndRoot(list)
-	doMulDivAndMod(list)
-	doAddAndSub(list)
-
-	answer := response(list)
-	list.Flush()
-	return answer
 }
 
 // doPowAndRoot do powers & roots
-func doPowAndRoot(list *doubly.Doubly[data.Token]) {
-	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
-		switch temp.Data().Kind() {
+func doPowAndRoot(list *doubly.Doubly[data.Token], left, right *doubly.Node[data.Token]) {
+	for temp := left.NNext(); temp != right; temp = temp.NNext() {
 
-		case data.PowToken:
-			x := temp.DPrev().(data.Decimal).Value()
-			y := temp.DNext().(data.Decimal).Value()
-			list.Disconnect(temp.NPrev())
-			list.Disconnect(temp.NNext())
-
+		if isKind(temp, data.PowToken) {
+			x, y := toDecimal(temp.NPrev()), toDecimal(temp.NNext())
 			temp.Update(data.NewDecimalToken(math.Pow(x, y)))
-
-		case data.RootToken:
-			x := temp.DNext().(data.Decimal).Value()
-			list.Disconnect(temp.NNext())
-			temp.Update(data.NewDecimalToken(math.Sqrt(x)))
+			disconnectEnds(list, temp)
+			continue
 		}
+
+		if isKind(temp, data.RootToken) {
+			sqrt := math.Sqrt(toDecimal(temp.NNext()))
+			temp.Update(data.NewDecimalToken(sqrt))
+			list.Disconnect(temp.NNext())
+		}
+
 	}
 }
 
 // doMulDivAndMod do multiplication, division & module
-func doMulDivAndMod(list *doubly.Doubly[data.Token]) {
-	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
-		token := temp.Data().Kind()
+func doMulDivAndMod(list *doubly.Doubly[data.Token], left, right *doubly.Node[data.Token]) {
+	for temp := left.NNext(); temp != right; temp = temp.NNext() {
 
-		if token == data.MulToken || token == data.DivToken || token == data.ModToken {
-			prev, next := temp.NPrev(), temp.NNext()
-
-			x := prev.Data().(data.Decimal).Value()
-			y := next.Data().(data.Decimal).Value()
-			list.Disconnect(prev)
-			list.Disconnect(next)
-
-			switch token {
-			case data.MulToken:
-				temp.Update(data.NewDecimalToken(x * y))
-			case data.DivToken:
-				temp.Update(data.NewDecimalToken(x / y))
-			case data.ModToken:
-				temp.Update(data.NewDecimalToken(math.Mod(x, y)))
-			}
+		if isKind(temp, data.MulToken) {
+			x, y := toDecimal(temp.NPrev()), toDecimal(temp.NNext())
+			temp.Update(data.NewDecimalToken(x * y))
+			disconnectEnds(list, temp)
+			continue
 		}
+
+		if isKind(temp, data.DivToken) {
+			x, y := toDecimal(temp.NPrev()), toDecimal(temp.NNext())
+			temp.Update(data.NewDecimalToken(x / y))
+			disconnectEnds(list, temp)
+			continue
+		}
+
+		if isKind(temp, data.ModToken) {
+			x, y := toDecimal(temp.NPrev()), toDecimal(temp.NNext())
+			temp.Update(data.NewDecimalToken(math.Mod(x, y)))
+			disconnectEnds(list, temp)
+		}
+
 	}
 }
 
 // doAddAndSub do addition & subtraction
-func doAddAndSub(list *doubly.Doubly[data.Token]) {
-	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
-		token := temp.Data().Kind()
+func doAddAndSub(list *doubly.Doubly[data.Token], left, right *doubly.Node[data.Token]) {
+	for temp := left.NNext(); temp != right; temp = temp.NNext() {
 
-		if token == data.AddToken || token == data.SubToken {
-			prev, next := temp.NPrev(), temp.NNext()
-
-			x := prev.Data().(data.Decimal).Value()
-			y := next.Data().(data.Decimal).Value()
-			list.Disconnect(prev)
-			list.Disconnect(next)
-
-			switch token {
-			case data.AddToken:
-				temp.Update(data.NewDecimalToken(x + y))
-			case data.SubToken:
-				temp.Update(data.NewDecimalToken(x - y))
-			}
+		if isKind(temp, data.AddToken) {
+			x, y := toDecimal(temp.NPrev()), toDecimal(temp.NNext())
+			temp.Update(data.NewDecimalToken(x + y))
+			disconnectEnds(list, temp)
+			continue
 		}
+
+		if isKind(temp, data.SubToken) {
+			x, y := toDecimal(temp.NPrev()), toDecimal(temp.NNext())
+			temp.Update(data.NewDecimalToken(x - y))
+			disconnectEnds(list, temp)
+		}
+
 	}
 }
 
-// response returns the response of calculating the list of tokens
-func response(list *doubly.Doubly[data.Token]) float64 {
-	switch {
-	case list.NHead() == nil:
-	case list.DHead() == nil:
-	case list.DHead().Kind() != data.NumToken:
-	default:
-		return list.DHead().(data.Decimal).Value()
+// isKind returns true if the node's kind is equal to the given kind, otherwise returns false
+func isKind(node *doubly.Node[data.Token], kind data.TokenKind) bool {
+	return node.Data().Kind() == kind
+}
+
+// toDecimal returns node's value as type float64
+func toDecimal(node *doubly.Node[data.Token]) float64 {
+	return node.Data().(data.Decimal).Value()
+}
+
+// disconnectEnds disconnects end nodes to current node
+func disconnectEnds(list *doubly.Doubly[data.Token], node *doubly.Node[data.Token]) {
+	list.Disconnect(node.NPrev())
+	list.Disconnect(node.NNext())
+}
+
+// calculateExpression calculate an expression from a given range of nodes
+func calculateExpression(list *doubly.Doubly[data.Token], left, right *doubly.Node[data.Token]) {
+	doPowAndRoot(list, left, right)
+	doMulDivAndMod(list, left, right)
+	doAddAndSub(list, left, right)
+}
+
+// deleteParentheses deletes the end nodes of the current node
+func deleteParentheses(list *doubly.Doubly[data.Token], left, right *doubly.Node[data.Token]) {
+	list.Disconnect(left)
+	list.Disconnect(right)
+}
+
+func result(head *doubly.Node[data.Token]) (float64, error) {
+	if res64 := toDecimal(head); !math.IsNaN(res64) {
+		return res64, nil
 	}
-	return 0
+	return 0, ierr.ResultIsNaN
 }

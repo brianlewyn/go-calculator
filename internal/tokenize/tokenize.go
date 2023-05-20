@@ -261,12 +261,12 @@ func wrapWithOtherParentheses(node *doubly.Node[data.Token], list *doubly.Doubly
 	}
 }
 
-// isKind returns true if the node's token is equal to the given token, otherwise returns false
+// isKind returns true if the node's kind is equal to the given kind, otherwise returns false
 func isKind(node *doubly.Node[data.Token], token data.TokenKind) bool {
 	return node.Data().Kind() == token
 }
 
-// isKindFn returns true if node's token is equal to the given token of a function, otherwise returns false
+// isKindFn returns true if node's kind is equal to the given kind of a function, otherwise returns false
 func isKindFn(node *doubly.Node[data.Token], tokenFn func(token data.TokenKind) bool) bool {
 	return tokenFn(node.Data().Kind())
 }
