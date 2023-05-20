@@ -116,7 +116,7 @@ func operateNodes(list *doubly.Doubly[data.Token]) float64 {
 	doAddAndSub(list)
 
 	answer := response(list)
-	list.Flush(false)
+	list.Flush()
 	return answer
 }
 
