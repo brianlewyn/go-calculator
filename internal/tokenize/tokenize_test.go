@@ -1,6 +1,8 @@
 package tokenize
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/brianlewyn/go-calculator/ierr"
@@ -125,26 +127,14 @@ func TestRebuildTokenizedLinkedList(t *testing.T) {
 }
 
 // areEqualList throws t.Error if assert.Equal or assert.EqualValues finds an error
-func areEqualList(t *testing.T, got, want *doubly.Doubly[data.Token]) {
-	n1, n2 := got.NHead(), want.NHead()
-
-	for n1 != nil && n2 != nil {
-		t1, t2 := n1.Data(), n2.Data()
-		k1, k2 := t1.Kind(), t2.Kind()
-
-		if assert.Equalf(t, k1, k2, "k1: %c != k2: %c", data.RuneMap[k1], data.RuneMap[k2]) {
-			if k1 == data.NumToken {
-				v1 := t1.(data.Number).Value()
-				v2 := t2.(data.Number).Value()
-				assert.IsType(t, v1, v2, "value1: %s != value2: %s", v1, v2)
-			}
-		}
-
-		n1, n2 = n1.NNext(), n2.NNext()
+func areEqualList(t *testing.T, g, w *doubly.Doubly[data.Token]) {
+	for n1, n2 := g.NHead(), w.NHead(); n1 != nil && n2 != nil; n1, n2 = n1.NNext(), n2.NNext() {
+		k1, k2 := n1.Data().Kind(), n2.Data().Kind()
+		assert.Equal(t, k1, k2, "\n\nk1 != k2\n\n")
 	}
 
-	if !assert.Equal(t, got, want) {
-		t.Errorf("\n\n%s\n%s\n\n", got, want)
+	if !assert.Equal(t, g, w) {
+		t.Errorf("\n\n%s\n%s\n\n", toString(g), toString(w))
 	}
 }
 
@@ -168,6 +158,20 @@ func toList(expression string) *doubly.Doubly[data.Token] {
 	}
 
 	return list
+}
+
+// toString converts a Doubly Linked List to string
+func toString(list *doubly.Doubly[data.Token]) string {
+	if list.IsEmpty() {
+		return "list <nil>"
+	}
+
+	var b strings.Builder
+	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
+		fmt.Fprintf(&b, "%c", data.RuneMap[temp.Data().Kind()])
+	}
+
+	return b.String()
 }
 
 // go test -bench=BenchmarkTokenizer -benchmem -count=10 -benchtime=100x >> bench.txt

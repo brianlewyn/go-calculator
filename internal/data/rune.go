@@ -1,5 +1,10 @@
 package data
 
+// !Data
+
+// DigitLimit is the limit of digits of a float64 type
+const DigitLimit uint16 = 617
+
 // !Runes
 
 const (

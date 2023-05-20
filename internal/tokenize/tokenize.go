@@ -59,12 +59,14 @@ func rebuildTokenizedLinkedList(list *doubly.Doubly[data.Token]) {
 	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
 
 		if areRightAndLeftTokenTogether(temp) {
-			list.Connect(temp, doubly.NewNode(data.NewSymbolToken(data.MulToken)))
+			symbol := data.NewSymbolToken(data.MulToken)
+			list.Connect(temp, doubly.NewNode(symbol))
 			continue
 		}
 
 		if areLeftAndSubTokenTogether(temp) {
-			list.Connect(temp, doubly.NewNode(data.NewNumberToken(data.Zero)))
+			zero := data.NewNumberToken("0")
+			list.Connect(temp, doubly.NewNode(zero))
 			continue
 		}
 
@@ -77,11 +79,11 @@ func rebuildTokenizedLinkedList(list *doubly.Doubly[data.Token]) {
 	}
 
 	if isKind(list.NHead(), data.AddToken) {
-		list.NPullHead()
+		list.RemoveHead()
 	}
 
 	if isKind(list.NHead(), data.SubToken) {
-		list.DPrepend(data.NewNumberToken(data.Zero))
+		list.DPrepend(data.NewNumberToken("0"))
 	}
 }
 
@@ -102,14 +104,9 @@ func getFullNumber(expression string) string {
 //
 //	)( => )*(
 func areRightAndLeftTokenTogether(node *doubly.Node[data.Token]) bool {
-	if !isKind(node, data.RightToken) {
+	if !isKind(node, data.RightToken) || node.NNext() == nil {
 		return false
 	}
-
-	if node.NNext() == nil {
-		return false
-	}
-
 	return isKind(node.NNext(), data.LeftToken)
 }
 
@@ -117,14 +114,9 @@ func areRightAndLeftTokenTogether(node *doubly.Node[data.Token]) bool {
 //
 //	(- => (0-
 func areLeftAndSubTokenTogether(node *doubly.Node[data.Token]) bool {
-	if !isKind(node, data.LeftToken) {
+	if !isKind(node, data.LeftToken) || node.NNext() == nil {
 		return false
 	}
-
-	if node.NNext() == nil {
-		return false
-	}
-
 	return isKind(node.NNext(), data.SubToken)
 }
 
@@ -237,8 +229,11 @@ func addParenthesesIfPossible(node *doubly.Node[data.Token], list *doubly.Doubly
 // addParentheseInRangeAfterNode adds a LeftToken at the next index of the node and
 // a RightToken at given index after the node
 func addParentheseInRangeAfterNode(node *doubly.Node[data.Token], index int, list *doubly.Doubly[data.Token]) {
-	list.Connect(node, doubly.NewNode(data.NewSymbolToken(data.LeftToken)))
-	list.ConnectFrom(node, index, doubly.NewNode(data.NewSymbolToken(data.RightToken)))
+	left := data.NewSymbolToken(data.LeftToken)
+	right := data.NewSymbolToken(data.RightToken)
+
+	list.Connect(node, doubly.NewNode(left))
+	list.ConnectFrom(node, index, doubly.NewNode(right))
 }
 
 // wrapWithOtherParentheses add add parentheses wrapping a sign and another operation with parentheses
@@ -255,8 +250,11 @@ func wrapWithOtherParentheses(node *doubly.Node[data.Token], list *doubly.Doubly
 			nRight++
 
 			if nLeft == nRight {
-				list.Connect(node, doubly.NewNode(data.NewSymbolToken(data.LeftToken)))
-				list.Connect(temp, doubly.NewNode(data.NewSymbolToken(data.RightToken)))
+				left := data.NewSymbolToken(data.LeftToken)
+				right := data.NewSymbolToken(data.RightToken)
+
+				list.Connect(node, doubly.NewNode(left))
+				list.Connect(temp, doubly.NewNode(right))
 				break
 			}
 		}
