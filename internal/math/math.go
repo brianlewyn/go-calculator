@@ -6,11 +6,11 @@ import (
 
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-calculator/internal/plugin"
+	"github.com/brianlewyn/go-linked-list/v2/doubly"
 )
 
 // Math returns the result of calculating the expression inside the list of tokens
-func Math(list *plugin.TokenList) (float64, error) {
+func Math(list *doubly.Doubly[data.Token]) (float64, error) {
 	for calculateDeepestExpression(list) {
 	}
 
@@ -23,8 +23,8 @@ func Math(list *plugin.TokenList) (float64, error) {
 }
 
 // calculateDeepestExpression returns true if it can calculate the deepest expression in parentheses
-func calculateDeepestExpression(list *plugin.TokenList) bool {
-	right := rightTokenNode(list.Head())
+func calculateDeepestExpression(list *doubly.Doubly[data.Token]) bool {
+	right := rightTokenNode(list.NHead())
 	left := leftTokenNode(right)
 
 	connection := nodeConnection(left)
@@ -36,17 +36,17 @@ func calculateDeepestExpression(list *plugin.TokenList) bool {
 	result := operateNodes(tempList)
 
 	if connection == nil {
-		list.Prepend(data.NewDecimalToken(result))
+		list.DPrepend(data.NewDecimalToken(result))
 	} else {
-		list.Connect(connection, data.NewDecimalToken(result))
+		list.Connect(connection, doubly.NewNode(data.NewDecimalToken(result)))
 	}
 	return true
 }
 
 // rightTokenNode gets the first Right Token in the list from left to right
-func rightTokenNode(node *plugin.TokenNode) *plugin.TokenNode {
-	for temp := node; temp != nil; temp = temp.Next() {
-		if temp.Token().Kind() == data.RightToken {
+func rightTokenNode(node *doubly.Node[data.Token]) *doubly.Node[data.Token] {
+	for temp := node; temp != nil; temp = temp.NNext() {
+		if temp.Data().Kind() == data.RightToken {
 			return temp
 		}
 	}
@@ -54,9 +54,9 @@ func rightTokenNode(node *plugin.TokenNode) *plugin.TokenNode {
 }
 
 // leftTokenNode gets the first Left Token in the list from right to left
-func leftTokenNode(node *plugin.TokenNode) *plugin.TokenNode {
-	for temp := node; temp != nil; temp = temp.Prev() {
-		if temp.Token().Kind() == data.LeftToken {
+func leftTokenNode(node *doubly.Node[data.Token]) *doubly.Node[data.Token] {
+	for temp := node; temp != nil; temp = temp.NPrev() {
+		if temp.Data().Kind() == data.LeftToken {
 			return temp
 		}
 	}
@@ -64,26 +64,26 @@ func leftTokenNode(node *plugin.TokenNode) *plugin.TokenNode {
 }
 
 // nodeConnection returns the converted node as node connection
-func nodeConnection(node *plugin.TokenNode) *plugin.TokenNode {
+func nodeConnection(node *doubly.Node[data.Token]) *doubly.Node[data.Token] {
 	if node == nil {
 		return nil
 	}
-	return node.Prev()
+	return node.NPrev()
 }
 
 // deeperList returns the deepest expression in parentheses as a list
-func deeperList(left, right *plugin.TokenNode, list *plugin.TokenList) *plugin.TokenList {
-	tempList := plugin.NewTokenList()
+func deeperList(left, right *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) *doubly.Doubly[data.Token] {
+	tempList := doubly.NewDoubly[data.Token]()
 
-	for temp := left; temp != nil; temp = temp.Next() {
-		flag := temp.Token() != left.Token() && temp.Token() != right.Token()
+	for temp := left; temp != nil; temp = temp.NNext() {
+		flag := temp.Data() != left.Data() && temp.Data() != right.Data()
 
 		if flag {
-			tempList.Append(temp.Token())
-			list.Disconnect(temp.Prev())
+			tempList.DAppend(temp.Data())
+			list.Disconnect(temp.NPrev())
 
-		} else if temp.Token() == right.Token() {
-			list.Disconnect(right.Prev())
+		} else if temp.Data() == right.Data() {
+			list.Disconnect(right.NPrev())
 			list.Disconnect(right)
 			return tempList
 		}
@@ -94,9 +94,9 @@ func deeperList(left, right *plugin.TokenNode, list *plugin.TokenList) *plugin.T
 
 // convertFloatList converts the 'Number' node of the TokenList to a 'Float'
 // and also converts the PiToken with math.Pi as a 'Float'
-func convertFloatList(list *plugin.TokenList) {
-	for temp := list.Head(); temp != nil; temp = temp.Next() {
-		token := temp.Token()
+func convertFloatList(list *doubly.Doubly[data.Token]) {
+	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
+		token := temp.Data()
 
 		if token.Kind() == data.PiToken {
 			temp.Update(data.NewDecimalToken(math.Pi))
@@ -108,7 +108,7 @@ func convertFloatList(list *plugin.TokenList) {
 	}
 }
 
-func operateNodes(list *plugin.TokenList) float64 {
+func operateNodes(list *doubly.Doubly[data.Token]) float64 {
 	convertFloatList(list)
 
 	doPowAndRoot(list)
@@ -116,41 +116,41 @@ func operateNodes(list *plugin.TokenList) float64 {
 	doAddAndSub(list)
 
 	answer := response(list)
-	list.Flush()
+	list.Flush(false)
 	return answer
 }
 
 // doPowAndRoot do powers & roots
-func doPowAndRoot(list *plugin.TokenList) {
-	for temp := list.Head(); temp != nil; temp = temp.Next() {
-		switch temp.Token().Kind() {
+func doPowAndRoot(list *doubly.Doubly[data.Token]) {
+	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
+		switch temp.Data().Kind() {
 
 		case data.PowToken:
-			x := temp.Prev().Token().(data.Decimal).Value()
-			y := temp.Next().Token().(data.Decimal).Value()
-			list.Disconnect(temp.Prev())
-			list.Disconnect(temp.Next())
+			x := temp.DPrev().(data.Decimal).Value()
+			y := temp.DNext().(data.Decimal).Value()
+			list.Disconnect(temp.NPrev())
+			list.Disconnect(temp.NNext())
 
 			temp.Update(data.NewDecimalToken(math.Pow(x, y)))
 
 		case data.RootToken:
-			x := temp.Next().Token().(data.Decimal).Value()
-			list.Disconnect(temp.Next())
+			x := temp.DNext().(data.Decimal).Value()
+			list.Disconnect(temp.NNext())
 			temp.Update(data.NewDecimalToken(math.Sqrt(x)))
 		}
 	}
 }
 
 // doMulDivAndMod do multiplication, division & module
-func doMulDivAndMod(list *plugin.TokenList) {
-	for temp := list.Head(); temp != nil; temp = temp.Next() {
-		token := temp.Token().Kind()
+func doMulDivAndMod(list *doubly.Doubly[data.Token]) {
+	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
+		token := temp.Data().Kind()
 
 		if token == data.MulToken || token == data.DivToken || token == data.ModToken {
-			prev, next := temp.Prev(), temp.Next()
+			prev, next := temp.NPrev(), temp.NNext()
 
-			x := prev.Token().(data.Decimal).Value()
-			y := next.Token().(data.Decimal).Value()
+			x := prev.Data().(data.Decimal).Value()
+			y := next.Data().(data.Decimal).Value()
 			list.Disconnect(prev)
 			list.Disconnect(next)
 
@@ -167,15 +167,15 @@ func doMulDivAndMod(list *plugin.TokenList) {
 }
 
 // doAddAndSub do addition & subtraction
-func doAddAndSub(list *plugin.TokenList) {
-	for temp := list.Head(); temp != nil; temp = temp.Next() {
-		token := temp.Token().Kind()
+func doAddAndSub(list *doubly.Doubly[data.Token]) {
+	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
+		token := temp.Data().Kind()
 
 		if token == data.AddToken || token == data.SubToken {
-			prev, next := temp.Prev(), temp.Next()
+			prev, next := temp.NPrev(), temp.NNext()
 
-			x := prev.Token().(data.Decimal).Value()
-			y := next.Token().(data.Decimal).Value()
+			x := prev.Data().(data.Decimal).Value()
+			y := next.Data().(data.Decimal).Value()
 			list.Disconnect(prev)
 			list.Disconnect(next)
 
@@ -190,13 +190,13 @@ func doAddAndSub(list *plugin.TokenList) {
 }
 
 // response returns the response of calculating the list of tokens
-func response(list *plugin.TokenList) float64 {
+func response(list *doubly.Doubly[data.Token]) float64 {
 	switch {
-	case list.Head() == nil:
-	case list.Head().Token() == nil:
-	case list.Head().Token().Kind() != data.NumToken:
+	case list.NHead() == nil:
+	case list.DHead() == nil:
+	case list.DHead().Kind() != data.NumToken:
 	default:
-		return list.Head().Token().(data.Decimal).Value()
+		return list.DHead().(data.Decimal).Value()
 	}
 	return 0
 }

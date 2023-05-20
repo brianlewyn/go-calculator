@@ -7,15 +7,15 @@ import (
 
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-calculator/internal/plugin"
 	"github.com/brianlewyn/go-calculator/internal/tokenize"
+	"github.com/brianlewyn/go-linked-list/v2/doubly"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAnalyser(t *testing.T) {
 	test := []struct {
 		name string
-		list *plugin.TokenList
+		list *doubly.Doubly[data.Token]
 		as   ierr.KindOf
 		is   error
 	}{
@@ -113,7 +113,7 @@ func TestAnalyser(t *testing.T) {
 }
 
 // toList returns the expression in a raw Tokenized Linked List
-func toList(expression string) *plugin.TokenList {
+func toList(expression string) *doubly.Doubly[data.Token] {
 	list, err := tokenize.Tokenizer(expression)
 	if err != nil {
 		fmt.Printf("ERROR: %s\n\n", err)

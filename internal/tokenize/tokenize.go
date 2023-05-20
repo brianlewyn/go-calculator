@@ -3,12 +3,12 @@ package tokenize
 import (
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-calculator/internal/plugin"
+	"github.com/brianlewyn/go-linked-list/v2/doubly"
 )
 
 // Tokenizer returns the expression in an Tokenized Linked List and nil,
 // otherwise returns nil and an error
-func Tokenizer(expression string) (*plugin.TokenList, error) {
+func Tokenizer(expression string) (*doubly.Doubly[data.Token], error) {
 	if expression == "" {
 		return nil, ierr.EmptyField
 	}
@@ -24,21 +24,21 @@ func Tokenizer(expression string) (*plugin.TokenList, error) {
 
 // toTokenizedLinkedList returns the expression in a raw Tokenized Linked List and nil,
 // otherwise returns nil and an error
-func toTokenizedLinkedList(expression string) (*plugin.TokenList, error) {
-	k, list := 0, plugin.NewTokenList()
+func toTokenizedLinkedList(expression string) (*doubly.Doubly[data.Token], error) {
+	k, list := 0, doubly.NewDoubly[data.Token]()
 
 	for i, r := range expression {
 		if data.IsDecimal(r) {
 			if i >= k {
 				num := getFullNumber(expression[i:])
-				list.Append(data.NewNumberToken(num))
+				list.DAppend(data.NewNumberToken(num))
 				k = i + len(num)
 			}
 			continue
 		}
 
 		if kind, ok := data.TokenKindMap[r]; ok {
-			list.Append(data.NewSymbolToken(kind))
+			list.DAppend(data.NewSymbolToken(kind))
 			continue
 		}
 
@@ -55,33 +55,33 @@ func toTokenizedLinkedList(expression string) (*plugin.TokenList, error) {
 }
 
 // rebuildTokenizedLinkedList returns a rebuilt Tokenized Linked List
-func rebuildTokenizedLinkedList(list *plugin.TokenList) {
-	for temp := list.Head(); temp != nil; temp = temp.Next() {
+func rebuildTokenizedLinkedList(list *doubly.Doubly[data.Token]) {
+	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
 
 		if areRightAndLeftTokenTogether(temp) {
-			list.Connect(temp, data.NewSymbolToken(data.MulToken))
+			list.Connect(temp, doubly.NewNode(data.NewSymbolToken(data.MulToken)))
 			continue
 		}
 
 		if areLeftAndSubTokenTogether(temp) {
-			list.Connect(temp, data.NewNumberToken(data.Zero))
+			list.Connect(temp, doubly.NewNode(data.NewNumberToken(data.Zero)))
 			continue
 		}
 
 		if canNextAddTokenBeRemoved(temp) {
-			list.Disconnect(temp.Next())
+			list.Disconnect(temp.NNext())
 			continue
 		}
 
 		addParenthesesIfPossible(temp, list)
 	}
 
-	if isKind(list.Head(), data.AddToken) {
-		list.RemoveHead()
+	if isKind(list.NHead(), data.AddToken) {
+		list.NPullHead()
 	}
 
-	if isKind(list.Head(), data.SubToken) {
-		list.Prepend(data.NewNumberToken(data.Zero))
+	if isKind(list.NHead(), data.SubToken) {
+		list.DPrepend(data.NewNumberToken(data.Zero))
 	}
 }
 
@@ -101,31 +101,31 @@ func getFullNumber(expression string) string {
 // areRightAndLeftTokenTogether returns true there are a RightToken and a LeftToken together
 //
 //	)( => )*(
-func areRightAndLeftTokenTogether(node *plugin.TokenNode) bool {
+func areRightAndLeftTokenTogether(node *doubly.Node[data.Token]) bool {
 	if !isKind(node, data.RightToken) {
 		return false
 	}
 
-	if node.Next() == nil {
+	if node.NNext() == nil {
 		return false
 	}
 
-	return isKind(node.Next(), data.LeftToken)
+	return isKind(node.NNext(), data.LeftToken)
 }
 
 // areLeftAndSubTokenTogether returns true there are a LeftToken and a SubToken together
 //
 //	(- => (0-
-func areLeftAndSubTokenTogether(node *plugin.TokenNode) bool {
+func areLeftAndSubTokenTogether(node *doubly.Node[data.Token]) bool {
 	if !isKind(node, data.LeftToken) {
 		return false
 	}
 
-	if node.Next() == nil {
+	if node.NNext() == nil {
 		return false
 	}
 
-	return isKind(node.Next(), data.SubToken)
+	return isKind(node.NNext(), data.SubToken)
 }
 
 // canNextAddTokenBeRemoved returns true if AddToken at the next index
@@ -135,14 +135,14 @@ func areLeftAndSubTokenTogether(node *plugin.TokenNode) bool {
 //
 //	From: #+n, #+π, #+(, #+√n, #+√π, #+√(...)
 //	To #n, #π, #(, #√n, #√π, #√(...)
-func canNextAddTokenBeRemoved(node *plugin.TokenNode) bool {
+func canNextAddTokenBeRemoved(node *doubly.Node[data.Token]) bool {
 	if !isKindFn(node, data.IsSpecialToken) {
 		if !isKind(node, data.LeftToken) {
 			return false
 		}
 	}
 
-	temp := node.Next()
+	temp := node.NNext()
 	if temp == nil {
 		return false
 	}
@@ -151,7 +151,7 @@ func canNextAddTokenBeRemoved(node *plugin.TokenNode) bool {
 		return false
 	}
 
-	temp = temp.Next()
+	temp = temp.NNext()
 	if temp == nil {
 		return false
 	}
@@ -180,12 +180,12 @@ func canNextAddTokenBeRemoved(node *plugin.TokenNode) bool {
 //
 //	From: #-n, #-π, #-(, #-√n, #-√π, #-√(...)
 //	To #(-n), #(-π), #(-(...)), #(-√n) #(-√π) #(-√(...))
-func addParenthesesIfPossible(node *plugin.TokenNode, list *plugin.TokenList) {
+func addParenthesesIfPossible(node *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) {
 	if !isKindFn(node, data.IsSpecialToken) {
 		return
 	}
 
-	temp := node.Next()
+	temp := node.NNext()
 	if temp == nil {
 		return
 	}
@@ -194,7 +194,7 @@ func addParenthesesIfPossible(node *plugin.TokenNode, list *plugin.TokenList) {
 		return
 	}
 
-	temp = temp.Next()
+	temp = temp.NNext()
 	if temp == nil {
 		return
 	}
@@ -216,7 +216,7 @@ func addParenthesesIfPossible(node *plugin.TokenNode, list *plugin.TokenList) {
 		return
 	}
 
-	temp = temp.Next()
+	temp = temp.NNext()
 	if temp == nil {
 		return
 	}
@@ -236,16 +236,16 @@ func addParenthesesIfPossible(node *plugin.TokenNode, list *plugin.TokenList) {
 
 // addParentheseInRangeAfterNode adds a LeftToken at the next index of the node and
 // a RightToken at given index after the node
-func addParentheseInRangeAfterNode(node *plugin.TokenNode, index int, list *plugin.TokenList) {
-	list.Connect(node, data.NewSymbolToken(data.LeftToken))
-	list.ConnectFrom(node, index, data.NewSymbolToken(data.RightToken))
+func addParentheseInRangeAfterNode(node *doubly.Node[data.Token], index int, list *doubly.Doubly[data.Token]) {
+	list.Connect(node, doubly.NewNode(data.NewSymbolToken(data.LeftToken)))
+	list.ConnectFrom(node, index, doubly.NewNode(data.NewSymbolToken(data.RightToken)))
 }
 
 // wrapWithOtherParentheses add add parentheses wrapping a sign and another operation with parentheses
-func wrapWithOtherParentheses(node *plugin.TokenNode, list *plugin.TokenList) {
+func wrapWithOtherParentheses(node *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) {
 	var nLeft, nRight int
 
-	for temp := node; temp != nil; temp = temp.Next() {
+	for temp := node; temp != nil; temp = temp.NNext() {
 		if isKind(temp, data.LeftToken) {
 			nLeft++
 			continue
@@ -255,8 +255,8 @@ func wrapWithOtherParentheses(node *plugin.TokenNode, list *plugin.TokenList) {
 			nRight++
 
 			if nLeft == nRight {
-				list.Connect(node, data.NewSymbolToken(data.LeftToken))
-				list.Connect(temp, data.NewSymbolToken(data.RightToken))
+				list.Connect(node, doubly.NewNode(data.NewSymbolToken(data.LeftToken)))
+				list.Connect(temp, doubly.NewNode(data.NewSymbolToken(data.RightToken)))
 				break
 			}
 		}
@@ -264,11 +264,11 @@ func wrapWithOtherParentheses(node *plugin.TokenNode, list *plugin.TokenList) {
 }
 
 // isKind returns true if the node's token is equal to the given token, otherwise returns false
-func isKind(node *plugin.TokenNode, token data.TokenKind) bool {
-	return node.Token().Kind() == token
+func isKind(node *doubly.Node[data.Token], token data.TokenKind) bool {
+	return node.Data().Kind() == token
 }
 
 // isKindFn returns true if node's token is equal to the given token of a function, otherwise returns false
-func isKindFn(node *plugin.TokenNode, tokenFn func(token data.TokenKind) bool) bool {
-	return tokenFn(node.Token().Kind())
+func isKindFn(node *doubly.Node[data.Token], tokenFn func(token data.TokenKind) bool) bool {
+	return tokenFn(node.Data().Kind())
 }

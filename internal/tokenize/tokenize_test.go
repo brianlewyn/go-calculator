@@ -5,7 +5,7 @@ import (
 
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-calculator/internal/plugin"
+	"github.com/brianlewyn/go-linked-list/v2/doubly"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -125,11 +125,11 @@ func TestRebuildTokenizedLinkedList(t *testing.T) {
 }
 
 // areEqualList throws t.Error if assert.Equal or assert.EqualValues finds an error
-func areEqualList(t *testing.T, got, want *plugin.TokenList) {
-	n1, n2 := got.Head(), want.Head()
+func areEqualList(t *testing.T, got, want *doubly.Doubly[data.Token]) {
+	n1, n2 := got.NHead(), want.NHead()
 
 	for n1 != nil && n2 != nil {
-		t1, t2 := n1.Token(), n2.Token()
+		t1, t2 := n1.Data(), n2.Data()
 		k1, k2 := t1.Kind(), t2.Kind()
 
 		if assert.Equalf(t, k1, k2, "k1: %c != k2: %c", data.RuneMap[k1], data.RuneMap[k2]) {
@@ -140,7 +140,7 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 			}
 		}
 
-		n1, n2 = n1.Next(), n2.Next()
+		n1, n2 = n1.NNext(), n2.NNext()
 	}
 
 	if !assert.Equal(t, got, want) {
@@ -149,21 +149,21 @@ func areEqualList(t *testing.T, got, want *plugin.TokenList) {
 }
 
 // toList returns the expression in a raw Tokenized Linked List
-func toList(expression string) *plugin.TokenList {
-	k, list := 0, plugin.NewTokenList()
+func toList(expression string) *doubly.Doubly[data.Token] {
+	k, list := 0, doubly.NewDoubly[data.Token]()
 
 	for i, r := range expression {
 		if data.IsDecimal(r) {
 			if i >= k {
 				num := getFullNumber(expression[i:])
-				list.Append(data.NewNumberToken(num))
+				list.DAppend(data.NewNumberToken(num))
 				k = i + len(num)
 			}
 			continue
 		}
 
 		if kind, ok := data.TokenKindMap[r]; ok {
-			list.Append(data.NewSymbolToken(kind))
+			list.DAppend(data.NewSymbolToken(kind))
 		}
 	}
 

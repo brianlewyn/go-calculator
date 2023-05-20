@@ -3,37 +3,37 @@ package analyse
 import (
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-calculator/internal/plugin"
+	"github.com/brianlewyn/go-linked-list/v2/doubly"
 )
 
 // Analyzer returns nil if the math expression has a correct sematic,
 // otherwise returns an error
-func Analyser(list *plugin.TokenList) error {
+func Analyser(list *doubly.Doubly[data.Token]) error {
 	nL, nR := new(int), new(int)
 	var bug error
 
-	bug = isFirstTokenCorrect(list.Head().Token())
+	bug = isFirstTokenCorrect(list.DHead())
 	if bug != nil {
 		return bug
 	}
 
-	bug = isLastTokenCorrect(list.Tail().Token())
+	bug = isLastTokenCorrect(list.DTail())
 	if bug != nil {
 		return bug
 	}
 
-	for temp := list.Head(); temp != nil; temp = temp.Next() {
-		bug = canBeTogether(temp, temp.Next())
+	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
+		bug = canBeTogether(temp, temp.NNext())
 		if bug != nil {
 			return bug
 		}
 
-		bug = isNumTokenCorrect(temp.Token())
+		bug = isNumTokenCorrect(temp.Data())
 		if bug != nil {
 			return bug
 		}
 
-		bug = areCorrectParentheses(temp, list.Tail(), nL, nR)
+		bug = areCorrectParentheses(temp, list.NTail(), nL, nR)
 		if bug != nil {
 			return bug
 		}
@@ -115,13 +115,13 @@ func hasLimitBeenExceeded(limit *uint16) bool {
 
 // canBeTogether returns nil if there are not duplicate kinds,
 // otherwise returns an error
-func canBeTogether(current, next *plugin.TokenNode) error {
+func canBeTogether(current, next *doubly.Node[data.Token]) error {
 	if next == nil {
 		return nil
 	}
 
-	kc1 := current.Token().Kind()
-	kn2 := next.Token().Kind()
+	kc1 := current.Data().Kind()
+	kn2 := next.Data().Kind()
 
 	beTogether := data.CanTokensBeTogether(kc1, kn2)
 	if beTogether {
@@ -132,8 +132,8 @@ func canBeTogether(current, next *plugin.TokenNode) error {
 }
 
 // areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error
-func areCorrectParentheses(current, tail *plugin.TokenNode, nLeft, nRight *int) error {
-	isParanthesesTokenIncrease(current.Token().Kind(), nLeft, nRight)
+func areCorrectParentheses(current, tail *doubly.Node[data.Token], nLeft, nRight *int) error {
+	isParanthesesTokenIncrease(current.Data().Kind(), nLeft, nRight)
 	if *current != *tail {
 		return nil
 	}
