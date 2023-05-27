@@ -19,5 +19,10 @@ func Calculate(expression string) (float64, error) {
 		return 0, err
 	}
 
-	return math.Math(list)
+	res64, err := math.Math(list)
+	if err != nil {
+		return 0, err
+	}
+
+	return res64, nil
 }
