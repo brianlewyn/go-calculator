@@ -21,7 +21,7 @@ func TestAnalyser(t *testing.T) {
 	}{
 		{
 			name: "Bug: First: The first element",
-			list: toList("%"),
+			list: toList("+"),
 			as:   ierr.CtxKindStart,
 			// Try these: % * + - / ) ^
 			// All except these: 0-9, (, ., π, √

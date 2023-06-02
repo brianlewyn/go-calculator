@@ -79,7 +79,9 @@ func rebuildTokenizedLinkedList(list *doubly.Doubly[data.Token]) {
 	}
 
 	if isKind(list.NHead(), data.AddToken) {
-		list.RemoveHead()
+		if list.Size() != 1 {
+			list.RemoveHead()
+		}
 	}
 
 	if isKind(list.NHead(), data.SubToken) {
