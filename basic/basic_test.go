@@ -45,6 +45,26 @@ func TestCalculate(t *testing.T) {
 			want: math.Sqrt(2),
 		},
 		{
+			name: "Double Root Square",
+			expr: "√√2",
+			want: math.Sqrt(math.Sqrt(2)),
+		},
+		{
+			name: "Double Root Square with wrap",
+			expr: "√√(2+4)",
+			want: math.Sqrt(math.Sqrt(2 + 4)),
+		},
+		{
+			name: "Triple Root Square",
+			expr: "√√√2",
+			want: math.Sqrt(math.Sqrt(math.Sqrt(2))),
+		},
+		{
+			name: "Triple Root Square with wrap",
+			expr: "√√√(2+4)",
+			want: math.Sqrt(math.Sqrt(math.Sqrt(2 + 4))),
+		},
+		{
 			name: "Power",
 			expr: "2^2",
 			want: math.Pow(2, 2),

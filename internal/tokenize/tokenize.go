@@ -6,6 +6,11 @@ import (
 	"github.com/brianlewyn/go-linked-list/v2/doubly"
 )
 
+var (
+	left  = data.NewSymbolToken(data.LeftToken)
+	right = data.NewSymbolToken(data.RightToken)
+)
+
 // Tokenizer returns the expression in an Tokenized Linked List and nil,
 // otherwise returns nil and an error
 func Tokenizer(expression string) (*doubly.Doubly[data.Token], error) {
@@ -70,12 +75,14 @@ func rebuildTokenizedLinkedList(list *doubly.Doubly[data.Token]) {
 			continue
 		}
 
-		if canNextAddTokenBeRemoved(temp) {
+		if canRemoveNextAddToken(temp) {
 			list.Disconnect(temp.NNext())
 			continue
 		}
 
-		addParenthesesIfPossible(temp, list)
+		if !canWrapNextSubToken(temp, list) {
+			canWrapNextRootToken(temp, list)
+		}
 	}
 
 	if isKind(list.NHead(), data.AddToken) {
@@ -122,14 +129,14 @@ func areLeftAndSubTokenTogether(node *doubly.Node[data.Token]) bool {
 	return isKind(node.NNext(), data.SubToken)
 }
 
-// canNextAddTokenBeRemoved returns true if AddToken at the next index
+// canRemoveNextAddToken returns true if AddToken at the next index
 // can be removed according to the following rules:
 //
 //	# = { %, *, +, -, /, ^, √, ( }
 //
 //	From: #+n, #+π, #+(, #+√n, #+√π, #+√(...)
-//	To #n, #π, #(, #√n, #√π, #√(...)
-func canNextAddTokenBeRemoved(node *doubly.Node[data.Token]) bool {
+//	To: #n, #π, #(, #√n, #√π, #√(...)
+func canRemoveNextAddToken(node *doubly.Node[data.Token]) bool {
 	if !isKindFn(node, data.IsSpecialToken) {
 		if !isKind(node, data.LeftToken) {
 			return false
@@ -150,7 +157,7 @@ func canNextAddTokenBeRemoved(node *doubly.Node[data.Token]) bool {
 		return false
 	}
 
-	// #+n of a function, #+π
+	// #+n, #+π
 	if isKindFn(temp, data.IsNumPiToken) {
 		return true
 	}
@@ -168,14 +175,76 @@ func canNextAddTokenBeRemoved(node *doubly.Node[data.Token]) bool {
 	return false
 }
 
-// addParenthesesIfPossible adds parentheses according to the following rules:
+// canWrapNextSubToken adds parentheses according to the following rules:
 //
 //	# = {%, *, +, -, /, ^, √}
 //
 //	From: #-n, #-π, #-(, #-√n, #-√π, #-√(...)
-//	To #(-n), #(-π), #(-(...)), #(-√n) #(-√π) #(-√(...))
-func addParenthesesIfPossible(node *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) {
+//	To: #(-n), #(-π), #(-(...)), #(-√n) #(-√π) #(-√(...))
+func canWrapNextSubToken(node *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) bool {
 	if !isKindFn(node, data.IsSpecialToken) {
+		return false
+	}
+
+	temp := node.NNext()
+	if temp == nil {
+		return false
+	}
+
+	if !isKind(temp, data.SubToken) {
+		return false
+	}
+
+	temp = temp.NNext()
+	if temp == nil {
+		return false
+	}
+
+	// #-n, #-π
+	if isKindFn(temp, data.IsNumPiToken) {
+		addParentheseInRangeAfterNode(node, 4, list)
+		return true
+	}
+
+	// #-(...)
+	if isKind(temp, data.LeftToken) {
+		wrapWithOtherParentheses(node, list)
+		return true
+	}
+
+	// #-√
+	if !isKind(temp, data.RootToken) {
+		return true
+	}
+
+	temp = temp.NNext()
+	if temp == nil {
+		return false
+	}
+
+	// #-√n, #-√π
+	if isKindFn(temp, data.IsNumPiToken) {
+		addParentheseInRangeAfterNode(node, 5, list)
+		return true
+	}
+
+	// #-√(...)
+	if isKind(temp, data.LeftToken) {
+		wrapWithOtherParentheses(node, list)
+		return true
+	}
+
+	return false
+}
+
+// canWrapNextRootToken adds parentheses according to the following rules:
+//
+//	Can: √√, √√√, √√√√, ...
+//
+//	From: √√n, √√π, √√(...)
+//	To: √(√n), √(√π), √(√(...))
+func canWrapNextRootToken(node *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) {
+	if !isKind(node, data.RootToken) {
 		return
 	}
 
@@ -184,56 +253,33 @@ func addParenthesesIfPossible(node *doubly.Node[data.Token], list *doubly.Doubly
 		return
 	}
 
-	if !isKind(temp, data.SubToken) {
-		return
-	}
+	for space := 4; true; space++ {
+		if !isKind(temp, data.RootToken) {
+			return
+		}
 
-	temp = temp.NNext()
-	if temp == nil {
-		return
-	}
+		temp = temp.NNext()
+		if temp == nil {
+			return
+		}
 
-	// #-n of a function, #-π
-	if isKindFn(temp, data.IsNumPiToken) {
-		addParentheseInRangeAfterNode(node, 4, list)
-		return
-	}
+		// √√n, √√√n, ...;  √√π, √√√π, ...
+		if isKindFn(temp, data.IsNumPiToken) {
+			addParentheseInRangeAfterNode(node, space, list)
+			return
+		}
 
-	// #-(...)
-	if isKind(temp, data.LeftToken) {
-		wrapWithOtherParentheses(node, list)
-		return
-	}
-
-	// #-√
-	if !isKind(temp, data.RootToken) {
-		return
-	}
-
-	temp = temp.NNext()
-	if temp == nil {
-		return
-	}
-
-	// #-√n, #-√π
-	if isKindFn(temp, data.IsNumPiToken) {
-		addParentheseInRangeAfterNode(node, 5, list)
-		return
-	}
-
-	// #-√(...)
-	if isKind(temp, data.LeftToken) {
-		wrapWithOtherParentheses(node, list)
-		return
+		// √√(...), √√√(...), ...
+		if isKind(temp, data.LeftToken) {
+			wrapWithOtherParentheses(node, list)
+			return
+		}
 	}
 }
 
 // addParentheseInRangeAfterNode adds a LeftToken at the next index of the node and
 // a RightToken at given index after the node
 func addParentheseInRangeAfterNode(node *doubly.Node[data.Token], index int, list *doubly.Doubly[data.Token]) {
-	left := data.NewSymbolToken(data.LeftToken)
-	right := data.NewSymbolToken(data.RightToken)
-
 	list.Connect(node, doubly.NewNode(left))
 	list.ConnectFrom(node, index, doubly.NewNode(right))
 }
@@ -252,9 +298,6 @@ func wrapWithOtherParentheses(node *doubly.Node[data.Token], list *doubly.Doubly
 			nRight++
 
 			if nLeft == nRight {
-				left := data.NewSymbolToken(data.LeftToken)
-				right := data.NewSymbolToken(data.RightToken)
-
 				list.Connect(node, doubly.NewNode(left))
 				list.Connect(temp, doubly.NewNode(right))
 				break
