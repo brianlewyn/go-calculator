@@ -140,7 +140,7 @@ func areEqualList(t *testing.T, g, w *doubly.Doubly[data.Token]) {
 
 // toList returns the expression in a raw Tokenized Linked List
 func toList(expression string) *doubly.Doubly[data.Token] {
-	k, list := 0, doubly.NewDoubly[data.Token]()
+	k, list := 0, doubly.New[data.Token]()
 
 	for i, r := range expression {
 		if data.IsDecimal(r) {

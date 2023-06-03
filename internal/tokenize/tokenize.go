@@ -30,7 +30,7 @@ func Tokenizer(expression string) (*doubly.Doubly[data.Token], error) {
 // toTokenizedLinkedList returns the expression in a raw Tokenized Linked List and nil,
 // otherwise returns nil and an error
 func toTokenizedLinkedList(expression string) (*doubly.Doubly[data.Token], error) {
-	k, list := 0, doubly.NewDoubly[data.Token]()
+	k, list := 0, doubly.New[data.Token]()
 
 	for i, r := range expression {
 		if data.IsDecimal(r) {
