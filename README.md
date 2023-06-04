@@ -17,10 +17,10 @@ The `go-calculator` package provides a function called `Calculate` with the abil
 ---
 
 ## Install
-Use `go get -u` to install the latest version of this package:
+Use `go get` to install this package:
 
 ```sh
-go get -u github.com/brianlewyn/go-calculator
+go get github.com/brianlewyn/go-calculator@v1.0.0
 ```
 
 ## How does it work?
