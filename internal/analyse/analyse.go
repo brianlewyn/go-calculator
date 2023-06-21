@@ -3,36 +3,36 @@ package analyse
 import (
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-linked-list/v2/doubly"
+	"github.com/brianlewyn/go-calculator/internal/doubly"
 )
 
 // Analyzer returns nil if the math expression has a correct sematic,
 // otherwise returns an error
-func Analyser(list *doubly.Doubly[data.Token]) error {
+func Analyser(list *doubly.Doubly) error {
 	nL, nR := new(int), new(int)
 
-	err := isFirstTokenCorrect(list.DHead())
+	err := isFirstTokenCorrect(list.Head().Token())
 	if err != nil {
 		return err
 	}
 
-	err = isLastTokenCorrect(list.DTail())
+	err = isLastTokenCorrect(list.Tail().Token())
 	if err != nil {
 		return err
 	}
 
-	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
-		err := canBeTogether(temp, temp.NNext())
+	for temp := list.Head(); temp != nil; temp = temp.Next() {
+		err := canBeTogether(temp, temp.Next())
 		if err != nil {
 			return err
 		}
 
-		err = isNumTokenCorrect(temp.Data())
+		err = isNumTokenCorrect(temp.Token())
 		if err != nil {
 			return err
 		}
 
-		err = areCorrectParentheses(temp, list.NTail(), nL, nR)
+		err = areCorrectParentheses(temp, list.Tail(), nL, nR)
 		if err != nil {
 			return err
 		}
@@ -63,13 +63,13 @@ func isLastTokenCorrect(token data.Token) error {
 
 // canBeTogether returns nil if there are not duplicate kinds,
 // otherwise returns an error
-func canBeTogether(current, next *doubly.Node[data.Token]) error {
+func canBeTogether(current, next *doubly.Node) error {
 	if next == nil {
 		return nil
 	}
 
-	kCurr := current.Data().Kind()
-	kNext := next.Data().Kind()
+	kCurr := current.Token().Kind()
+	kNext := next.Token().Kind()
 
 	if data.CanTokensBeTogether(kCurr, kNext) {
 		return nil
@@ -114,11 +114,13 @@ func isAbsurdDot(num string) bool {
 }
 
 // areCorrectParentheses returns nil if the number of parentheses is correct, otherwise returns an error
-func areCorrectParentheses(current, tail *doubly.Node[data.Token], nLeft, nRight *int) error {
-	increaseIfIsParanthesesToken(current.Data().Kind(), nLeft, nRight)
+func areCorrectParentheses(current, tail *doubly.Node, nLeft, nRight *int) error {
+	increaseIfIsParanthesesToken(current.Token().Kind(), nLeft, nRight)
+
 	if *current != *tail {
 		return nil
 	}
+
 	return areNLeftEqualToNRight(nLeft, nRight)
 }
 
@@ -128,6 +130,7 @@ func increaseIfIsParanthesesToken(kind data.TokenKind, nLeft, nRight *int) {
 		*nLeft++
 		return
 	}
+
 	if kind == data.RightToken {
 		*nRight++
 	}
@@ -140,8 +143,10 @@ func areNLeftEqualToNRight(nLeft, nRight *int) error {
 	if *nLeft == *nRight {
 		return nil
 	}
+
 	if *nLeft > *nRight {
 		return ierr.IncompleteLeft
 	}
+
 	return ierr.IncompleteRight
 }

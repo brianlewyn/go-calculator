@@ -1,9 +1,3 @@
-github.com/brianlewyn/go-linked-list/v2 v2.1.0 h1:Nclm1hE6Vf5/48hOACkHsH54IP6u0LHTZssTCPoi3mw=
-github.com/brianlewyn/go-linked-list/v2 v2.1.0/go.mod h1:V6aSMb/tqgNFCo7G5bL8GkRtdmnBPTaPa3hdLcUQePI=
-github.com/brianlewyn/go-linked-list/v2 v2.2.0 h1:JehfFIv8kq1Ak4aun5pIKjmtI9L4CLr+dzspyRlA0ZM=
-github.com/brianlewyn/go-linked-list/v2 v2.2.0/go.mod h1:V6aSMb/tqgNFCo7G5bL8GkRtdmnBPTaPa3hdLcUQePI=
-github.com/brianlewyn/go-linked-list/v2 v2.3.0 h1:WHJBHuHSyAFp2IPNT0etLJexepS1583ONPoHO3aNHpA=
-github.com/brianlewyn/go-linked-list/v2 v2.3.0/go.mod h1:V6aSMb/tqgNFCo7G5bL8GkRtdmnBPTaPa3hdLcUQePI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

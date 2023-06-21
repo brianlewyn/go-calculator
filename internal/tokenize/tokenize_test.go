@@ -7,7 +7,7 @@ import (
 
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-linked-list/v2/doubly"
+	"github.com/brianlewyn/go-calculator/internal/doubly"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -127,9 +127,9 @@ func TestRebuildTokenizedLinkedList(t *testing.T) {
 }
 
 // areEqualList throws t.Error if assert.Equal or assert.EqualValues finds an error
-func areEqualList(t *testing.T, g, w *doubly.Doubly[data.Token]) {
-	for n1, n2 := g.NHead(), w.NHead(); n1 != nil && n2 != nil; n1, n2 = n1.NNext(), n2.NNext() {
-		k1, k2 := n1.Data().Kind(), n2.Data().Kind()
+func areEqualList(t *testing.T, g, w *doubly.Doubly) {
+	for n1, n2 := g.Head(), w.Head(); n1 != nil && n2 != nil; n1, n2 = n1.Next(), n2.Next() {
+		k1, k2 := n1.Token().Kind(), n2.Token().Kind()
 		assert.Equal(t, k1, k2, "\n\nk1 != k2\n\n")
 	}
 
@@ -139,21 +139,21 @@ func areEqualList(t *testing.T, g, w *doubly.Doubly[data.Token]) {
 }
 
 // toList returns the expression in a raw Tokenized Linked List
-func toList(expression string) *doubly.Doubly[data.Token] {
-	k, list := 0, doubly.New[data.Token]()
+func toList(expression string) *doubly.Doubly {
+	k, list := 0, doubly.New()
 
 	for i, r := range expression {
 		if data.IsDecimal(r) {
 			if i >= k {
 				num := getFullNumber(expression[i:])
-				list.DAppend(data.NewNumberToken(num))
+				list.PushBack(data.NewNumberToken(num))
 				k = i + len(num)
 			}
 			continue
 		}
 
 		if kind, ok := data.TokenKindMap[r]; ok {
-			list.DAppend(data.NewSymbolToken(kind))
+			list.PushBack(data.NewSymbolToken(kind))
 		}
 	}
 
@@ -161,14 +161,14 @@ func toList(expression string) *doubly.Doubly[data.Token] {
 }
 
 // toString converts a Doubly Linked List to string
-func toString(list *doubly.Doubly[data.Token]) string {
+func toString(list *doubly.Doubly) string {
 	if list.IsEmpty() {
 		return "list <nil>"
 	}
 
 	var b strings.Builder
-	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
-		fmt.Fprintf(&b, "%c", data.RuneMap[temp.Data().Kind()])
+	for temp := list.Head(); temp != nil; temp = temp.Next() {
+		fmt.Fprintf(&b, "%c", data.RuneMap[temp.Token().Kind()])
 	}
 
 	return b.String()
