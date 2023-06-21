@@ -2,10 +2,7 @@ module github.com/brianlewyn/go-calculator
 
 go 1.20
 
-require (
-	github.com/brianlewyn/go-linked-list/v2 v2.2.0
-	github.com/stretchr/testify v1.8.2
-)
+require github.com/stretchr/testify v1.8.2
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

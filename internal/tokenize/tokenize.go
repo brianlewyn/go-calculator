@@ -3,7 +3,7 @@ package tokenize
 import (
 	"github.com/brianlewyn/go-calculator/ierr"
 	"github.com/brianlewyn/go-calculator/internal/data"
-	"github.com/brianlewyn/go-linked-list/v2/doubly"
+	"github.com/brianlewyn/go-calculator/internal/doubly"
 )
 
 var (
@@ -13,7 +13,7 @@ var (
 
 // Tokenizer returns the expression in an Tokenized Linked List and nil,
 // otherwise returns nil and an error
-func Tokenizer(expression string) (*doubly.Doubly[data.Token], error) {
+func Tokenizer(expression string) (*doubly.Doubly, error) {
 	if expression == "" {
 		return nil, ierr.EmptyField
 	}
@@ -29,21 +29,21 @@ func Tokenizer(expression string) (*doubly.Doubly[data.Token], error) {
 
 // toTokenizedLinkedList returns the expression in a raw Tokenized Linked List and nil,
 // otherwise returns nil and an error
-func toTokenizedLinkedList(expression string) (*doubly.Doubly[data.Token], error) {
-	k, list := 0, doubly.New[data.Token]()
+func toTokenizedLinkedList(expression string) (*doubly.Doubly, error) {
+	k, list := 0, doubly.New()
 
 	for i, r := range expression {
 		if data.IsDecimal(r) {
 			if i >= k {
 				num := getFullNumber(expression[i:])
-				list.DAppend(data.NewNumberToken(num))
+				list.PushBack(data.NewNumberToken(num))
 				k = i + len(num)
 			}
 			continue
 		}
 
 		if kind, ok := data.TokenKindMap[r]; ok {
-			list.DAppend(data.NewSymbolToken(kind))
+			list.PushBack(data.NewSymbolToken(kind))
 			continue
 		}
 
@@ -60,23 +60,23 @@ func toTokenizedLinkedList(expression string) (*doubly.Doubly[data.Token], error
 }
 
 // rebuildTokenizedLinkedList returns a rebuilt Tokenized Linked List
-func rebuildTokenizedLinkedList(list *doubly.Doubly[data.Token]) {
-	for temp := list.NHead(); temp != nil; temp = temp.NNext() {
+func rebuildTokenizedLinkedList(list *doubly.Doubly) {
+	for temp := list.Head(); temp != nil; temp = temp.Next() {
 
 		if areRightAndLeftTokenTogether(temp) {
 			symbol := data.NewSymbolToken(data.MulToken)
-			list.Connect(temp, doubly.NewNode(symbol))
+			list.ConnectAfterNode(temp, doubly.NewNode(symbol))
 			continue
 		}
 
 		if areLeftAndSubTokenTogether(temp) {
 			zero := data.NewNumberToken("0")
-			list.Connect(temp, doubly.NewNode(zero))
+			list.ConnectAfterNode(temp, doubly.NewNode(zero))
 			continue
 		}
 
 		if canRemoveNextAddToken(temp) {
-			list.Disconnect(temp.NNext())
+			list.RemoveNode(temp.Next())
 			continue
 		}
 
@@ -85,14 +85,14 @@ func rebuildTokenizedLinkedList(list *doubly.Doubly[data.Token]) {
 		}
 	}
 
-	if isKind(list.NHead(), data.AddToken) {
+	if isKind(list.Head(), data.AddToken) {
 		if list.Size() != 1 {
 			list.RemoveHead()
 		}
 	}
 
-	if isKind(list.NHead(), data.SubToken) {
-		list.DPrepend(data.NewNumberToken("0"))
+	if isKind(list.Head(), data.SubToken) {
+		list.PushFront(data.NewNumberToken("0"))
 	}
 }
 
@@ -112,21 +112,21 @@ func getFullNumber(expression string) string {
 // areRightAndLeftTokenTogether returns true there are a RightToken and a LeftToken together
 //
 //	)( => )*(
-func areRightAndLeftTokenTogether(node *doubly.Node[data.Token]) bool {
-	if !isKind(node, data.RightToken) || node.NNext() == nil {
+func areRightAndLeftTokenTogether(node *doubly.Node) bool {
+	if !isKind(node, data.RightToken) || node.Next() == nil {
 		return false
 	}
-	return isKind(node.NNext(), data.LeftToken)
+	return isKind(node.Next(), data.LeftToken)
 }
 
 // areLeftAndSubTokenTogether returns true there are a LeftToken and a SubToken together
 //
 //	(- => (0-
-func areLeftAndSubTokenTogether(node *doubly.Node[data.Token]) bool {
-	if !isKind(node, data.LeftToken) || node.NNext() == nil {
+func areLeftAndSubTokenTogether(node *doubly.Node) bool {
+	if !isKind(node, data.LeftToken) || node.Next() == nil {
 		return false
 	}
-	return isKind(node.NNext(), data.SubToken)
+	return isKind(node.Next(), data.SubToken)
 }
 
 // canRemoveNextAddToken returns true if AddToken at the next index
@@ -136,14 +136,14 @@ func areLeftAndSubTokenTogether(node *doubly.Node[data.Token]) bool {
 //
 //	From: #+n, #+π, #+(, #+√n, #+√π, #+√(...)
 //	To: #n, #π, #(, #√n, #√π, #√(...)
-func canRemoveNextAddToken(node *doubly.Node[data.Token]) bool {
+func canRemoveNextAddToken(node *doubly.Node) bool {
 	if !isKindFn(node, data.IsSpecialToken) {
 		if !isKind(node, data.LeftToken) {
 			return false
 		}
 	}
 
-	temp := node.NNext()
+	temp := node.Next()
 	if temp == nil {
 		return false
 	}
@@ -152,7 +152,7 @@ func canRemoveNextAddToken(node *doubly.Node[data.Token]) bool {
 		return false
 	}
 
-	temp = temp.NNext()
+	temp = temp.Next()
 	if temp == nil {
 		return false
 	}
@@ -181,12 +181,12 @@ func canRemoveNextAddToken(node *doubly.Node[data.Token]) bool {
 //
 //	From: #-n, #-π, #-(, #-√n, #-√π, #-√(...)
 //	To: #(-n), #(-π), #(-(...)), #(-√n) #(-√π) #(-√(...))
-func canWrapNextSubToken(node *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) bool {
+func canWrapNextSubToken(node *doubly.Node, list *doubly.Doubly) bool {
 	if !isKindFn(node, data.IsSpecialToken) {
 		return false
 	}
 
-	temp := node.NNext()
+	temp := node.Next()
 	if temp == nil {
 		return false
 	}
@@ -195,7 +195,7 @@ func canWrapNextSubToken(node *doubly.Node[data.Token], list *doubly.Doubly[data
 		return false
 	}
 
-	temp = temp.NNext()
+	temp = temp.Next()
 	if temp == nil {
 		return false
 	}
@@ -217,7 +217,7 @@ func canWrapNextSubToken(node *doubly.Node[data.Token], list *doubly.Doubly[data
 		return true
 	}
 
-	temp = temp.NNext()
+	temp = temp.Next()
 	if temp == nil {
 		return false
 	}
@@ -243,12 +243,12 @@ func canWrapNextSubToken(node *doubly.Node[data.Token], list *doubly.Doubly[data
 //
 //	From: √√n, √√π, √√(...)
 //	To: √(√n), √(√π), √(√(...))
-func canWrapNextRootToken(node *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) {
+func canWrapNextRootToken(node *doubly.Node, list *doubly.Doubly) {
 	if !isKind(node, data.RootToken) {
 		return
 	}
 
-	temp := node.NNext()
+	temp := node.Next()
 	if temp == nil {
 		return
 	}
@@ -258,7 +258,7 @@ func canWrapNextRootToken(node *doubly.Node[data.Token], list *doubly.Doubly[dat
 			return
 		}
 
-		temp = temp.NNext()
+		temp = temp.Next()
 		if temp == nil {
 			return
 		}
@@ -279,16 +279,16 @@ func canWrapNextRootToken(node *doubly.Node[data.Token], list *doubly.Doubly[dat
 
 // addParentheseInRangeAfterNode adds a LeftToken at the next index of the node and
 // a RightToken at given index after the node
-func addParentheseInRangeAfterNode(node *doubly.Node[data.Token], index int, list *doubly.Doubly[data.Token]) {
-	list.Connect(node, doubly.NewNode(left))
-	list.ConnectFrom(node, index, doubly.NewNode(right))
+func addParentheseInRangeAfterNode(node *doubly.Node, index int, list *doubly.Doubly) {
+	list.ConnectAfterNode(node, doubly.NewNode(left))
+	list.PushNodeForwardFrom(node, index, doubly.NewNode(right))
 }
 
 // wrapWithOtherParentheses add add parentheses wrapping a sign and another operation with parentheses
-func wrapWithOtherParentheses(node *doubly.Node[data.Token], list *doubly.Doubly[data.Token]) {
+func wrapWithOtherParentheses(node *doubly.Node, list *doubly.Doubly) {
 	var nLeft, nRight int
 
-	for temp := node; temp != nil; temp = temp.NNext() {
+	for temp := node; temp != nil; temp = temp.Next() {
 		if isKind(temp, data.LeftToken) {
 			nLeft++
 			continue
@@ -298,8 +298,8 @@ func wrapWithOtherParentheses(node *doubly.Node[data.Token], list *doubly.Doubly
 			nRight++
 
 			if nLeft == nRight {
-				list.Connect(node, doubly.NewNode(left))
-				list.Connect(temp, doubly.NewNode(right))
+				list.ConnectAfterNode(node, doubly.NewNode(left))
+				list.ConnectAfterNode(temp, doubly.NewNode(right))
 				break
 			}
 		}
@@ -307,11 +307,11 @@ func wrapWithOtherParentheses(node *doubly.Node[data.Token], list *doubly.Doubly
 }
 
 // isKind returns true if the node's kind is equal to the given kind, otherwise returns false
-func isKind(node *doubly.Node[data.Token], token data.TokenKind) bool {
-	return node.Data().Kind() == token
+func isKind(node *doubly.Node, token data.TokenKind) bool {
+	return node.Token().Kind() == token
 }
 
 // isKindFn returns true if node's kind is equal to the given kind of a function, otherwise returns false
-func isKindFn(node *doubly.Node[data.Token], tokenFn func(token data.TokenKind) bool) bool {
-	return tokenFn(node.Data().Kind())
+func isKindFn(node *doubly.Node, tokenFn func(token data.TokenKind) bool) bool {
+	return tokenFn(node.Token().Kind())
 }

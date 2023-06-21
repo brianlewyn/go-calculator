@@ -5,9 +5,8 @@ import (
 	"testing"
 
 	"github.com/brianlewyn/go-calculator/internal/analyse"
-	"github.com/brianlewyn/go-calculator/internal/data"
+	"github.com/brianlewyn/go-calculator/internal/doubly"
 	"github.com/brianlewyn/go-calculator/internal/tokenize"
-	"github.com/brianlewyn/go-linked-list/v2/doubly"
 )
 
 func TestMath(t *testing.T) {
@@ -20,7 +19,7 @@ func TestMath(t *testing.T) {
 }
 
 // toList returns the expression in a raw Tokenized Linked List
-func toList(expression string) *doubly.Doubly[data.Token] {
+func toList(expression string) *doubly.Doubly {
 	list, err1 := tokenize.Tokenizer(expression)
 	if err1 != nil {
 		fmt.Printf("ERROR [1]: %s\n\n", err1)

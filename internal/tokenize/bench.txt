@@ -65,3 +65,20 @@ BenchmarkTokenizer-2   	     100	      3340 ns/op	     856 B/op	      29 allocs/
 BenchmarkTokenizer-2   	     100	      9838 ns/op	     856 B/op	      29 allocs/op
 PASS
 ok  	github.com/brianlewyn/go-calculator/internal/tokenize	0.071s
+
+goos: linux
+goarch: amd64
+pkg: github.com/brianlewyn/go-calculator/internal/tokenize
+cpu: Intel(R) Core(TM) i3-8130U CPU @ 2.20GHz
+BenchmarkTokenizer-2   	     100	      8365 ns/op	     856 B/op	      29 allocs/op
+BenchmarkTokenizer-2   	     100	      2330 ns/op	     856 B/op	      29 allocs/op
+BenchmarkTokenizer-2   	     100	      2585 ns/op	     856 B/op	      29 allocs/op
+BenchmarkTokenizer-2   	     100	      3041 ns/op	     856 B/op	      29 allocs/op
+BenchmarkTokenizer-2   	     100	      3823 ns/op	     856 B/op	      29 allocs/op
+BenchmarkTokenizer-2   	     100	      6348 ns/op	     856 B/op	      29 allocs/op
+BenchmarkTokenizer-2   	     100	      8536 ns/op	     856 B/op	      29 allocs/op
+BenchmarkTokenizer-2   	     100	      7516 ns/op	     856 B/op	      29 allocs/op
+BenchmarkTokenizer-2   	     100	      3181 ns/op	     856 B/op	      29 allocs/op
+BenchmarkTokenizer-2   	     100	      3169 ns/op	     856 B/op	      29 allocs/op
+PASS
+ok  	github.com/brianlewyn/go-calculator/internal/tokenize	0.048s
