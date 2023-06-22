@@ -21,13 +21,19 @@ func TestCalculate(t *testing.T) {
 			name: "Root Square: NaN",
 			expr: "√-2",
 			want: math.Sqrt(-2),
-			is:   ierr.ResultIsNaN,
+			is:   ierr.IsNaN,
 		},
 		{
-			name: "Power: NaN",
+			name: "Power (negative base number): NaN",
 			expr: "(-2)^(1/2)",
 			want: math.Pow(-2, 1.0/2),
-			is:   ierr.ResultIsNaN,
+			is:   ierr.IsNaN,
+		},
+		{
+			name: "Division (number divided by zero): NaN",
+			expr: "100 / 0",
+			want: math.Inf(0),
+			is:   ierr.IsInf,
 		},
 		{
 			name: "Tokenizer: Bug",
@@ -93,6 +99,11 @@ func TestCalculate(t *testing.T) {
 			name: "Solve a complex expression",
 			expr: "(0.5 + 4.5 - 1) * 10 * √(6-2) / 4^2",
 			want: 5,
+		},
+		{
+			name: "Decimal precision",
+			expr: "1.12345 * 1.12345",
+			want: 1.2621399025,
 		},
 	}
 	for _, tt := range tests {

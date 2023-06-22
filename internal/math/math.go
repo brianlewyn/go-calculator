@@ -171,8 +171,15 @@ func deleteParentheses(list *doubly.Doubly, left, right *doubly.Node) {
 }
 
 func result(head *doubly.Node) (float64, error) {
-	if res64 := toDecimal(head); !math.IsNaN(res64) {
-		return res64, nil
+	res64 := toDecimal(head)
+
+	if math.IsNaN(res64) {
+		return 0, ierr.IsNaN
 	}
-	return 0, ierr.ResultIsNaN
+
+	if math.IsInf(res64, 0) {
+		return 0, ierr.IsInf
+	}
+
+	return res64, nil
 }

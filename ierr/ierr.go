@@ -30,7 +30,8 @@ var (
 	EmptyField      = wrap(Syntax, errors.New("empty field"))
 	IncompleteLeft  = wrap(Syntax, errors.New("there are incomplete left parentheses"))
 	IncompleteRight = wrap(Syntax, errors.New("there are incomplete right parentheses"))
-	ResultIsNaN     = wrap(Math, errors.New("reports that the value is \"not a number\""))
+	IsNaN           = wrap(Math, errors.New("reports that the value is \"not a number\""))
+	IsInf           = wrap(Math, errors.New("reports that the value is any type of infinity"))
 )
 
 // !Interface errors
